@@ -3,10 +3,10 @@ name: Build and deploy container app to Azure Web App - 437
 on:
   push:
     branches:
-      - main
+      - release
 
 env:
-    AZURE_WEBAPP_NAME: 437-api   # set this to your application's name
+    AZURE_WEBAPP_NAME: 437-webapp   # set this to your application's name
     CONTAINER_REGISTRY: ${{ secrets.REGISTRY_URL }}  # set secret with Container Registry URL, example : xyz.azurecr.io 
 
 jobs:
@@ -31,10 +31,10 @@ jobs:
                 username: ${{ secrets.REGISTRY_USERNAME }}
                 password: ${{ secrets.REGISTRY_PASSWORD }}
         - run: |
-                docker build api/ -t ${{ env.CONTAINER_REGISTRY }}/437-api:${{ github.sha }}
+                docker build api/ -t ${{ env.CONTAINER_REGISTRY }}/437-api:${{ github.sha }} -t ${{ env.CONTAINER_REGISTRY }}/437-api:latest
                 docker push ${{ env.CONTAINER_REGISTRY }}/437-api:${{ github.sha }}
 
-        # - uses: azure/webapps-deploy@v2
-        #   with:
-        #     app-name:  ${{ env.AZURE_WEBAPP_NAME }}
-        #     images: '${{ env.CONTAINER_REGISTRY }}/437-api:${{ github.sha }}'
+        - uses: azure/webapps-deploy@v2
+          with:
+            app-name:  ${{ env.AZURE_WEBAPP_NAME }}
+            images: '${{ env.CONTAINER_REGISTRY }}/437-api:${{ github.sha }}'
