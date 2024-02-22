@@ -19,5 +19,5 @@ jobs:
     - name: Setup bun
       uses: oven-sh/setup-bun@v1
 
-    - run: cd api
     - run: bun run test
+      working-directory: ./api
