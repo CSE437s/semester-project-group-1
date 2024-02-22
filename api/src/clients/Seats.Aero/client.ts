@@ -11,13 +11,7 @@ class SeatsAero implements SearchClientInterface {
   find_route(params: SeatsCachedSearchParams): Promise<boolean> {
     return new Promise((resolve, reject) => {
       sdk.auth(this.api_key)
-      sdk.cachedSearch({
-        origin_airport: "JFK",
-        destination_airport: "LAX",
-        cabin: "economy",
-        start_date: "2024-05-01",
-        end_date: "2024-05-01" // TODO: as of now, the end_date is not optional
-    })
+      sdk.cachedSearch(params)
         .then(({ data }: { data: any }) => {
           const parsedResponse: ResponseData = {
             data: data.data.map((item: any) => ({
