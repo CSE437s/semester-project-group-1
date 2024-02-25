@@ -1,5 +1,7 @@
-import { SearchClientInterface } from "../client_interface";
 import { ResponseData, SeatsCachedSearchParams } from "./types";
+
+import { SearchClientInterface } from "../client_interface";
+
 const sdk = require('api')('@seatsaero/v1.0#cqdn9uslsnn1wyf');
 
 class SeatsAero implements SearchClientInterface {
@@ -8,15 +10,15 @@ class SeatsAero implements SearchClientInterface {
     this.api_key = api_key
   }
 
-  find_route(params: SeatsCachedSearchParams): Promise<boolean> {
+  find_route(params: SeatsCachedSearchParams): Promise<ResponseData> {
     return new Promise((resolve, reject) => {
       sdk.auth(this.api_key)
       sdk.cachedSearch({
-        origin_airport: "JFK",
-        destination_airport: "LAX",
-        cabin: "economy",
-        start_date: "2024-05-01",
-        end_date: "2024-05-01" // TODO: as of now, the end_date is not optional
+        origin_airport: params.origin_airport,
+        destination_airport: params.destination_airport,
+        cabin: params.cabin,
+        start_date: params.start_date,
+        end_date: params.end_date // TODO: as of now, the end_date is not optional
     })
         .then(({ data }: { data: any }) => {
           const parsedResponse: ResponseData = {
@@ -30,8 +32,7 @@ class SeatsAero implements SearchClientInterface {
             hasMore: data.hasMore,
             cursor: data.cursor
           } as ResponseData;
-          console.log(parsedResponse)
-          resolve(true)
+          return resolve(parsedResponse)
         })
         .catch(console.error)
     })

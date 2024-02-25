@@ -1,7 +1,10 @@
 // The interface that all route-finding clients must adhere to (in our case, just seats.aero)
+
+import { ResponseData } from "./Seats.Aero/types"
+
 // At minimum, we need to be able to take in parameters for a specific route, and return whether or not it's available
 interface SearchClientInterface {
-    find_route: (params: SearchParams) => Promise<boolean>
+    find_route: (params: SearchParams) => Promise<ResponseData>
 }
 
 type SearchParams = {

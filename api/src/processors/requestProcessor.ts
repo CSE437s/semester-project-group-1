@@ -1,18 +1,19 @@
-import { SeatsAero } from "../clients/Seats.Aero/client"
-import { SeatsCachedSearchParams, SEAT_CLASS } from "../clients/Seats.Aero/types";
-import { SearchParams } from "../clients/client_interface";
+import { SEAT_CLASS, SeatsCachedSearchParams } from "../clients/Seats.Aero/types";
 
+import { SearchParams } from "../clients/client_interface";
+import { SeatsAero } from "../clients/Seats.Aero/client"
 
 const handleRequest = async (body: SearchParams) => {
+    console.log(body)
     const seatsAero = new SeatsAero(process.env.SEATS_API!)
     const searchParams: SeatsCachedSearchParams = {
-        origin_airport: "JFK",
-        destination_airport: "LAX",
+        origin_airport: body.origin_airport,
+        destination_airport: body.destination_airport,
         cabin: SEAT_CLASS.ECONOMY,
-        start_date: "2024-05-01",
-        end_date: "2024-05-01" // TODO: as of now, the end_date is not optional
+        start_date: body.start_date,
+        end_date: body.end_date // TODO: as of now, the end_date is not optional
     }
-    await seatsAero.find_route(searchParams)
+    return await seatsAero.find_route(searchParams)
 }
 
 export { handleRequest };

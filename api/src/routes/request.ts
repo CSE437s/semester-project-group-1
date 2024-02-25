@@ -1,8 +1,9 @@
 import { Elysia, t } from "elysia";
+
 import { handleRequest } from "../processors/requestProcessor";
 
-const request = new Elysia({ prefix: '/request' })
-    .post('', async ({ body }) => await handleRequest(body), {
+const request = new Elysia()
+    .post('/request', async ({ body }) => await handleRequest(body), {
         body: t.Object({
             origin_airport: t.String({
                 minLength: 3,
@@ -21,6 +22,12 @@ const request = new Elysia({ prefix: '/request' })
                 default: '2022-01-01',
                 description: 'The departure date',
                 error: 'Invalid departure date'
+            }),
+            end_date: t.String({
+                format: 'date',
+                default: '2022-01-01',
+                description: 'The arrival date',
+                error: 'Invalid arrival date'
             })
         })
     })
