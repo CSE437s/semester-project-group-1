@@ -1,10 +1,13 @@
 import { Elysia } from "elysia";
+import api from "./routes"
+import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
 
-import { request } from "./routes/request";
-
 const app = new Elysia()
-  .use(request)
+  .use(api)
   .use(swagger())
-  .listen(3000)
+  .use(cors())
+  .listen(4000)
+
+export type API = typeof app
   
