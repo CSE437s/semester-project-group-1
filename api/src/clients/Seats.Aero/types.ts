@@ -83,4 +83,4 @@ type ResponseData = {
 }
 
 
-export { SEAT_CLASS, PROGRAMS, REGION, SeatsCachedSearchParams, BulkAvailabilityParams, ResponseData, DataItem }
+export { SEAT_CLASS, PROGRAMS, REGION, type SeatsCachedSearchParams, type BulkAvailabilityParams, type ResponseData, type DataItem }

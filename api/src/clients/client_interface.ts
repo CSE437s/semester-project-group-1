@@ -47,4 +47,4 @@ enum REGION {
     OC = 'Oceania'
 }
 
-export { SEAT_CLASS, PROGRAMS, REGION, SearchClientInterface, SearchParams }
+export { SEAT_CLASS, PROGRAMS, REGION, type SearchClientInterface, type SearchParams }
