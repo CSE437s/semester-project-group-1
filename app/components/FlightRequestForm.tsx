@@ -11,12 +11,15 @@ import {
 } from "@/components/ui/form"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 
+import type { API } from "../../api/src/index";
 import { Button } from "@/components/ui/button"
 import { Calendar } from "./ui/calendar"
 import { CalendarIcon } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { ResponseData } from "../../api/src/clients/Seats.Aero/types"
 import airports from "../lib/airports"
 import { cn } from "@/lib/utils"
+import { edenTreaty } from "@elysiajs/eden"
 import { format } from "date-fns"
 import { promises as fs } from 'fs';
 import { toast } from "@/components/ui/use-toast"
@@ -56,7 +59,14 @@ const FormSchema = z.object({
     endOutDate: z.date(),
 })
 
-export function FlightRequestForm() {
+const api = edenTreaty<API>('http://localhost:4000')
+
+type Props = {
+    setData: (data: ResponseData) => void,
+    setLoading: (loading: boolean) => void
+}
+
+export function FlightRequestForm(props: Props) {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -68,17 +78,19 @@ export function FlightRequestForm() {
   })
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    console.log(data)
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
+    props.setLoading(true)
+    api.api.request.post({
+      origin_airport: data.outboundAirportCode, // TODO: make these names align
+      destination_airport: data.inboundAirportCode,
+      start_date: data.startOutDate.toISOString().split('T')[0],
+      end_date: data.endOutDate.toISOString().split('T')[0]
+    }).then((res: any) => {
+      console.log(res.data)
+      props.setData(res.data as ResponseData)
+      props.setLoading(false)
     })
   }
-
+  
   return (
     <div className="flex flex-row items-center">
         {airports.length === 0 ? <p>Loading...</p> : 

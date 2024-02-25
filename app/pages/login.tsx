@@ -120,7 +120,7 @@ export default function Login() {
                                 }}
                                 />
                                 <Button className="mx-2" onClick={handleCodeSubmit}
-                                onKeyDown={(e) => {
+                                onKeyDown={(e: { key: string }) => {
                                     if (e.key === "Enter") {
                                         handleCodeSubmit()
                                     }
@@ -136,7 +136,7 @@ export default function Login() {
                             }}
                             />
                             <Button className="mx-2" onClick={handleClick}
-                            onKeyDown={(e) => {
+                            onKeyDown={(e: { key: string }) => {
                                 if (e.key === "Enter") {
                                     handleClick()
                                 }
