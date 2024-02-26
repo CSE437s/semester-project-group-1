@@ -4,10 +4,14 @@ import { cors } from '@elysiajs/cors'
 import { swagger } from '@elysiajs/swagger'
 
 const app = new Elysia()
-  .use(api)
-  .use(swagger())
+  .use(api)  
   .use(cors())
-  .listen(4000)
+
+if(process.env.NODE_ENV === 'development') {
+  app.use(swagger()).listen(4000)
+} else {
+  app.listen(4000)
+}
 
 export type API = typeof app
   
