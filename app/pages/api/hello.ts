@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-import { API } from "../../../api/src";
+// import { API } from "../../../api/src";
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { edenTreaty } from "@elysiajs/eden";
+// import { edenTreaty } from "@elysiajs/eden";
 
 type Data = {
   data: string
@@ -10,13 +10,12 @@ type Data = {
 
 const ENDPOINT = process.env.NODE_ENV === "development" ? "http://localhost:4000" : process.env.NEXT_API_URL
 
-const api = edenTreaty<API>(ENDPOINT)
+// const api = edenTreaty<API>(ENDPOINT)
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
   console.log("pin ping")
-  const data = await api.api.hello.get().then((res: any) => res.json())
-  res.status(200).json({ data });
+  res.status(200).json({ data: "Hello"});
 }
