@@ -59,7 +59,8 @@ const FormSchema = z.object({
     endOutDate: z.date(),
 })
 
-const ENDPOINT = process.env.NODE_ENV === "development" ? "http://localhost:4000" : process.env.NEXT_API_URL
+// const ENDPOINT = process.env.NODE_ENV === "development" ? "http://localhost:4000" : process.env.NEXT_API_URL
+const ENDPOINT = "https://437-webapp.azurewebsites.net"
 
 // const api = edenTreaty<API>(ENDPOINT!)
 
@@ -86,11 +87,13 @@ export function FlightRequestForm(props: Props) {
     //   destination_airport: data.inboundAirportCode,
     //   start_date: data.startOutDate.toISOString().split('T')[0],
     //   end_date: data.endOutDate.toISOString().split('T')[0]
+    
     fetch(`${ENDPOINT}/api/request`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
         },
+        "mode": "cors",
         body: JSON.stringify({
           origin_airport: data.outboundAirportCode, // TODO: make these names align
           destination_airport: data.inboundAirportCode,
