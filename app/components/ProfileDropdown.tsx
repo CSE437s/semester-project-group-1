@@ -20,7 +20,7 @@ export function ProfileDropdown() {
 
     const handleLogout = async () => {
         await supabaseClient.auth.signOut()
-        await router.push("/")
+        await router.push("/login")
     }
 
     return (
