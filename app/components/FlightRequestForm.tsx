@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/form"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 
-import type { API } from "../../api/src/index";
+// import type { API } from "../../api/src/index";
 import { Button } from "@/components/ui/button"
 import { Calendar } from "./ui/calendar"
 import { CalendarIcon } from "lucide-react"
@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input"
 import { ResponseData } from "../../api/src/clients/Seats.Aero/types"
 import airports from "../lib/airports"
 import { cn } from "@/lib/utils"
-import { edenTreaty } from "@elysiajs/eden"
+// import { edenTreaty } from "@elysiajs/eden"
 import { format } from "date-fns"
 import { promises as fs } from 'fs';
 import { toast } from "@/components/ui/use-toast"
@@ -61,7 +61,7 @@ const FormSchema = z.object({
 
 const ENDPOINT = process.env.NODE_ENV === "development" ? "http://localhost:4000" : process.env.NEXT_API_URL
 
-const api = edenTreaty<API>(ENDPOINT!)
+// const api = edenTreaty<API>(ENDPOINT!)
 
 type Props = {
     setData: (data: ResponseData) => void,
@@ -81,14 +81,30 @@ export function FlightRequestForm(props: Props) {
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     props.setLoading(true)
-    api.api.request.post({
-      origin_airport: data.outboundAirportCode, // TODO: make these names align
-      destination_airport: data.inboundAirportCode,
-      start_date: data.startOutDate.toISOString().split('T')[0],
-      end_date: data.endOutDate.toISOString().split('T')[0]
-    }).then((res: any) => {
-      console.log(res.data)
-      props.setData(res.data as ResponseData)
+    // api.api.request.post({
+    //   origin_airport: data.outboundAirportCode, // TODO: make these names align
+    //   destination_airport: data.inboundAirportCode,
+    //   start_date: data.startOutDate.toISOString().split('T')[0],
+    //   end_date: data.endOutDate.toISOString().split('T')[0]
+    fetch(`${ENDPOINT}/api/request`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          origin_airport: data.outboundAirportCode, // TODO: make these names align
+          destination_airport: data.inboundAirportCode,
+          start_date: data.startOutDate.toISOString().split('T')[0],
+          end_date: data.endOutDate.toISOString().split('T')[0]
+        })
+    }).then((res) => {
+      if (res.status === 500) {
+        throw new Error("Internal server error")
+      }
+      return res
+    }).then((res) => res.json()).then((res) => {
+      console.log(res)
+      props.setData(res as ResponseData)
       props.setLoading(false)
     })
   }
