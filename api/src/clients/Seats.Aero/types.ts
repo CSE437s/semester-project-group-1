@@ -1,4 +1,4 @@
-import { SEAT_CLASS, REGION, PROGRAMS, SearchParams } from '../client_interface';
+import { PROGRAMS, REGION, SEAT_CLASS, SearchParams } from '../client_interface';
 
 type SeatsParams = {
     cursor: string,
@@ -7,7 +7,7 @@ type SeatsParams = {
     skip: number,
 }
 
-type SeatsCachedSearchParams = SearchParams | SeatsParams
+type SeatsCachedSearchParams = SearchParams // | SeatsParams
 
 interface BulkAvailabilityParams {
     source: PROGRAMS,
@@ -83,4 +83,4 @@ type ResponseData = {
 }
 
 
-export { SEAT_CLASS, PROGRAMS, REGION, SeatsCachedSearchParams, BulkAvailabilityParams, ResponseData}
+export { SEAT_CLASS, PROGRAMS, REGION, type SeatsCachedSearchParams, type BulkAvailabilityParams, type ResponseData, type DataItem }
