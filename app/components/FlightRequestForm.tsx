@@ -59,7 +59,9 @@ const FormSchema = z.object({
     endOutDate: z.date(),
 })
 
-const api = edenTreaty<API>('http://localhost:4000')
+const ENDPOINT = process.env.NODE_ENV === "development" ? "https://437-webapp.azurewebsites.net" : process.env.NEXT_API_URL
+
+const api = edenTreaty<API>(ENDPOINT!)
 
 type Props = {
     setData: (data: ResponseData) => void,

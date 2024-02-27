@@ -11,8 +11,6 @@ import { useState } from "react"
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
 
 // check if we are on the dev env or prod, and assign BASE accordingly
-const BASE = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "TODO" //FIXME:
-console.log(BASE)
 
 const validEmail = (email: string): boolean => {
     const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
