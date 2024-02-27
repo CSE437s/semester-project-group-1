@@ -8,7 +8,9 @@ type Data = {
   data: string
 };
 
-const api = edenTreaty<API>('https://437-webapp.azurewebsites.net')
+const ENDPOINT = process.env.NODE_ENV === "development" ? "http://localhost:4000" : process.env.NEXT_API_URL
+
+const api = edenTreaty<API>(ENDPOINT)
 
 export default async function handler(
   req: NextApiRequest,

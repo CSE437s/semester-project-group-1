@@ -59,7 +59,7 @@ const FormSchema = z.object({
     endOutDate: z.date(),
 })
 
-const ENDPOINT = process.env.NODE_ENV === "development" ? "https://437-webapp.azurewebsites.net" : process.env.NEXT_API_URL
+const ENDPOINT = process.env.NODE_ENV === "development" ? "http://localhost:4000" : process.env.NEXT_API_URL
 
 const api = edenTreaty<API>(ENDPOINT!)
 
