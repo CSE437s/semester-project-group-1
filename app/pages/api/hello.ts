@@ -8,7 +8,7 @@ type Data = {
   data: string
 };
 
-const api = edenTreaty<API>('https://localhost:4000')
+const api = edenTreaty<API>('https://437-webapp.azurewebsites.net')
 
 export default async function handler(
   req: NextApiRequest,
