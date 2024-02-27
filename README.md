@@ -11,3 +11,5 @@
 ## Instructions/Link to access: 
 
 https://437-group-proj-downstream.vercel.app/
+
+User testing available at [USERTESTING.md](USERTESTING.md)
