@@ -52,6 +52,7 @@ export default function Login() {
         }
         setLoading(false)
         if (session) {
+            setLoading(true)
             // set session
             // redirect to /studios
             await supabaseClient.auth.setSession(session)
@@ -74,9 +75,15 @@ export default function Login() {
                 email: email,
             })
             if (error) {
+                console.log(error.message)
                 switch (error.message) {
                     case "Signups not allowed for otp":
                         alert("No account exists. Please sign up") //FIXME:
+                        break
+                    case "Email rate limit exceeded":
+                        alert("Email rate limit exceeded due to Supabase free tier limitations. Please try again later.")
+                    case "For security purposes, you can only request this once every 60 seconds":
+                        alert("60 second rate limit hit, please try again in a minute")
                         break
                     default:
                         alert("There was an error. Please try again.") // TODO: make better
