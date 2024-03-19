@@ -1,10 +1,8 @@
-import { SEAT_CLASS, SeatsCachedSearchParams } from "../clients/Seats.Aero/types";
+import { SEAT_CLASS, SeatsCachedSearchParams } from "./types"
 
-import { SearchParams } from "../clients/client_interface";
-import { SeatsAero } from "../clients/Seats.Aero/client"
+import { SeatsAero } from "./client"
 
-const handleRequest = async (body: SearchParams) => {
-    console.log(body)
+const handleRequest = async (body: SeatsCachedSearchParams) => {
     const seatsAero = new SeatsAero(process.env.SEATS_API!)
     const searchParams: SeatsCachedSearchParams = {
         origin_airport: body.origin_airport,

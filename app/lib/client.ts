@@ -1,6 +1,4 @@
-import { ResponseData, SeatsCachedSearchParams } from "./types";
-
-import { SearchClientInterface } from "../client_interface";
+import { ResponseData, SearchClientInterface, SeatsCachedSearchParams } from "./types";
 
 const sdk = require('api')('@seatsaero/v1.0#cqdn9uslsnn1wyf');
 

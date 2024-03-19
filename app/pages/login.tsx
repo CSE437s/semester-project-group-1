@@ -2,25 +2,17 @@
  * v0 by Vercel.
  * @see https://v0.dev/t/XNlTLb7
  */
-// import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useRouter } from "next/router"
 import { useState } from "react"
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
-
-// check if we are on the dev env or prod, and assign BASE accordingly
-
-const validEmail = (email: string): boolean => {
-    const regex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    return regex.test(email)
-}
+import { validEmail } from "@/lib/utils"
 
 export default function Login() {
     const supabaseClient = useSupabaseClient()
     const router = useRouter()
-    // const user = useUser()
 
     const [sent, setSent] = useState(false)
     const [email, setEmail] = useState("")
@@ -53,8 +45,6 @@ export default function Login() {
         setLoading(false)
         if (session) {
             setLoading(true)
-            // set session
-            // redirect to /studios
             await supabaseClient.auth.setSession(session)
             await router.push("/")
         }

@@ -1,39 +1,12 @@
-import { DataItem, ResponseData } from "../../api/src/clients/Seats.Aero/types";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
 import { FlightRequestForm } from "@/components/FlightRequestForm";
 import Navbar from "@/components/Navbar";
+import { ResponseData } from "@/lib/types";
+import { getMinCost } from "@/lib/utils";
 
-export const dynamic = 'force-dynamic'
-
-export type Todo = {
-  id: number;
-  title: string;
-  completed: boolean;
-  date: Date;
-};
-
-export type NewTodo = {
-  title: string;
-  date: Date;
-};
-
-
-const getMinCost = (data: DataItem) => {
-  const fields = [
-    "J", "W", "Y", "F"
-  ]
-  let minCost = Infinity
-  fields.forEach((field) => {
-    const availField = `${field}Available`
-    const costField = `${field}MileageCost`
-    if (data[availField as keyof DataItem] && data[costField as keyof DataItem] < minCost) {
-      minCost = data[costField as keyof DataItem]
-    }
-  })
-  return minCost
-}
+export const dynamic = 'force-dynamic' // TODO: this was here for a reason, figure out why
 
 export default function Home(
 ) {
