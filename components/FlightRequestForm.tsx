@@ -14,7 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "./ui/calendar"
 import { CalendarIcon } from "lucide-react"
-import { ResponseData } from "@/lib/types"
+import { FlightResponseData } from "@/lib/route-types"
 import airports from "@/lib/airports"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
@@ -38,7 +38,7 @@ const FormSchema = z.object({
 })
 
 type Props = {
-    setData: (data: ResponseData) => void,
+    setData: (data: FlightResponseData) => void,
     setLoading: (loading: boolean) => void
 }
 
@@ -55,8 +55,8 @@ export function FlightRequestForm(props: Props) {
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     props.setLoading(true)
-
-    fetch('/api/get-flights',{
+    
+    fetch('/api/get-flights-basic',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -65,7 +65,7 @@ export function FlightRequestForm(props: Props) {
         outboundAirportCode: data.outboundAirportCode,
         inboundAirportCode: data.inboundAirportCode,
         outboundDate: data.startOutDate,
-        inboundDate: data.endOutDate
+        inboundDate: data.endOutDate,
       })
     }).then((res) => {
         if (res.status === 500) {
@@ -75,7 +75,7 @@ export function FlightRequestForm(props: Props) {
         return res
     }
     ).then((res) => res.json()).then((res) => {
-        props.setData(res as ResponseData)
+        props.setData(res as FlightResponseData)
         props.setLoading(false)
     }) // TODO: add error catching
   }

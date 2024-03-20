@@ -1,3 +1,5 @@
+import { FlightResponseData } from "./route-types";
+
 type SeatsParams = {
     cursor: string,
     take: number,
@@ -73,16 +75,9 @@ type DataItem = {
     AvailabilityTrips: null | any; // Adjust type accordingly if possible
 }
 
-type ResponseData = {
-    data: DataItem[];
-    count: number;
-    hasMore: boolean;
-    cursor: number;
-}
-
 // At minimum, we need to be able to take in parameters for a specific route, and return whether or not it's available
 interface SearchClientInterface {
-    find_route: (params: SearchParams) => Promise<ResponseData>
+    find_route: (params: SearchParams) => Promise<FlightResponseData>
 }
 
 type SearchParams = {
@@ -125,20 +120,6 @@ enum REGION {
     OC = 'Oceania'
 }
 
-type BasicFlightRequest = {
-    outboundAirportCode: string,
-    inboundAirportCode: string,
-    outboundDate: Date,
-    inboundDate: Date,
-}
-
-type BasicFlightRequestStringified = {
-    outboundAirportCode: string,
-    inboundAirportCode: string,
-    outboundDate: string,
-    inboundDate: string,
-}
-
 type Airport = {
     "icao": string,
     "iata": string,
@@ -156,18 +137,16 @@ type AirportMap = {
     [key: string]: Airport
 }
 
-export { SEAT_CLASS,
+export { 
+    SEAT_CLASS,
     PROGRAMS,
     REGION,
     type SearchClientInterface,
     type SeatsCachedSearchParams,
     type BulkAvailabilityParams,
-    type ResponseData,
     type DataItem,
     type Route,
     type SeatsParams,
-    type BasicFlightRequest,
     type Airport,
     type AirportMap,
-    type BasicFlightRequestStringified,
 }

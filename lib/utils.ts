@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { BasicFlightRequestStringified, DataItem, SeatsCachedSearchParams } from "./types"
+import { DataItem, SeatsCachedSearchParams } from "./types"
+import { BasicFlightRequestStringified } from "./route-types"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
