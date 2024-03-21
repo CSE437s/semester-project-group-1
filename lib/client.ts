@@ -1,4 +1,6 @@
-import { ResponseData, SearchClientInterface, SeatsCachedSearchParams } from "./types";
+import { SearchClientInterface, SeatsCachedSearchParams } from "./types";
+
+import { FlightResponseData } from "./route-types";
 
 const sdk = require('api')('@seatsaero/v1.0#cqdn9uslsnn1wyf');
 
@@ -8,7 +10,7 @@ class SeatsAero implements SearchClientInterface {
     this.api_key = api_key
   }
 
-  find_route(params: SeatsCachedSearchParams): Promise<ResponseData> {
+  find_route(params: SeatsCachedSearchParams): Promise<FlightResponseData> {
     return new Promise((resolve, reject) => {
       sdk.auth(this.api_key)
       sdk.cachedSearch({
@@ -19,7 +21,7 @@ class SeatsAero implements SearchClientInterface {
         end_date: params.end_date // TODO: as of now, the end_date is not optional
     })
         .then(({ data }: { data: any }) => {
-          const parsedResponse: ResponseData = {
+          const parsedResponse: FlightResponseData = {
             data: data.data.map((item: any) => ({
               ...item,
               Route: {
@@ -29,7 +31,7 @@ class SeatsAero implements SearchClientInterface {
             count: data.count,
             hasMore: data.hasMore,
             cursor: data.cursor
-          } as ResponseData;
+          } as FlightResponseData;
           return resolve(parsedResponse)
         })
         .catch(console.error)
