@@ -4,8 +4,14 @@
 import { Home } from "lucide-react";
 import Link from "next/link";
 import { ProfileDropdown } from "./ProfileDropdown";
+import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 
 export default function Navbar() {
+  // Get supabase user
+  const sb = useSupabaseClient();
+  const user: User | null = useUser()
+  // If user isn't logged in, don't show settings button
+
   return (
     <div className="flex flex-row justify-between items-center w-full h-16 bg-white border-b border-gray-200">
       <div className="flex flex-row items-center">
@@ -16,9 +22,10 @@ export default function Navbar() {
                     </Link> */}
         </div>
       </div>
+      
       <div className="flex flex-row items-center">
         <div className="flex flex-row items-center mr-4">
-          <ProfileDropdown />
+          {user && <ProfileDropdown />}
         </div>
       </div>
     </div>

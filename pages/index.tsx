@@ -18,7 +18,6 @@ export default function Home(
   
   return (
     <div className="w-[100vw] max-h-[100vh] flex flex-col justify-center items-between">
-      <Navbar />
       <div className="flex flex-row justify-center items-center h-[80vh]">
         <FlightRequestForm setData={setData} setLoading={setLoading} />
       </div>
