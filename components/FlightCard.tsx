@@ -88,6 +88,9 @@ function FlightCard(props: Props) {
         ) : (
           <></>
         )}
+        <div className="flex justify-center m-0 p-0 text-sm">
+          <img width="50px" src="../lib/drag-handle.svg" alt="draggable"></img>
+        </div>
         <div className="text-lg">{props.title}</div>
         <div className="text-sm font-light">{props.description}</div>
         {props.x == false ? (
