@@ -29,21 +29,28 @@ type Props = {
   data: FlightResponseData;
 };
 
-function FlightStoreMobile(props: any) {
+function FlightStoreMobile(props: Props) {
   const [board, setBoard] = useState<any[] | []>([]);
+
+  const FlightList = props.data.data.map((item, idx) => ({
+    ...item,
+    idx: idx,
+  }));
 
   const handleRemove = (id: any) => {
     console.log("here");
     console.log(id);
 
-    setBoard(board.filter((card) => card.id !== id));
+    setBoard(board.filter((flight) => flight.idx !== id));
     // TODO
     // remove card from your saved list in db
   };
 
   const addCardToBoard = (id: any) => {
-    const cardList: any = CardList.filter((card: any) => id === card.id);
-    setBoard((board) => [...board, cardList[0]]);
+    const flightList: any = FlightList.filter(
+      (flight: any) => id === flight.idx
+    );
+    setBoard((board) => [...board, flightList[0]]);
     // TODO
     // add card to your saved list in db
   };
@@ -54,13 +61,13 @@ function FlightStoreMobile(props: any) {
         Flight Results
       </div>
       <div className="flex  items-center justify-center flex-col">
-        {CardList.map((card) => {
-          console.log(props.data.data);
+        {FlightList.map((flight) => {
           return (
             <FlightCardMobile
-              description={card.description}
-              title={card.title}
-              id={card.id}
+              description="description"
+              title="title"
+              id={flight.idx}
+              item={flight}
               addCardToBoard={addCardToBoard}
               handleRemove={handleRemove}
               x={false}
@@ -73,12 +80,13 @@ function FlightStoreMobile(props: any) {
       </div>
       <div className="flex flex-row justify-center">
         <div className="w-[80vw] no-scrollbar rounded-xl p-8 border-2 border-solid border-slate-400 flex flex-col flex-nowrap overflow-y-scroll   overflow-x-hidden h-auto justify-center bg-[#fafafa]">
-          {board.map((card) => {
+          {board.map((flight) => {
             return (
               <FlightCardMobile
-                description={card.description}
-                title={card.title}
-                id={card.id}
+                description="description"
+                title="title"
+                id={flight.idx}
+                item={flight}
                 x={true}
                 addCardToBoard={addCardToBoard}
                 handleRemove={handleRemove}

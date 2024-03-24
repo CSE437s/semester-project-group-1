@@ -32,6 +32,16 @@ const CardList = [
     title: "Card 5",
     description: "Description of card 5",
   },
+  {
+    id: 6,
+    title: "Card 5",
+    description: "Description of card 5",
+  },
+  {
+    id: 7,
+    title: "Card 5",
+    description: "Description of card 5",
+  },
 ];
 
 // cards added to board should be removed from card list.
@@ -52,18 +62,25 @@ function FlightStore(props: Props) {
     }),
   }));
 
+  const FlightList = props.data.data.map((item, idx) => ({
+    ...item,
+    idx: idx,
+  }));
+
   const handleRemove = (id: any) => {
     console.log("here");
     console.log(id);
 
-    setBoard(board.filter((card) => card.id !== id));
+    setBoard(board.filter((flight) => flight.idx !== id));
     // TODO
     // remove card from your saved list in db
   };
 
   const addCardToBoard = (id: any) => {
-    const cardList: any = CardList.filter((card: any) => id === card.id);
-    setBoard((board) => [...board, cardList[0]]);
+    const flightList: any = FlightList.filter(
+      (flight: any) => id === flight.idx
+    );
+    setBoard((board) => [...board, flightList[0]]);
     // TODO
     // add card to your saved list in db
   };
@@ -73,14 +90,27 @@ function FlightStore(props: Props) {
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d]">
         Flight Results
       </div>
-      <div className="flex flex-row justify-center flex-wrap max-w[700px]">
-        {CardList.map((card) => {
+      <div className="flex flex-row justify-center flex-wrap max-w-[800px]">
+        {/* {CardList.map((card) => {
           console.log(props.data.data);
+          console.log(Flightlist);
           return (
             <FlightCard
               description={card.description}
               title={card.title}
               id={card.id}
+              handleRemove={handleRemove}
+              x={false}
+            />
+          );
+        })} */}
+        {FlightList.map((flight) => {
+          return (
+            <FlightCard
+              description="description"
+              title="title"
+              id={flight.idx}
+              item={flight}
               handleRemove={handleRemove}
               x={false}
             />
@@ -95,12 +125,13 @@ function FlightStore(props: Props) {
           className="max-w-[800px] min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-slate-400 flex flex-row flex-nowrap overflow-y-hidden   overflow-x-scroll h-auto justify-start bg-[#fafafa]"
           ref={drop}
         >
-          {board.map((card) => {
+          {board.map((flight) => {
             return (
               <FlightCard
-                description={card.description}
-                title={card.title}
-                id={card.id}
+                description={"description"}
+                title={"title"}
+                item={flight}
+                id={flight.idx}
                 x={true}
                 handleRemove={handleRemove}
               />

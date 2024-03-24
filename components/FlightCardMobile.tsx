@@ -1,10 +1,12 @@
 import React, { useState, useRef } from "react";
 import { Button } from "./ui/button";
 import { FlightResponseData } from "@/lib/route-types";
+import { getMinCost } from "@/lib/utils";
 
 // Update props
 type Props = {
   data?: FlightResponseData;
+  item?: any;
   description?: string;
   title?: string;
   id: number;
@@ -25,10 +27,10 @@ function FlightCardMobile(props: Props) {
     ref.current?.scrollIntoView({ behavior: "auto" });
   };
 
-  function displayModal(card: any, setModal: any) {
+  function displayModal(card: any, setModal: any, item: any) {
     return (
       <div className="z-40 text-black h-[100vh] absolute top-0 left-0 flex justify-center items-center w-screen bg-slate-600/80">
-        <div className="w-[50vw] h-[50vh] p-8 border-solid b-1 border-slate-100 bg-white relative">
+        <div className="w-[50vw] h-[50vh] p-8 border-solid b-1 border-slate-200 bg-white relative rounded-lg">
           <div
             onClick={() => {
               setModal(false);
@@ -40,8 +42,13 @@ function FlightCardMobile(props: Props) {
               <div className="text-3xl">x</div>
             </div>
           </div>
-          <div className="text-xl">{card.title}</div>
-          <div className="text-sm">{card.description}</div>
+          <div className="text-xl">{"Flight: " + (item.idx + 1)}</div>
+          <div className="text-sm">{item.Date}</div>
+          <div className="text-sm">
+            {" "}
+            {item.Route.OriginAirport} to {item.Route.DestinationAirport}
+          </div>
+          <div className="text-sm">{getMinCost(item)}</div>
         </div>
       </div>
     );
@@ -49,7 +56,7 @@ function FlightCardMobile(props: Props) {
 
   return (
     <div>
-      {showModal == true ? displayModal(props, setModal) : <></>}
+      {showModal == true ? displayModal(props, setModal, props.item) : <></>}
       <div
         onClick={() => {}}
         ref={ref}
@@ -65,8 +72,10 @@ function FlightCardMobile(props: Props) {
         ) : (
           <></>
         )}
-        <div className="text-lg">{props.title}</div>
-        <div className="text-sm font-light">{props.description}</div>
+        <div className="text-lg">{"Flight: " + (props.item.idx + 1)}</div>
+        <div className="text-sm font-light">
+          {"Points: " + getMinCost(props.item)}
+        </div>
         <div className="flex justify-center space-x-2">
           <Button
             onClick={() => {
