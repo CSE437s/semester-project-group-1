@@ -4,12 +4,22 @@
 import { Home } from "lucide-react";
 import Link from "next/link";
 import { ProfileDropdown } from "./ProfileDropdown";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuIndicator,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "@/components/ui/navigation-menu";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 
 export default function Navbar() {
   // Get supabase user
   const sb = useSupabaseClient();
-  const user: User | null = useUser()
+  const user: User | null = useUser();
   // If user isn't logged in, don't show settings button
 
   return (
@@ -20,9 +30,19 @@ export default function Navbar() {
           {/* <Link href="/studios">
                         <div className="text-2xl font-bold ml-4"><Home /></div>
                     </Link> */}
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Item One</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <NavigationMenuLink>Link</NavigationMenuLink>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
       </div>
-      
+
       <div className="flex flex-row items-center">
         <div className="flex flex-row items-center mr-4">
           {user && <ProfileDropdown />}

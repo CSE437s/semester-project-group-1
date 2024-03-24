@@ -8,8 +8,8 @@
 
 ## TA: Raj Thakkar
 
-## Instructions/Link to access: 
+## Instructions/Link to access:
 
 https://437-group-proj-downstream.vercel.app/
 
-User testing available at [USERTESTING.md](USERTESTING.md)
+User testing for the beta available at [USERTESTING2.md](USERTESTING2.md)
