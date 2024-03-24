@@ -13,14 +13,20 @@ type Props = {
   addCardToBoard: (id: number) => void;
   x: boolean;
   handleRemove: (id: number) => void;
+  reference: any;
 };
 
 function FlightCardMobile(props: Props) {
   const [showModal, setModal] = useState(false);
   const ref = useRef<any>(null);
+  const ref2 = props.reference;
   // const [card, setCard] = useState<any | null>();
   const handleClick = () => {
     window.scrollTo({ top: 0, behavior: "auto" });
+  };
+
+  const handleClick3 = () => {
+    ref2.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleClick2 = () => {
@@ -91,6 +97,7 @@ function FlightCardMobile(props: Props) {
               onClick={() => {
                 if (props.x == false) {
                   props.addCardToBoard(props.id);
+                  handleClick3();
                 }
               }}
               className="z-2 text-xs font-thin w-[100px]"

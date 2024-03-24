@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import React, { useState, useEffect, useRef } from "react";
 import FlightCardMobile from "./FlightCardMobile";
 import { FlightResponseData } from "@/lib/route-types";
 
@@ -31,28 +32,57 @@ type Props = {
 
 function FlightStoreMobile(props: Props) {
   const [board, setBoard] = useState<any[] | []>([]);
+  const sb = useSupabaseClient();
+  const user: User | null = useUser();
+
+  const ref = useRef<any>(null);
+
+  useEffect(() => {
+    async function getData() {
+      if (user != null) {
+        let data = await sb
+          .from("saved_flights")
+          .select("flight_id")
+          .eq("user_id", user.id);
+        // console.log(data);
+      }
+      // TODO
+      // Potentially add flights to the board below, but need to make a request again for flights
+    }
+
+    getData();
+    // console.log(user);
+    // console.log(props.data.data);
+  }, []);
 
   const FlightList = props.data.data.map((item, idx) => ({
     ...item,
     idx: idx,
   }));
 
-  const handleRemove = (id: any) => {
-    console.log("here");
-    console.log(id);
-
+  const handleRemove = async (id: any) => {
+    const flightList: any = FlightList.filter(
+      (flight: any) => id === flight.idx
+    );
     setBoard(board.filter((flight) => flight.idx !== id));
-    // TODO
-    // remove card from your saved list in db
+    if (user !== null) {
+      await sb
+        .from("saved_flights")
+        .delete()
+        .match({ flight_id: flightList[0].ID, user_id: user.id });
+    }
   };
 
-  const addCardToBoard = (id: any) => {
+  const addCardToBoard = async (id: any) => {
     const flightList: any = FlightList.filter(
       (flight: any) => id === flight.idx
     );
     setBoard((board) => [...board, flightList[0]]);
-    // TODO
-    // add card to your saved list in db
+    if (user !== null) {
+      await sb
+        .from("saved_flights")
+        .insert({ flight_id: flightList[0].ID, user_id: user.id });
+    }
   };
 
   return (
@@ -71,15 +101,16 @@ function FlightStoreMobile(props: Props) {
               addCardToBoard={addCardToBoard}
               handleRemove={handleRemove}
               x={false}
+              reference={ref}
             />
           );
         })}
       </div>
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d]">
-        Tap flights above to save them
+        Flights currently saved for later
       </div>
-      <div className="flex flex-row justify-center">
-        <div className="w-[80vw] no-scrollbar rounded-xl p-8 border-2 border-solid border-slate-400 flex flex-col flex-nowrap overflow-y-scroll   overflow-x-hidden h-auto justify-center bg-[#fafafa]">
+      <div ref={ref} className="flex flex-row justify-center">
+        <div className="w-[80vw] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-col flex-nowrap overflow-y-scroll   overflow-x-hidden h-auto justify-center bg-[#2c2c2c]">
           {board.map((flight) => {
             return (
               <FlightCardMobile
@@ -90,6 +121,7 @@ function FlightStoreMobile(props: Props) {
                 x={true}
                 addCardToBoard={addCardToBoard}
                 handleRemove={handleRemove}
+                reference={ref}
               />
             );
           })}

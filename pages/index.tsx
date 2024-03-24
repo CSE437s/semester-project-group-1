@@ -32,6 +32,9 @@ export default function Home() {
   const user: User | null = useUser();
   const router = useRouter();
 
+  const [gotFlights, setGotFlights] = useState(false);
+  const [savedFlights, setSavedFlights] = useState<any>();
+
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<FlightResponseData | undefined>();
 
@@ -124,9 +127,25 @@ export default function Home() {
   }
 
   function renderSaved() {
+    async function getSavedFlights() {
+      if (user != null) {
+        let flights = await sb
+          .from("saved_flights")
+          .select("flight_id")
+          .eq("user_id", user.id);
+        console.log(flights);
+        setSavedFlights(flights);
+        setGotFlights(true);
+      }
+    }
+    if (!gotFlights) {
+      getSavedFlights();
+    }
+
     return (
       <>
-        {/* TODO add flights from db */}
+        {/* TODO make api calls for all flights from db to get information with te flights in savedFlights */}
+
         <div className="flex flex-col items-center">
           <div className="text-center font-bold text-[#fafafa] text-2xl w-[400px] my-5">
             See your saved flights here
@@ -186,7 +205,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#1f1b24] text-[#fafafa] overflow-x-hidden w-screen max-w-[100vw] min-h-[100vh] flex flex-col  relative">
-      <div className="flex m-5 flex-col justify-center items-center min-[1000px]:space-x-14 w-full min-[1000px]:flex-row">
+      <div className="flex m-5 flex-col justify-center items-center min-[1000px]:space-x-14 w-full min-[1000px]:flex-row text-xs min-[1000px]:text-sm">
         <div className="text-white font-bold text-lg">
           Fli<span className="text-cyan-300">ghts</span>
         </div>
@@ -219,7 +238,7 @@ export default function Home() {
           </NavigationMenuList>
         </NavigationMenu>
         <Avatar onClick={() => changePage("profile")}>
-          <AvatarFallback className="bg-[#ee6c4d] cursor-pointer p-1 rounded-full text-white hover:bg-black hover:text-white transition-all">
+          <AvatarFallback className="bg-[#ee6c4d] cursor-pointer p-1 rounded-full text-white hover:bg-black hover:text-white transition-all text-sm">
             {user == null ? "JD" : user.email?.substring(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>

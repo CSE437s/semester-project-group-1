@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import React, { useState, useEffect } from "react";
 import FlightCard from "./FlightCard";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "./Constants";
@@ -53,6 +54,26 @@ type Props = {
 
 function FlightStore(props: Props) {
   const [board, setBoard] = useState<any[] | []>([]);
+  const sb = useSupabaseClient();
+  const user: User | null = useUser();
+
+  useEffect(() => {
+    async function getData() {
+      if (user != null) {
+        let data = await sb
+          .from("saved_flights")
+          .select("flight_id")
+          .eq("user_id", user.id);
+        // console.log(data);
+      }
+      // TODO
+      // Potentially add flights to the board below, but need to make a request again for flights
+    }
+
+    getData();
+    // console.log(user);
+    // console.log(props.data.data);
+  }, []);
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
@@ -67,22 +88,29 @@ function FlightStore(props: Props) {
     idx: idx,
   }));
 
-  const handleRemove = (id: any) => {
-    console.log("here");
-    console.log(id);
-
+  const handleRemove = async (id: any) => {
+    const flightList: any = FlightList.filter(
+      (flight: any) => id === flight.idx
+    );
     setBoard(board.filter((flight) => flight.idx !== id));
-    // TODO
-    // remove card from your saved list in db
+    if (user !== null) {
+      await sb
+        .from("saved_flights")
+        .delete()
+        .match({ flight_id: flightList[0].ID, user_id: user.id });
+    }
   };
 
-  const addCardToBoard = (id: any) => {
+  const addCardToBoard = async (id: any) => {
     const flightList: any = FlightList.filter(
       (flight: any) => id === flight.idx
     );
     setBoard((board) => [...board, flightList[0]]);
-    // TODO
-    // add card to your saved list in db
+    if (user !== null) {
+      await sb
+        .from("saved_flights")
+        .insert({ flight_id: flightList[0].ID, user_id: user.id });
+    }
   };
 
   return (
@@ -107,6 +135,7 @@ function FlightStore(props: Props) {
         {FlightList.map((flight) => {
           return (
             <FlightCard
+              key={flight.idx}
               description="description"
               title="title"
               id={flight.idx}
@@ -118,16 +147,17 @@ function FlightStore(props: Props) {
         })}
       </div>
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d]">
-        Drag flights from above to save them
+        Drag any flights below to save them for later
       </div>
       <div className="flex flex-row justify-center">
         <div
-          className="max-w-[800px] min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-slate-400 flex flex-row flex-nowrap overflow-y-hidden   overflow-x-scroll h-auto justify-start bg-[#fafafa]"
+          className="max-w-[800px] min-h-[200px] min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden   overflow-x-scroll h-auto justify-start bg-[#2c2c2c]"
           ref={drop}
         >
           {board.map((flight) => {
             return (
               <FlightCard
+                key={flight.idx}
                 description={"description"}
                 title={"title"}
                 item={flight}
