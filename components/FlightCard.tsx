@@ -6,6 +6,7 @@ import { FlightResponseData } from "@/lib/route-types";
 import { getMinCost } from "@/lib/utils";
 import Image from "next/image";
 import svg from "../public/drag-handle.svg";
+import airlines from "@/lib/airlines";
 
 // Update props
 type Props = {
@@ -99,10 +100,15 @@ function FlightCard(props: Props) {
               return (
                 <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
                   <div className="text-sm font-semibold">
+                    {/* {airlines.find((element) => {
+                      if (element.code == airline) {
+                        return element.airline;
+                      }
+                    })} */}
                     Airline: {airline}
                   </div>
                   <div className="text-sm font-normal">
-                    Direct Flight: {direct}
+                    Direct Flight: {direct ? "Yes" : "No"}
                   </div>
                   <div className="text-sm font-normal">
                     Remaining Seats: {seats}

@@ -104,7 +104,7 @@ function FlightCardMobile(props: Props) {
                     Airline: {airline}
                   </div>
                   <div className="text-sm font-normal">
-                    Direct Flight: {direct}
+                    Direct Flight: {direct ? "Yes" : "No"}
                   </div>
                   <div className="text-sm font-normal">
                     Remaining Seats: {seats}
