@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { FlightResponseData } from "@/lib/route-types";
 import { getMinCost } from "@/lib/utils";
 import Image from "next/image";
+import svg from "../public/drag-handle.svg";
 
 // Update props
 type Props = {
@@ -157,9 +158,10 @@ function FlightCard(props: Props) {
         )}
         <div className="flex justify-center m-0 p-0 text-sm">
           <Image
-            width={50}
-            height={50}
-            src="../public/drag-handle.svg"
+            className="rotate-90 -mt-3"
+            width={30}
+            height={30}
+            src={svg}
             alt="draggable"
           />
           {/* <img width="50px" src="drag-handle.svg" alt="draggable"></img> */}
