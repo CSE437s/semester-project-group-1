@@ -22,11 +22,13 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "./ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { FlightOption } from "@/lib/availability-types";
+import { ReducedFlightRequestForm } from "./ReducedFlightRequestForm";
 import airports from "@/lib/airports";
 import { cn } from "@/lib/utils";
 import { fetchFlights } from "@/lib/requestHandler";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -51,6 +53,8 @@ const FormSchema = z.object({
   endRangeSearch: z.date(),
 });
 
+export type RequestFormData = z.infer<typeof FormSchema>;
+
 type Props = {
   setData: (data: FlightOption[]) => void;
   setLoading: (loading: boolean) => void;
@@ -58,6 +62,8 @@ type Props = {
 };
 
 export function FlightRequestForm(props: Props) {
+  const [expanded, setExpanded] = useState(true);
+  const [data, setData] = useState<RequestFormData>();
   const handleClick = () => {
     props.reference.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -74,15 +80,20 @@ export function FlightRequestForm(props: Props) {
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     props.setLoading(true);
-
+    setData(data);
     const res = await fetchFlights(data as BasicFlightRequest)
     props.setData(res);
     props.setLoading(false);
+    setExpanded(false)
     handleClick();
     window.scrollTo({ top: 700, behavior: "smooth" });
   };
 
   return (
+    <div>
+    {!expanded ? (
+      <ReducedFlightRequestForm data={data} setExpanded={setExpanded} />
+    ) : (
     <div className="flex flex-row items-center">
       {airports.length === 0 ? (
         <p>Loading...</p>
@@ -319,10 +330,15 @@ export function FlightRequestForm(props: Props) {
                 )}
               />
             </div>
-            <Button type="submit">Submit</Button>
+            <div className="flex flex-row justify-between w-full">
+              <Button type="submit">Submit</Button>
+              {data && <Button onClick={() => setExpanded(false)}>Compress</Button>}
+            </div>
           </form>
         </Form>
       )}
+    </div>
+    )}
     </div>
   );
 }

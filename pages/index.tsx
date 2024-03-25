@@ -20,6 +20,7 @@ import FlightStore from "@/components/FlightStore";
 import FlightStoreMobile from "@/components/FlightStoreMobile";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Input } from "@/components/ui/input";
+import { ReducedFlightRequestForm } from "@/components/ReducedFlightRequestForm";
 import { useRouter } from "next/router";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
@@ -54,34 +55,22 @@ export default function Home() {
     await router.push("/" + pageToChangeTo);
   };
 
+  // midnight today
+  const date1 = new Date();
+  date1.setHours(0, 0, 0, 0);
+  const date2 = new Date();
+  date2.setHours(23, 59, 59, 999);
+
   function renderInput() {
     return (
       <>
-        <div className="flex flex-row justify-center items-center h-[80vh] -m-10">
+        <div className="flex flex-col justify-center items-center h-auto m-10">
           <FlightRequestForm
             setData={setData}
             setLoading={setLoading}
             reference={ref}
           />
         </div>
-        {/* <div className="flex flex-row p-3 w-[80vw] items-center justify-center">
-          {data !== undefined &&
-            data.data.map((item, idx) => {
-              return (
-                <div key={idx} className="flex flex-col p-3 m-3">
-                  <p>Flight: {idx + 1}</p>
-                  <p>{item.Date}</p>
-                  <p>
-                    {item.Route.OriginAirport} to{" "}
-                    {item.Route.DestinationAirport}
-                  </p>
-                  <p>{getMinCost(item)}</p>
-                </div>
-              );
-            })}
-          {loading && <p>Loading...</p>}
-        </div> */}
-        {/* TODO make the cards consume the data from search */}
         <div ref={ref}>
           <div className="flex justify-center text-[#ee6c4d] font-bold text-xl">
             {loading && <div>Loading...</div>}
