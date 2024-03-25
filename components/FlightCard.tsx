@@ -1,18 +1,14 @@
-import React, { useState, useRef } from "react";
-import { ItemTypes } from "./Constants";
-import { useDrag } from "react-dnd";
-import { Button } from "./ui/button";
-import { FlightResponseData } from "@/lib/route-types";
-import { getMinCost } from "@/lib/utils";
+import { AvailabilitySegment, FlightOptionWIndex } from "@/lib/availability-types";
+import React, { useRef, useState } from "react";
+
 import Image from "next/image";
+import { ItemTypes } from "./Constants";
 import svg from "../public/drag-handle.svg";
-import airlines from "@/lib/airlines";
-import { FlightOption } from "@/lib/availability-types";
+import { useDrag } from "react-dnd";
 
 // Update props
 type Props = {
-  item?: any;
-  data?: FlightOption;
+  item: FlightOptionWIndex;
   description?: string;
   title?: string;
   id: number;
@@ -20,10 +16,17 @@ type Props = {
   handleRemove: (id: number) => void;
 };
 
+const getOriginAirport = (segments: AvailabilitySegment[]) => {
+  return segments[0].OriginAirport;
+}
+
+const getDestinationAirport = (segments: AvailabilitySegment[]) => {
+  return segments[segments.length - 1].DestinationAirport;
+}
+
 function FlightCard(props: Props) {
   const [showModal, setModal] = useState(false);
   const ref = useRef<any>(null);
-  // const [card, setCard] = useState<any | null>();
   const handleClick = () => {
     window.scrollTo({ top: 0, behavior: "auto" });
   };
@@ -31,10 +34,7 @@ function FlightCard(props: Props) {
   const handleClick2 = () => {
     ref.current?.scrollIntoView({ behavior: "auto" });
   };
-
-  function displayModal(card: any, setModal: any, item: any) {
-    // console.log(item);
-    let flightOptions = ["F", "J", "W", "Y"];
+  const displayModal = (props: Props, setModal: React.Dispatch<React.SetStateAction<boolean>>, item: FlightOptionWIndex) => {
     return (
       <div className="z-40 drop-shadow-lg text-black h-[100vh] absolute top-0 left-0 flex justify-center items-center w-screen bg-slate-600/80">
         <div className="w-[50vw] h-[50vh] p-8 pb-10 border-solid b-1 border-slate-200 bg-white relative rounded-lg">
@@ -53,71 +53,27 @@ function FlightCard(props: Props) {
             {"Flight: " + (item.idx + 1)}
           </div>
           <div className="text-base text-center font-normal">
-            Date: {item.Date}
+            Date: {item.DepartsAt}  {/*  TODO: may not be what we want to display */}
           </div>
           <div className="text-base text-center font-normal">
-            From: {item.Route.OriginAirport} to {item.Route.DestinationAirport}
+            From: {getOriginAirport(item.AvailabilitySegments)} to {getDestinationAirport(item.AvailabilitySegments)}
           </div>
           <div className="text-lg font-normal text-center mb-2">
             Flight Options
           </div>
           <div className="grid grid-rows-2 grid-cols-2 gap-4">
-            {flightOptions.map((element) => {
-              const airline =
-                element == "F"
-                  ? item.FAirlines
-                  : element == "J"
-                  ? item.JAirlines
-                  : element == "W"
-                  ? item.WAirlines
-                  : item.YAirlines;
-              const direct =
-                element == "F"
-                  ? item.FDirect
-                  : element == "J"
-                  ? item.JDirect
-                  : element == "W"
-                  ? item.WDirect
-                  : item.YDirect;
-              const seats =
-                element == "F"
-                  ? item.FRemainingSeats
-                  : element == "J"
-                  ? item.JRemainingSeats
-                  : element == "W"
-                  ? item.WRemainingSeats
-                  : item.YRemainingSeats;
-              const points =
-                element == "F"
-                  ? item.FMileageCost
-                  : element == "J"
-                  ? item.JMileageCost
-                  : element == "W"
-                  ? item.WMileageCost
-                  : item.YMileageCost;
-              if (airline == "") {
-                return <div className="hidden"></div>;
-              }
-              return (
                 <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
                   <div className="text-sm font-semibold">
-                    {/* {airlines.find((element) => {
-                      if (element.code == airline) {
-                        return element.airline;
-                      }
-                    })} */}
-                    Airline: {airline}
+                    Airline: {item.Carriers}
                   </div>
                   <div className="text-sm font-normal">
-                    Direct Flight: {direct ? "Yes" : "No"}
+                    Direct Flight: {item.Stops === 0 ? "Yes" : "No"}
                   </div>
                   <div className="text-sm font-normal">
-                    Remaining Seats: {seats}
+                    Remaining Seats: {item.RemainingSeats}
                   </div>
-                  <div className="text-sm font-normal">Points: {points}</div>
+                  <div className="text-sm font-normal">Points: {item.MileageCost}</div>
                 </div>
-              );
-            })}
           </div>
         </div>
       </div>
@@ -175,7 +131,7 @@ function FlightCard(props: Props) {
         </div>
         <div className="text-lg">{"Flight: " + (props.item.idx + 1)}</div>
         <div className="text-sm font-light">
-          {"Points: " + getMinCost(props.item)}
+          {"Points: " + props.item.MileageCost }
         </div>
         {props.x == false ? (
           <div className=" text-xs font-thin">Click for details</div>

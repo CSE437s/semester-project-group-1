@@ -1,5 +1,5 @@
-import { BasicFlightRequest, FlightResponseData } from "./route-types";
 import { AvailabilityResponseData, FlightOption } from "./availability-types";
+import { BasicFlightRequest, FlightResponseData } from "./route-types";
 
 /* This file contains a list of functions that should be called from the frontend */
 
@@ -41,6 +41,7 @@ async function fetchFlights(data: BasicFlightRequest) : Promise<FlightOption[]> 
 
     } catch (error) {
         // TODO: handle error
+        return []
     }
 }
 
