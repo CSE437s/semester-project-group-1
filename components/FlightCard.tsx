@@ -24,6 +24,36 @@ const getDestinationAirport = (segments: AvailabilitySegment[]) => {
   return segments[segments.length - 1].DestinationAirport;
 }
 
+const getFlightNumbers = (item: FlightOptionWIndex) => {
+  const parseFlightNumsFromString = (flightNums: string): string[] => {
+    return flightNums.split(",").map((num) => num.trim());
+  }
+  const flightNums = parseFlightNumsFromString(item.FlightNumbers);
+  return `Flight #${flightNums.length > 1 ? "s" : ""}: ${flightNums.join(", ")}`
+}
+
+const getStops = (segments: AvailabilitySegment[]) => {
+  return segments.length - 1;
+}
+
+const getFlightDuration = (segments: AvailabilitySegment[]) => {
+  const firstDeparture = new Date(segments[0].DepartsAt);
+  const lastArrival = new Date(segments[segments.length - 1].ArrivesAt);
+  return (lastArrival.getTime() - firstDeparture.getTime()) / 60000;
+}
+
+const displayDuration = (duration: number) => {
+  // if under an hour, display in minutes. Otherwise, display in hours and minutes
+  if (duration < 60) {
+    return `${duration} minutes`;
+  } else {
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+
+    return `${hours} hour${hours > 1 ? "s" : ""}, ${minutes} minutes`;
+  }
+}
+
 function FlightCard(props: Props) {
   const [showModal, setModal] = useState(false);
   const ref = useRef<any>(null);
@@ -107,7 +137,7 @@ function FlightCard(props: Props) {
             handleClick();
           }
         }}
-        className="z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg min-w-[200px] w-auto p-4 mx-2 my-2 h-auto border border-solid border-[#ee6c4d] flex flex-col justify-start text-black"
+        className="z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg w-[250px] h-[200px] p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black"
       >
         {props.x == true ? (
           <div
@@ -127,11 +157,15 @@ function FlightCard(props: Props) {
             src={svg}
             alt="draggable"
           />
-          {/* <img width="50px" src="drag-handle.svg" alt="draggable"></img> */}
         </div>
-        <div className="text-lg">{"Flight: " + (props.item.idx + 1)}</div>
-        <div className="text-sm font-light">
-          {"Points: " + props.item.MileageCost }
+        <div className="text-sm font-light flex flex-col">
+          <p>{getFlightNumbers(props.item)}</p>
+          <p>{`Departs: ${new Date(props.item.DepartsAt).toLocaleString()}`}</p>
+          <p>{`Arrives: ${new Date(props.item.ArrivesAt).toLocaleString()}`}</p>
+          <p>{`${getOriginAirport(props.item.AvailabilitySegments)} -> ${getDestinationAirport(props.item.AvailabilitySegments)}, ${getStops(props.item.AvailabilitySegments)} stops`}</p>
+          <p>{`Duration: ${displayDuration(getFlightDuration(props.item.AvailabilitySegments))}`}</p>
+          <p>{"Airline: " + props.item.Carriers}</p>
+          <p>{"Points: " + props.item.MileageCost }</p>
         </div>
         {props.x == false ? (
           <div className=" text-xs font-thin">Click for details</div>
@@ -139,18 +173,6 @@ function FlightCard(props: Props) {
           <></>
         )}
       </div>
-      {/* {props.x == false ? (
-        <div className="flex justify-center">
-          <div
-            onClick={() => setModal(true)}
-            className="text-xs bg-slate-200 p-2 cursor-pointer text-black rounded-md hover:bg-slate-100"
-          >
-            Details
-          </div>
-        </div>
-      ) : (
-        <></>
-      )} */}
     </div>
   );
 }
