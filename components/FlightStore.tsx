@@ -4,6 +4,7 @@ import FlightCard from "./FlightCard";
 import { useDrop } from "react-dnd";
 import { ItemTypes } from "./Constants";
 import { FlightResponseData } from "@/lib/route-types";
+import { FlightOption } from "@/lib/availability-types";
 
 // TODO
 // These cards are flight cards and should be pulled from the flights that the user searches for
@@ -49,7 +50,7 @@ const CardList = [
 // don't need to keep trakc of cards added, but if you press x they should be removed from saved
 
 type Props = {
-  data: FlightResponseData;
+  data: FlightOption[];
 };
 
 function FlightStore(props: Props) {
@@ -83,7 +84,7 @@ function FlightStore(props: Props) {
     }),
   }));
 
-  const FlightList = props.data.data.map((item, idx) => ({
+  const FlightList = props.data.map((item, idx) => ({
     ...item,
     idx: idx,
   }));

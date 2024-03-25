@@ -7,11 +7,12 @@ import { getMinCost } from "@/lib/utils";
 import Image from "next/image";
 import svg from "../public/drag-handle.svg";
 import airlines from "@/lib/airlines";
+import { FlightOption } from "@/lib/availability-types";
 
 // Update props
 type Props = {
   item?: any;
-  data?: FlightResponseData;
+  data?: FlightOption;
   description?: string;
   title?: string;
   id: number;

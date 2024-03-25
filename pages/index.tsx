@@ -9,7 +9,6 @@ import FlightStore from "@/components/FlightStore";
 import FlightStoreMobile from "@/components/FlightStoreMobile";
 
 import { FlightRequestForm } from "@/components/FlightRequestForm";
-import { FlightResponseData } from "@/lib/route-types";
 import Navbar from "@/components/Navbar";
 import { getMinCost } from "@/lib/utils";
 import { useRouter } from "next/router";
@@ -24,6 +23,7 @@ import {
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FlightOption } from "@/lib/availability-types";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
 
@@ -36,7 +36,7 @@ export default function Home() {
   const [savedFlights, setSavedFlights] = useState<any>();
 
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<FlightResponseData | undefined>();
+  const [data, setData] = useState<FlightOption[] | undefined>();
 
   const [screen, setScreen] = useState(1001);
   useEffect(() => {
@@ -185,7 +185,7 @@ export default function Home() {
     );
   }
 
-  function renderDragCards(data: FlightResponseData) {
+  function renderDragCards(data: FlightOptions) {
     return (
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-row justify-center h-auto -m-10">
@@ -195,7 +195,7 @@ export default function Home() {
     );
   }
 
-  function renderMobileCards(data: FlightResponseData) {
+  function renderMobileCards(data: FlightOptions) {
     return (
       <div>
         <FlightStoreMobile data={data} />

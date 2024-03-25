@@ -24,7 +24,7 @@ interface AvailabilitySegment {
     Order: number;
 }
 
-interface FlightOptions {
+interface FlightOption {
     ID: string;
     RouteID: string;
     AvailabilityID: string;
@@ -54,10 +54,10 @@ interface CoordinateData {
 }
 
 interface AvailabilityResponseData {
-    data: FlightOptions[];
+    data: FlightOption[];
     origin_coordinates: CoordinateData;
     destination_coordinates: CoordinateData;
     booking_links: BookingLink[];
 }
 
-export type { AvailabilityResponseData, CoordinateData, FlightOptions, BookingLink, AvailabilitySegment }
+export type { AvailabilityResponseData, CoordinateData, FlightOption, BookingLink, AvailabilitySegment }

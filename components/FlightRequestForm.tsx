@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "./ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { BasicFlightRequest } from "@/lib/route-types";
-import { FlightOptions } from "@/lib/route-types";
+import { FlightOption } from "@/lib/availability-types";
 import airports from "@/lib/airports";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -52,7 +52,7 @@ const FormSchema = z.object({
 });
 
 type Props = {
-  setData: (data: FlightOptions[]) => void;
+  setData: (data: FlightOption[]) => void;
   setLoading: (loading: boolean) => void;
   reference: any;
 };
@@ -76,7 +76,7 @@ export function FlightRequestForm(props: Props) {
     props.setLoading(true);
 
     const res = await fetchFlights(data as BasicFlightRequest)
-    props.setData(res as FlightOptions[]);
+    props.setData(res);
     props.setLoading(false);
     handleClick();
     window.scrollTo({ top: 700, behavior: "smooth" });

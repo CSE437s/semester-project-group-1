@@ -45,7 +45,6 @@ class SeatsAero implements SearchClientInterface {
   async get_trips(id: string): Promise<AvailabilityResponseData> {
     try {
       await sdk.auth(this.api_key);
-      console.log("Attempting", id)
       const { data } = await sdk.getTrips({id: id});
 
       return data as AvailabilityResponseData;
