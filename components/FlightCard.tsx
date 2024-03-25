@@ -1,4 +1,4 @@
-import { AvailabilitySegment, FlightOptionWIndex } from "@/lib/availability-types";
+import { AvailabilitySegment, FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
 import React, { useRef, useState } from "react";
 
 import Image from "next/image";
@@ -8,12 +8,11 @@ import { useDrag } from "react-dnd";
 
 // Update props
 type Props = {
-  item: FlightOptionWIndex;
+  item: FlightOption;
   description?: string;
   title?: string;
-  id: number;
   x: boolean;
-  handleRemove: (id: number) => void;
+  handleRemove: (flight: FlightOption) => void;
 };
 
 const getOriginAirport = (segments: AvailabilitySegment[]) => {
@@ -24,7 +23,7 @@ const getDestinationAirport = (segments: AvailabilitySegment[]) => {
   return segments[segments.length - 1].DestinationAirport;
 }
 
-const getFlightNumbers = (item: FlightOptionWIndex) => {
+const getFlightNumbers = (item: FlightOption) => {
   const parseFlightNumsFromString = (flightNums: string): string[] => {
     return flightNums.split(",").map((num) => num.trim());
   }
@@ -64,7 +63,16 @@ function FlightCard(props: Props) {
   const handleClick2 = () => {
     ref.current?.scrollIntoView({ behavior: "auto" });
   };
-  const displayModal = (props: Props, setModal: React.Dispatch<React.SetStateAction<boolean>>, item: FlightOptionWIndex) => {
+
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: ItemTypes.CARD,
+    item: props.item,
+    collect: (monitor) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  }));
+
+  const displayModal = (props: Props, setModal: React.Dispatch<React.SetStateAction<boolean>>, item: FlightOption) => {
     return (
       <div className="z-40 drop-shadow-lg text-black h-[100vh] absolute top-0 left-0 flex justify-center items-center w-screen bg-slate-600/80">
         <div className="w-[50vw] h-[50vh] p-8 pb-10 border-solid b-1 border-slate-200 bg-white relative rounded-lg">
@@ -79,9 +87,9 @@ function FlightCard(props: Props) {
               <div className="text-3xl">x</div>
             </div>
           </div>
-          <div className="text-xl font-bold text-center text-cyan-300">
+          {/* <div className="text-xl font-bold text-center text-cyan-300">
             {"Flight: " + (item.idx + 1)}
-          </div>
+          </div> */}
           <div className="text-base text-center font-normal">
             Date: {item.DepartsAt}  {/*  TODO: may not be what we want to display */}
           </div>
@@ -92,31 +100,23 @@ function FlightCard(props: Props) {
             Flight Options
           </div>
           <div className="grid grid-rows-2 grid-cols-2 gap-4">
-                <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
-                  <div className="text-sm font-semibold">
-                    Airline: {item.Carriers}
-                  </div>
-                  <div className="text-sm font-normal">
-                    Direct Flight: {item.Stops === 0 ? "Yes" : "No"}
-                  </div>
-                  <div className="text-sm font-normal">
-                    Remaining Seats: {item.RemainingSeats}
-                  </div>
-                  <div className="text-sm font-normal">Points: {item.MileageCost}</div>
-                </div>
+            <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
+              <div className="text-sm font-semibold">
+                Airline: {item.Carriers}
+              </div>
+              <div className="text-sm font-normal">
+                Direct Flight: {item.Stops === 0 ? "Yes" : "No"}
+              </div>
+              <div className="text-sm font-normal">
+                Remaining Seats: {item.RemainingSeats}
+              </div>
+              <div className="text-sm font-normal">Points: {item.MileageCost}</div>
+            </div>
           </div>
         </div>
       </div>
     );
   }
-
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: ItemTypes.CARD,
-    item: { id: props.id },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  }));
 
   return (
     <div
@@ -141,7 +141,7 @@ function FlightCard(props: Props) {
       >
         {props.x == true ? (
           <div
-            onClick={() => props.handleRemove(props.id)}
+            onClick={() => props.handleRemove(props.item)}
             className="z-2 absolute top-0 right-0 text-sm p-2 rounded-full cursor-pointer hover:bg-slate-200"
           >
             x
@@ -162,10 +162,13 @@ function FlightCard(props: Props) {
           <p>{getFlightNumbers(props.item)}</p>
           <p>{`Departs: ${new Date(props.item.DepartsAt).toLocaleString()}`}</p>
           <p>{`Arrives: ${new Date(props.item.ArrivesAt).toLocaleString()}`}</p>
-          <p>{`${getOriginAirport(props.item.AvailabilitySegments)} -> ${getDestinationAirport(props.item.AvailabilitySegments)}, ${getStops(props.item.AvailabilitySegments)} stops`}</p>
+          <p>{`${getOriginAirport(props.item.AvailabilitySegments)} -> 
+              ${getDestinationAirport(props.item.AvailabilitySegments)}, 
+              ${getStops(props.item.AvailabilitySegments)} 
+              ${getStops(props.item.AvailabilitySegments) !== 1 ? 'stops' : 'stop'}`}</p>
           <p>{`Duration: ${displayDuration(getFlightDuration(props.item.AvailabilitySegments))}`}</p>
           <p>{"Airline: " + props.item.Carriers}</p>
-          <p>{"Points: " + props.item.MileageCost }</p>
+          <p>{"Points: " + props.item.MileageCost}</p>
         </div>
         {props.x == false ? (
           <div className=" text-xs font-thin">Click for details</div>

@@ -13,20 +13,35 @@ type Props = {
 };
 
 function FlightStore(props: Props) {
-  const [board, setBoard] = useState<any[] | []>([]);
+  const SORT_METHODS = {
+    PRICE: "PRICE",
+    DURATION: "DURATION",
+    STOPS: "STOPS",
+  };
+
+  const [board, setBoard] = useState<FlightOption[] | []>([]);
   const sb = useSupabaseClient();
   const user: User | null = useUser();
+
+  const [sortMethod, setSortMethod] = useState(SORT_METHODS.PRICE);
+  const [numFlightsToReturn, setNumFlightsToReturn] = useState(8); // TODO: enforce this number by screen size?
+  // Could also implement a "show more" button
 
   useEffect(() => {
     async function getData() {
       if (user != null) {
-        const data = await sb
+        console.log("ping sb")
+        const {data} = await sb
           .from("saved_flights")
           .select("flight_id")
           .eq("user_id", user.id);
+        
+        // Add all matching flight IDs to board
+        if (data !== null){
+          const matchingFlights = props.data.filter((flight) => data.some((item) => item.flight_id === flight.ID));
+          setBoard(matchingFlights)
+        }
       }
-      // TODO
-      // Potentially add flights to the board below, but need to make a request again for flights
     }
 
     getData();
@@ -34,7 +49,9 @@ function FlightStore(props: Props) {
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    drop: (item: any) => addCardToBoard(item.id),
+    drop: (item: any) => {
+      saveFlight(item)
+    },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
@@ -45,56 +62,41 @@ function FlightStore(props: Props) {
     idx: idx,
   }));
 
-  const handleRemove = async (id: number) => {
-    const flightList: FlightOptionWIndex[] = FlightList.filter(
-      (flight) => id === flight.idx
-    );
-    setBoard(board.filter((flight) => flight.idx !== id));
+  const saveFlight = async (flight: FlightOption) => {
+    setBoard((board) => [...board, flight]);
+    if (user !== null) {
+      await sb
+        .from("saved_flights")
+        .insert({ flight_id: flight.ID, availability_id: flight.AvailabilityID, user_id: user.id });
+    }
+  };
+
+  const deleteSavedFlight = async (flight: FlightOption) => {
+    setBoard((board) => board.filter((item) => item.ID !== flight.ID));
     if (user !== null) {
       await sb
         .from("saved_flights")
         .delete()
-        .match({ flight_id: flightList[0].ID, user_id: user.id });
+        .match({ flight_id: flight.ID, user_id: user.id });
     }
   };
-
-  const addCardToBoard = async (id: number) => {
-    const flightList = FlightList.filter(
-      (flight) => id === flight.idx
-    );
-    setBoard((board) => [...board, flightList[0]]);
-    if (user !== null) {
-      await sb
-        .from("saved_flights")
-        .insert({ flight_id: flightList[0].ID, user_id: user.id });
-    }
-  };
-
-  const SORT_METHODS = {
-    PRICE: "PRICE",
-    DURATION: "DURATION",
-    STOPS: "STOPS",
-  };
-
-  const [sortMethod, setSortMethod] = useState(SORT_METHODS.PRICE);
-  const [numFlightsToReturn, setNumFlightsToReturn] = useState(8); // TODO: enforce this number by screen size?
 
   return (
     <div className="flex flex-col mb-10 no-scrollbar">
       <div className="flex flex-row justify-between mx-[10vw]">
         <p className="text-center text-lg my-3 font-bold text-[#ee6c4d]">Flight Results</p>
         <DropdownMenuRadioGroupWithOptions
-        options={[
-          { value: SORT_METHODS.PRICE, label: "Price" },
-          { value: SORT_METHODS.DURATION, label: "Duration" },
-          { value: SORT_METHODS.STOPS, label: "Stops" },
-        ]}
-        label="Sort by"
-        selected={sortMethod}
-        setSelected={setSortMethod}
-      />
+          options={[
+            { value: SORT_METHODS.PRICE, label: "Price" },
+            { value: SORT_METHODS.DURATION, label: "Duration" },
+            { value: SORT_METHODS.STOPS, label: "Stops" },
+          ]}
+          label="Sort by"
+          selected={sortMethod}
+          setSelected={setSortMethod}
+        />
       </div>
-      
+
       <div className="flex flex-row justify-center flex-wrap max-w-[90vw]">
         {FlightList.sort((a, b) => {
           if (sortMethod === SORT_METHODS.PRICE) {
@@ -105,19 +107,21 @@ function FlightStore(props: Props) {
             return a.Stops - b.Stops;
           }
         }).slice(0, numFlightsToReturn)
-        .map((flight) => {
-          return (
-            <FlightCard
-              key={flight.idx}
-              description="description"
-              title="title"
-              id={flight.idx}
-              item={flight}
-              handleRemove={handleRemove}
-              x={false}
-            />
-          );
-        })}
+          .map((flight) => {
+            // Only show flights that are not already saved
+            if (!board.some((savedFlight) => savedFlight.ID === flight.ID)) {
+              return (
+                <FlightCard
+                  key={flight.idx}
+                  description="description"
+                  title="title"
+                  item={flight}
+                  handleRemove={deleteSavedFlight}
+                  x={false}
+                />
+              )
+            }
+          })}
       </div>
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d]">
         Drag any flights below to save them for later
@@ -130,13 +134,12 @@ function FlightStore(props: Props) {
           {board.map((flight) => {
             return (
               <FlightCard
-                key={flight.idx}
+                key={flight.ID}
                 description={"description"}
                 title={"title"}
                 item={flight}
-                id={flight.idx}
                 x={true}
-                handleRemove={handleRemove}
+                handleRemove={deleteSavedFlight}
               />
             );
           })}

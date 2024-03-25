@@ -119,7 +119,6 @@ export default function Home() {
           .from("saved_flights")
           .select("flight_id")
           .eq("user_id", user.id);
-        console.log(flights);
         setSavedFlights(flights);
         setGotFlights(true);
       }
@@ -232,10 +231,10 @@ export default function Home() {
       {page == "input"
         ? renderInput()
         : page == "query"
-        ? renderQuery()
-        : page == "saved"
-        ? renderSaved()
-        : renderProfile()}
+          ? renderQuery()
+          : page == "saved"
+            ? renderSaved()
+            : renderProfile()}
     </div>
   );
 }

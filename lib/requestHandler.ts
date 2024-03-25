@@ -20,20 +20,7 @@ async function fetchFlights(data: BasicFlightRequest) : Promise<FlightOption[]> 
         const airlineOptions = (await response.json()) as FlightResponseData;
 
         const flightAvailability = await Promise.all(airlineOptions.data.map(async (item) => {
-            const response = await fetch("/api/get-availability", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ flightId: item.ID }),
-            });
-
-            if (response.status === 500) {
-                throw new Error("Internal server error");
-            }
-
-            const availability = (await response.json()) as AvailabilityResponseData;
-            return availability.data;
+            return (await grabAvailability(item.ID))
         }))
 
         // TODO: This discards booking data, not sure if that's something we want
@@ -43,6 +30,23 @@ async function fetchFlights(data: BasicFlightRequest) : Promise<FlightOption[]> 
         // TODO: handle error
         return []
     }
+}
+
+async function grabAvailability(flightId: string) {
+    const response = await fetch("/api/get-availability", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ flightId: flightId }),
+    });
+
+    if (response.status === 500) {
+        throw new Error("Internal server error");
+    }
+
+    const availability = (await response.json()) as AvailabilityResponseData;
+    return availability.data.filter((flight) => flight.RemainingSeats > 0);
 }
 
 export { fetchFlights }

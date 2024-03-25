@@ -6,11 +6,36 @@
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { FlightOption } from "@/lib/availability-types";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { useEffect, useState } from "react";
 
 export default function Saved() {
-    const sb = useSupabaseClient();
-    const user: User | null = useUser()
+  const [savedFlights, setSavedFlights] = useState<FlightOption[] | []>([]);
+  const sb = useSupabaseClient();
+  const user: User | null = useUser()
+
+  useEffect(() => {
+    async function getData() {
+      if (user != null) {
+        console.log("ping sb")
+        const { data } = await sb
+          .from("saved_flights")
+          .select("flight_id")
+          .eq("user_id", user.id);
+
+        // Re-fetch flight data using grabAvailability
+        if (data !== null) {
+          const flightData = await Promise.all(data.map(async (item) => {
+            return (await grabAvailability(item.flight_id))
+          }))
+          setSavedFlights(flightData.flat())
+        }
+      }
+    }
+
+    getData();
+  }, [])
 
   return (
     <div className="flex flex-col w-full min-h-screen">
@@ -76,5 +101,9 @@ export default function Saved() {
       </div>
     </div>
   )
+}
+
+function grabAvailability(flight_id: any): any {
+  throw new Error("Function not implemented.");
 }
 
