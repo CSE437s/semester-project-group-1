@@ -1,10 +1,11 @@
+import { FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
+import React, { useEffect, useState } from "react";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import React, { useState, useEffect } from "react";
+
 import FlightCard from "./FlightCard";
-import { useDrop } from "react-dnd";
-import { ItemTypes } from "./Constants";
 import { FlightResponseData } from "@/lib/route-types";
-import { FlightOption } from "@/lib/availability-types";
+import { ItemTypes } from "./Constants";
+import { useDrop } from "react-dnd";
 
 // TODO
 // These cards are flight cards and should be pulled from the flights that the user searches for
@@ -84,7 +85,7 @@ function FlightStore(props: Props) {
     }),
   }));
 
-  const FlightList = props.data.map((item, idx) => ({
+  const FlightList: FlightOptionWIndex[] = props.data.map((item, idx) => ({
     ...item,
     idx: idx,
   }));

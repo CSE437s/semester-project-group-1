@@ -1,17 +1,4 @@
-import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-import { useEffect, useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { DndProvider } from "react-dnd";
-import { Input } from "@/components/ui/input";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { TouchBackend } from "react-dnd-touch-backend";
-import FlightStore from "@/components/FlightStore";
-import FlightStoreMobile from "@/components/FlightStoreMobile";
-
-import { FlightRequestForm } from "@/components/FlightRequestForm";
-import Navbar from "@/components/Navbar";
-import { getMinCost } from "@/lib/utils";
-import { useRouter } from "next/router";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -22,8 +9,18 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+import { useEffect, useRef, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { DndProvider } from "react-dnd";
 import { FlightOption } from "@/lib/availability-types";
+import { FlightRequestForm } from "@/components/FlightRequestForm";
+import FlightStore from "@/components/FlightStore";
+import FlightStoreMobile from "@/components/FlightStoreMobile";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "next/router";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
 
@@ -185,7 +182,7 @@ export default function Home() {
     );
   }
 
-  function renderDragCards(data: FlightOptions) {
+  function renderDragCards(data: FlightOption[]) {
     return (
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-row justify-center h-auto -m-10">
@@ -195,7 +192,7 @@ export default function Home() {
     );
   }
 
-  function renderMobileCards(data: FlightOptions) {
+  function renderMobileCards(data: FlightOption[]) {
     return (
       <div>
         <FlightStoreMobile data={data} />

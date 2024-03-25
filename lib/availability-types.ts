@@ -1,10 +1,10 @@
-interface BookingLink {
+type BookingLink = {
     label: string;
     link: string;
     primary: boolean;
 }
 
-interface AvailabilitySegment {
+type AvailabilitySegment = {
     ID: string;
     RouteID: string;
     AvailabilityID: string;
@@ -24,7 +24,7 @@ interface AvailabilitySegment {
     Order: number;
 }
 
-interface FlightOption {
+type FlightOption = {
     ID: string;
     RouteID: string;
     AvailabilityID: string;
@@ -48,16 +48,18 @@ interface FlightOption {
     Source: string;
 }
 
-interface CoordinateData {
+type FlightOptionWIndex = FlightOption & { idx: number };
+
+type CoordinateData = {
     Lat: number;
     Lon: number;
 }
 
-interface AvailabilityResponseData {
+type AvailabilityResponseData = {
     data: FlightOption[];
     origin_coordinates: CoordinateData;
     destination_coordinates: CoordinateData;
     booking_links: BookingLink[];
 }
 
-export type { AvailabilityResponseData, CoordinateData, FlightOption, BookingLink, AvailabilitySegment }
+export type { AvailabilityResponseData, CoordinateData, FlightOption, BookingLink, AvailabilitySegment, FlightOptionWIndex }
