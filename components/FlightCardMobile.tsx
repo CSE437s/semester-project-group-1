@@ -34,9 +34,10 @@ function FlightCardMobile(props: Props) {
   };
 
   function displayModal(card: any, setModal: any, item: any) {
+    let flightOptions = ["F", "J", "W", "Y"];
     return (
-      <div className="z-40 text-black h-[100vh] absolute top-0 left-0 flex justify-center items-center w-screen bg-slate-600/80">
-        <div className="w-[50vw] h-[50vh] p-8 border-solid b-1 border-slate-200 bg-white relative rounded-lg">
+      <div className="z-40 drop-shadow-lg text-black h-[100vh] absolute top-0 left-0 flex justify-center items-center w-screen bg-slate-600/80">
+        <div className="w-[80vw] h-[60vh] p-8 border-solid b-1 border-slate-200 bg-white relative rounded-lg">
           <div
             onClick={() => {
               setModal(false);
@@ -48,13 +49,71 @@ function FlightCardMobile(props: Props) {
               <div className="text-3xl">x</div>
             </div>
           </div>
-          <div className="text-xl">{"Flight: " + (item.idx + 1)}</div>
-          <div className="text-sm">{item.Date}</div>
-          <div className="text-sm">
-            {" "}
-            {item.Route.OriginAirport} to {item.Route.DestinationAirport}
+          <div className="text-xl text-center font-bold text-cyan-300">
+            {"Flight: " + (item.idx + 1)}
           </div>
-          <div className="text-sm">{getMinCost(item)}</div>
+          <div className="text-base text-center font-normal">
+            Date: {item.Date}
+          </div>
+          <div className="text-base text-center font-normal">
+            From: {item.Route.OriginAirport} to {item.Route.DestinationAirport}
+          </div>
+          <div className="text-lg font-normal text-center mb-2">
+            Flight Options
+          </div>
+          <div className="grid grid-rows-2 grid-cols-2 gap-4">
+            {flightOptions.map((element) => {
+              const airline =
+                element == "F"
+                  ? item.FAirlines
+                  : element == "J"
+                  ? item.JAirlines
+                  : element == "W"
+                  ? item.WAirlines
+                  : item.YAirlines;
+              const direct =
+                element == "F"
+                  ? item.FDirect
+                  : element == "J"
+                  ? item.JDirect
+                  : element == "W"
+                  ? item.WDirect
+                  : item.YDirect;
+              const seats =
+                element == "F"
+                  ? item.FRemainingSeats
+                  : element == "J"
+                  ? item.JRemainingSeats
+                  : element == "W"
+                  ? item.WRemainingSeats
+                  : item.YRemainingSeats;
+              const points =
+                element == "F"
+                  ? item.FMileageCost
+                  : element == "J"
+                  ? item.JMileageCost
+                  : element == "W"
+                  ? item.WMileageCost
+                  : item.YMileageCost;
+              if (airline == "") {
+                return <div className="hidden"></div>;
+              }
+              return (
+                <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
+                  <div className="text-sm font-semibold">
+                    Airline: {airline}
+                  </div>
+                  <div className="text-sm font-normal">
+                    Direct Flight: {direct}
+                  </div>
+                  <div className="text-sm font-normal">
+                    Remaining Seats: {seats}
+                  </div>
+                  <div className="text-sm font-normal">Points: {points}</div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     );
@@ -66,7 +125,7 @@ function FlightCardMobile(props: Props) {
       <div
         onClick={() => {}}
         ref={ref}
-        className="relative bg-[#fafafa] hover:bg-slate-200 transition hover:rounded-tr-none hover:rounded-bl-none rounded-lg min-w-[70vw] w-auto p-4 my-2 h-auto border border-solid border-[#ee6c4d] flex flex-col justify-start text-black"
+        className="relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition hover:rounded-tr-none hover:rounded-bl-none rounded-lg min-w-[70vw] w-auto p-4 my-2 h-auto border border-solid border-[#ee6c4d] flex flex-col justify-start text-black"
       >
         {props.x == true ? (
           <div
