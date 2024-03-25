@@ -39,7 +39,7 @@ type SaveFlightRequest = {
 }
 
 type FlightsByIdsRequest = {
-    flightIds: string[],
+    flightId: string,
 }
 
 type AvailabilitySegment = {

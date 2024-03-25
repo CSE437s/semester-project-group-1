@@ -20,7 +20,7 @@ export default async function handler(
     end_date: data.end_date // TODO: as of now, the end_date is not optional
   }
   try {
-    const apiResponse = await seatsAero.find_route(searchParams)
+    const apiResponse = await seatsAero.cached_search(searchParams)
     res.status(200).json(apiResponse)
   } catch (e) {
     console.error(e)

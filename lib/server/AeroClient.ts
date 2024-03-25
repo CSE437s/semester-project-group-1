@@ -1,4 +1,5 @@
 import { SearchClientInterface, SeatsCachedSearchParams } from "@/lib/types";
+import { AvailabilityResponseData } from "@/lib/availability-types";
 
 import { FlightResponseData } from "@/lib/route-types";
 
@@ -10,7 +11,7 @@ class SeatsAero implements SearchClientInterface {
     this.api_key = api_key
   }
 
-  async find_route(params: SeatsCachedSearchParams): Promise<FlightResponseData> {
+  async cached_search(params: SeatsCachedSearchParams): Promise<FlightResponseData> {
     try {
       await sdk.auth(this.api_key);
       const { data } = await sdk.cachedSearch({
@@ -20,6 +21,7 @@ class SeatsAero implements SearchClientInterface {
         start_date: params.start_date,
         end_date: params.end_date // TODO: as of now, the end_date is not optional
       });
+      console.log(data)
 
       const parsedResponse: FlightResponseData = {
         data: data.data.map((item: any) => ({
@@ -34,6 +36,19 @@ class SeatsAero implements SearchClientInterface {
       } as FlightResponseData;
 
       return parsedResponse;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async get_trips(id: string): Promise<AvailabilityResponseData> {
+    try {
+      await sdk.auth(this.api_key);
+      console.log("Attempting", id)
+      const { data } = await sdk.getTrips({id: id});
+
+      return data as AvailabilityResponseData;
     } catch (error) {
       console.error(error);
       throw error;
