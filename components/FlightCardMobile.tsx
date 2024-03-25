@@ -2,10 +2,11 @@ import React, { useState, useRef } from "react";
 import { Button } from "./ui/button";
 import { FlightResponseData } from "@/lib/route-types";
 import { getMinCost } from "@/lib/utils";
+import { FlightOption } from "@/lib/availability-types";
 
 // Update props
 type Props = {
-  data?: FlightResponseData;
+  data?: FlightOption;
   item?: any;
   description?: string;
   title?: string;

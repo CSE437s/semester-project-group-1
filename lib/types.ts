@@ -77,7 +77,7 @@ type DataItem = {
 
 // At minimum, we need to be able to take in parameters for a specific route, and return whether or not it's available
 interface SearchClientInterface {
-    find_route: (params: SearchParams) => Promise<FlightResponseData>
+    cached_search: (params: SearchParams) => Promise<FlightResponseData>
 }
 
 type SearchParams = {
