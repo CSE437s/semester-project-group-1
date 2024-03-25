@@ -17,18 +17,18 @@ import {
 } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
+import { BasicFlightRequest } from "@/lib/route-types";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "./ui/calendar";
 import { CalendarIcon } from "lucide-react";
-import { BasicFlightRequest } from "@/lib/route-types";
 import { FlightOption } from "@/lib/availability-types";
 import airports from "@/lib/airports";
 import { cn } from "@/lib/utils";
+import { fetchFlights } from "@/lib/requestHandler";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { fetchFlights } from "@/lib/requestHandler";
 
 const FormSchema = z.object({
   outboundAirportCode: z
@@ -93,140 +93,142 @@ export function FlightRequestForm(props: Props) {
             className="w-2/3 space-y-6 h-auto"
           >
             <div className="flex flex-row justify-between items-center w-[35vw]">
-              <FormField
-                control={form.control}
-                name="outboundAirportCode"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col px-2">
-                    <FormLabel>Outbound Airport</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              "max-w-[200px] justify-between",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value
-                              ? airports.find(
-                                  (airport) => `${airport.iata}` === field.value
-                                )?.name
-                              : "Select Airport"}
-                            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="max-w-[200px] p-0 items-start">
-                        <Command>
-                          <CommandInput
-                            placeholder="Search airports..."
-                            className="h-9"
-                          />
-                          <CommandEmpty>No airport found.</CommandEmpty>
-                          <CommandGroup>
-                            {airports.map((airport) => (
-                              <CommandItem
-                                value={`${airport.name} (${airport.iata})`}
-                                key={airport.iata}
-                                onSelect={() => {
-                                  form.setValue(
-                                    "outboundAirportCode",
-                                    airport.iata
-                                  );
-                                }}
-                              >
-                                {`${airport.name} (${airport.iata})`}
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto h-4 w-4",
-                                    airport.iata === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormDescription>
-                      The airport you are flying from.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="inboundAirportCode"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel>Inbound Airport</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={cn(
-                              "max-w-[200px] justify-between",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            {field.value
-                              ? airports.find(
-                                  (airport) => `${airport.iata}` === field.value
-                                )?.name
-                              : "Select Airport"}
-                            <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="max-w-[200px] p-0 items-start">
-                        <Command>
-                          <CommandInput
-                            placeholder="Search airports..."
-                            className="h-9"
-                          />
-                          <CommandEmpty>No airport found.</CommandEmpty>
-                          <CommandGroup>
-                            {airports.map((airport) => (
-                              <CommandItem
-                                value={`${airport.name} (${airport.iata})`}
-                                key={airport.iata}
-                                onSelect={() => {
-                                  form.setValue(
-                                    "inboundAirportCode",
-                                    airport.iata
-                                  );
-                                }}
-                              >
-                                {`${airport.name} (${airport.iata})`}
-                                <CheckIcon
-                                  className={cn(
-                                    "ml-auto h-4 w-4",
-                                    airport.iata === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                    <FormDescription>
-                      The airport you are flying to.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-col">
+                <FormField
+                  control={form.control}
+                  name="outboundAirportCode"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col pb-2">
+                      <FormLabel>Outbound Airport</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "justify-between text-black",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? airports.find(
+                                    (airport) => `${airport.iata}` === field.value
+                                  )?.name
+                                : "Select Airport"}
+                              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="max-w-[200px] p-0 items-start">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search airports..."
+                              className="h-9"
+                            />
+                            <CommandEmpty>No airport found.</CommandEmpty>
+                            <CommandGroup>
+                              {airports.map((airport) => (
+                                <CommandItem
+                                  value={`${airport.name} (${airport.iata})`}
+                                  key={airport.iata}
+                                  onSelect={() => {
+                                    form.setValue(
+                                      "outboundAirportCode",
+                                      airport.iata
+                                    );
+                                  }}
+                                >
+                                  {`${airport.name} (${airport.iata})`}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      airport.iata === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>
+                        The airport you are flying from.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="inboundAirportCode"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Inbound Airport</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "min-w-[400px] justify-between text-black",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? airports.find(
+                                    (airport) => `${airport.iata}` === field.value
+                                  )?.name
+                                : "Select Airport"}
+                              <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="max-w-[200px] p-0 items-start">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search airports..."
+                              className="h-9"
+                            />
+                            <CommandEmpty>No airport found.</CommandEmpty>
+                            <CommandGroup>
+                              {airports.map((airport) => (
+                                <CommandItem
+                                  value={`${airport.name} (${airport.iata})`}
+                                  key={airport.iata}
+                                  onSelect={() => {
+                                    form.setValue(
+                                      "inboundAirportCode",
+                                      airport.iata
+                                    );
+                                  }}
+                                >
+                                  {`${airport.name} (${airport.iata})`}
+                                  <CheckIcon
+                                    className={cn(
+                                      "ml-auto h-4 w-4",
+                                      airport.iata === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormDescription>
+                        The airport you are flying to.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
             <div className="flex flex-row justify-between items-center w-[35vw]">
               <FormField
@@ -241,7 +243,7 @@ export function FlightRequestForm(props: Props) {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
+                              "w-[240px] pl-3 text-left font-normal text-black",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -283,7 +285,7 @@ export function FlightRequestForm(props: Props) {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[240px] pl-3 text-left font-normal",
+                              "w-[240px] pl-3 text-left font-normal text-black",
                               !field.value && "text-muted-foreground"
                             )}
                           >

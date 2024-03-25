@@ -247,26 +247,6 @@ export default function Home() {
         : page == "saved"
         ? renderSaved()
         : renderProfile()}
-
-      {/* <div className="flex flex-row justify-center items-center h-[80vh] -m-10">
-        <FlightRequestForm setData={setData} setLoading={setLoading} />
-      </div>
-      <div className="flex flex-row p-3 w-[80vw] items-center justify-center">
-        {data !== undefined &&
-          data.data.map((item, idx) => {
-            return (
-              <div key={idx} className="flex flex-col p-3 m-3">
-                <p>Flight: {idx + 1}</p>
-                <p>{item.Date}</p>
-                <p>
-                  {item.Route.OriginAirport} to {item.Route.DestinationAirport}
-                </p>
-                <p>{getMinCost(item)}</p>
-              </div>
-            );
-          })}
-        {loading && <p>Loading...</p>}
-        </div> */}
     </div>
   );
 }
