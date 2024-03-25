@@ -1,7 +1,9 @@
+import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
 import React, { useEffect, useState } from "react";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 
+import { DropdownMenuRadioGroupWithOptions } from "./ui/DropdownMenuRadioGroup";
 import FlightCard from "./FlightCard";
 import { ItemTypes } from "./Constants";
 import { useDrop } from "react-dnd";
@@ -79,9 +81,20 @@ function FlightStore(props: Props) {
 
   return (
     <div className="flex flex-col mb-10 no-scrollbar">
-      <div className="text-center text-lg my-3 font-bold text-[#ee6c4d]">
-        Flight Results
+      <div className="flex flex-row justify-between mx-[10vw]">
+        <p className="text-center text-lg my-3 font-bold text-[#ee6c4d]">Flight Results</p>
+        <DropdownMenuRadioGroupWithOptions
+        options={[
+          { value: SORT_METHODS.PRICE, label: "Price" },
+          { value: SORT_METHODS.DURATION, label: "Duration" },
+          { value: SORT_METHODS.STOPS, label: "Stops" },
+        ]}
+        label="Sort by"
+        selected={sortMethod}
+        setSelected={setSortMethod}
+      />
       </div>
+      
       <div className="flex flex-row justify-center flex-wrap max-w-[90vw]">
         {FlightList.sort((a, b) => {
           if (sortMethod === SORT_METHODS.PRICE) {
