@@ -1,4 +1,9 @@
-const airlines: any[] = [
+type Airline = {
+  code: string;
+  airline: string;
+};
+
+const airlines: Airline[] = [
   { code: "AS", airline: "Alaska Airlines" },
   { code: "FL", airline: "Air Tran" },
   { code: "AA", airline: "American Airlines" },
