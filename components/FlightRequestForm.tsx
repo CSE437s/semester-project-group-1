@@ -20,7 +20,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "./ui/calendar";
 import { CalendarIcon } from "lucide-react";
-import { FlightResponseData } from "@/lib/route-types";
+import { BasicFlightRequest } from "@/lib/route-types";
+import { FlightOptions } from "@/lib/route-types";
 import airports from "@/lib/airports";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -51,7 +52,7 @@ const FormSchema = z.object({
 });
 
 type Props = {
-  setData: (data: FlightResponseData) => void;
+  setData: (data: FlightOptions[]) => void;
   setLoading: (loading: boolean) => void;
   reference: any;
 };
@@ -74,8 +75,8 @@ export function FlightRequestForm(props: Props) {
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     props.setLoading(true);
 
-    const res = await fetchFlights(data as any)
-    props.setData(res as FlightResponseData);
+    const res = await fetchFlights(data as BasicFlightRequest)
+    props.setData(res as FlightOptions[]);
     props.setLoading(false);
     handleClick();
     window.scrollTo({ top: 700, behavior: "smooth" });

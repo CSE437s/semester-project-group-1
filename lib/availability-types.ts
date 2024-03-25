@@ -60,4 +60,4 @@ interface AvailabilityResponseData {
     booking_links: BookingLink[];
 }
 
-export type { AvailabilityResponseData, CoordinateData, FlightOptions as Datum, BookingLink, AvailabilitySegment }
+export type { AvailabilityResponseData, CoordinateData, FlightOptions, BookingLink, AvailabilitySegment }
