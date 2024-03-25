@@ -35,8 +35,8 @@ const basicFlightRequestToSeatsCachedSearchParams = (data: BasicFlightRequestStr
   return {
     origin_airport: data.outboundAirportCode,
     destination_airport: data.inboundAirportCode,
-    start_date: cropDateStr(data.outboundDate),
-    end_date: cropDateStr(data.inboundDate)
+    start_date: cropDateStr(data.beginRangeSearch),
+    end_date: cropDateStr(data.endRangeSearch)
   }
 }
 

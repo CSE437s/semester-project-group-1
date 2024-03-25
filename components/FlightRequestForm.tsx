@@ -27,6 +27,7 @@ import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { fetchFlights } from "@/lib/requestHandler";
 
 const FormSchema = z.object({
   outboundAirportCode: z
@@ -45,8 +46,8 @@ const FormSchema = z.object({
     .max(3, {
       message: "Code must be at most 3 characters.",
     }),
-  startOutDate: z.date(),
-  endOutDate: z.date(),
+  beginRangeSearch: z.date(),
+  endRangeSearch: z.date(),
 });
 
 type Props = {
@@ -65,40 +66,19 @@ export function FlightRequestForm(props: Props) {
     defaultValues: {
       outboundAirportCode: "",
       inboundAirportCode: "",
-      startOutDate: new Date(),
-      endOutDate: new Date(),
+      beginRangeSearch: new Date(),
+      endRangeSearch: new Date(),
     },
   });
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     props.setLoading(true);
 
-    fetch("/api/get-flights-basic", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        outboundAirportCode: data.outboundAirportCode,
-        inboundAirportCode: data.inboundAirportCode,
-        outboundDate: data.startOutDate,
-        inboundDate: data.endOutDate,
-      }),
-    })
-      .then((res) => {
-        if (res.status === 500) {
-          throw new Error("Internal server error");
-        }
-        console.log(res);
-        return res;
-      })
-      .then((res) => res.json())
-      .then((res) => {
-        props.setData(res as FlightResponseData);
-        props.setLoading(false);
-        handleClick();
-        window.scrollTo({ top: 700, behavior: "smooth" });
-      }); // TODO: add error catching
+    const res = await fetchFlights(data as any)
+    props.setData(res as FlightResponseData);
+    props.setLoading(false);
+    handleClick();
+    window.scrollTo({ top: 700, behavior: "smooth" });
   };
 
   return (
@@ -250,7 +230,7 @@ export function FlightRequestForm(props: Props) {
             <div className="flex flex-row justify-between items-center w-[35vw]">
               <FormField
                 control={form.control}
-                name="startOutDate"
+                name="beginRangeSearch"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Date Range Start</FormLabel>
@@ -292,7 +272,7 @@ export function FlightRequestForm(props: Props) {
               />
               <FormField
                 control={form.control}
-                name="endOutDate"
+                name="endRangeSearch"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
                     <FormLabel>Date Range End</FormLabel>
@@ -322,7 +302,7 @@ export function FlightRequestForm(props: Props) {
                           onSelect={field.onChange}
                           disabled={(date) =>
                             date < new Date() ||
-                            date < form.getValues("startOutDate")
+                            date < form.getValues("beginRangeSearch")
                           }
                           initialFocus
                         />

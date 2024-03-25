@@ -8,8 +8,8 @@ type Stringify<T> = {
 type BasicFlightRequest = {
     outboundAirportCode: string,
     inboundAirportCode: string,
-    outboundDate: Date,
-    inboundDate: Date,
+    beginRangeSearch: Date,
+    endRangeSearch: Date,
 }
 
 type BasicFlightRequestStringified = Stringify<BasicFlightRequest>
