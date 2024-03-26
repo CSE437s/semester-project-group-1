@@ -36,18 +36,18 @@ const FormSchema = z.object({
   outboundAirportCode: z
     .string()
     .min(3, {
-      message: "Code must be at least 3 characters.",
+      message: "Enter an airport code.",
     })
     .max(3, {
-      message: "Code must be at most 3 characters.",
+      message: "Enter an airport code.",
     }),
   inboundAirportCode: z
     .string()
     .min(3, {
-      message: "Code must be at least 3 characters.",
+      message: "Enter an airport code.",
     })
     .max(3, {
-      message: "Code must be at most 3 characters.",
+      message: "Enter an airport code.",
     }),
   beginRangeSearch: z.date(),
   endRangeSearch: z.date(),
