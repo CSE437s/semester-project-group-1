@@ -117,7 +117,7 @@ function FlightCard(props: Props) {
       });
       airlineString += temp?.airline;
     });
-    console.log(airlineString);
+    // console.log(airlineString);
     return airlineString;
   }
 
@@ -146,10 +146,16 @@ function FlightCard(props: Props) {
                 <div className="text-sm">
                   Airline: {getCarrier(item.Carriers)}
                 </div>
-                <div className="text-sm font-normal">Cabin: {item.Cabin}</div>
+                <div className="text-sm font-normal">
+                  Cabin: {item.Cabin[0].toUpperCase() + item.Cabin.slice(1)}
+                </div>
                 <div className="text-sm font-normal">
                   Direct Flight:{" "}
-                  {item.Stops === 0 ? "Yes" : "No, " + item.Stops}
+                  {item.Stops === 0
+                    ? "Yes"
+                    : item.Stops >= 2
+                    ? "No, " + item.Stops + " stops"
+                    : "No, " + item.Stops + " stop"}
                 </div>
                 <div className="text-sm font-normal">
                   Remaining Seats: {item.RemainingSeats}
