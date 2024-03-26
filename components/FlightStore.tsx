@@ -138,7 +138,7 @@ function FlightStore(props: Props) {
           </div> */}
           <Drawer open={dragging}>
             <DrawerContent ref={drop}>
-              <div className="mx-auto w-full max-w-sm h-[45vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
+              <div className="mx-auto w-full max-w-sm h-[35vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
                 <div className="">Drop flight here to save it for later!</div>
               </div>
             </DrawerContent>
