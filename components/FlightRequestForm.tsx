@@ -79,10 +79,9 @@ export function FlightRequestForm(props: Props) {
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    console.log("here");
     props.setLoading(true);
     setData(data);
-    const res = await fetchFlights(data as BasicFlightRequest);
+    const res: FlightOption[] = await fetchFlights(data)
     props.setData(res);
     props.setLoading(false);
     setExpanded(false);
