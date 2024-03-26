@@ -20,6 +20,7 @@ export default function SavedFlights(props: Props) {
   useEffect(() => {
     // use grabAvailability to get the flight data for each flight id in flights
     // setFlights with the result
+
     const fetchFlights = async () => {
       if (flights.length != 0) return;
 
@@ -46,14 +47,29 @@ export default function SavedFlights(props: Props) {
         return;
       }
 
+      const uniqueAvailabilityIds = Array.from(
+        new Set(data.map((d) => d.availability_id))
+      );
+
       const res = (
-        await grabAvailibilities(data.map((flight) => flight.availability_id))
+        await grabAvailibilities(uniqueAvailabilityIds)
       ).flat();
 
       const filteredResults = res.filter((flight) =>
         data.some((d) => d.flight_id === flight.ID)
       );
-      setFlights(filteredResults);
+
+      // Double check and only keep flights with unique IDs
+      const uniqueFlights = new Map();
+      for (const flight of filteredResults) {
+        if (!uniqueFlights.has(flight.ID)) {
+          uniqueFlights.set(flight.ID, flight);
+        }
+      }
+
+      const uniqueResults = Array.from(uniqueFlights.values());
+
+      setFlights(uniqueResults);
       setLoading(false);
     };
 
@@ -70,7 +86,7 @@ export default function SavedFlights(props: Props) {
       if (error) {
         console.error("Error deleting saved flight", error);
       } else {
-        toast("Deleted flight from profile");
+        // toast("Deleted flight from profile");
       }
     }
   };
