@@ -168,29 +168,6 @@ export default function Home() {
     );
   }
 
-  function renderProfile() {
-    return (
-      <div className="flex flex-col justify-center items-center">
-        <div className="flex flex-row items-center justify-center w-[40vw] my-5">
-          <Avatar>
-            <AvatarFallback className="bg-cyan-200 transition-all rounded-full text-white">
-              {user == null ? "" : user.email?.substring(0, 2).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-        <div className="flex flex-row  items-center w-[40vw] justify-center text-md my-5">
-          {user == null ? "user@email.com" : user.email}
-        </div>
-        <div className="flex flex-row items-center w-[40vw] justify-center text-md my-5">
-          <div>Your saved flights</div>
-        </div>
-        <div className="flex flex-row items-center w-[40vw] justify-center text-md my-5">
-          <Button onClick={() => handleLogout()}>Log out</Button>
-        </div>
-      </div>
-    );
-  }
-
   function renderDragCards(data: FlightOption[]) {
     return (
       <DndProvider backend={HTML5Backend}>
@@ -253,7 +230,7 @@ export default function Home() {
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
+          <DropdownMenuContent className="w-56 bg-black rounded-md shadow-lg">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuItem
               className="text-sm text-white font-normal"
@@ -261,7 +238,6 @@ export default function Home() {
             >
               {user !== null ? user.email : ""}
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
@@ -273,9 +249,7 @@ export default function Home() {
         ? renderInput()
         : page == "query"
         ? renderQuery()
-        : page == "saved"
-        ? renderSaved()
-        : renderProfile()}
+        : renderSaved()}
     </div>
   );
 }
