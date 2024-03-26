@@ -14,7 +14,7 @@ export function ReducedFlightRequestForm(props: Props) {
   // implements a UI reduced form of the flight request, after the user already clicks through the main one
   // should now be on one line showing the input data, with a button to expand the form
   return (
-    <div className="flex flex-row items-center  m-10">
+    <div className="flex flex-row items-center">
       {props.data === undefined ? (
         <></>
       ) : (
@@ -24,18 +24,18 @@ export function ReducedFlightRequestForm(props: Props) {
               <p className="">From: {props.data.outboundAirportCode}</p>
               <p className="mx-2">To: {props.data.inboundAirportCode}</p>
               <p className="">
-                Date Range Start:{" "}
+                Start Date:{" "}
                 {cropISOString(props.data.beginRangeSearch.toISOString())}
               </p>
               <p className="mx-2">
-                Date Range End:{" "}
+                End Date:{" "}
                 {cropISOString(props.data.endRangeSearch.toISOString())}
               </p>
             </div>
           </div>
           <Button
             onClick={() => props.setExpanded(true)}
-            className="mx-2 px-2 text-sm font-semibold h-12 bg-white text-black"
+            className="mx-2 px-2 text-sm font-semibold h-8 bg-white text-black"
           >
             Expand
           </Button>

@@ -38,7 +38,8 @@ export default function Home() {
   const user: User | null = useUser();
   const router = useRouter();
 
-  const [gotFlights, setGotFlights] = useState(false);
+  const [expanded, setExpanded] = useState(true);
+  const [queryExpanded, setQueryExpanded] = useState(true);
 
   const [loading, setLoading] = useState(false);
   const [queryLoading, setQueryLoading] = useState(false);
@@ -87,9 +88,12 @@ export default function Home() {
     setQueryLoading(true);
 
     const res: CreateEmbeddingResponse = await getQueryEmbedding(queryValue);
+    if (!res.data || res.data.length === 0) {
+      console.error('Error fetching embedding', res)
+      setQueryLoading(false)
+      return
+    }
     const embedding = trimEmbedding(res.data[0].embedding)
-
-
 
     const { data: documents } = await sb.rpc('match_documents', {
       query_embedding: embedding, // Pass the embedding you want to compare
@@ -103,14 +107,18 @@ export default function Home() {
     const TOP = 7
     const fetchData: RequestFormData[] = documents.slice(0, TOP).map((doc) => {
       const today1am = new Date()
-      const today11pm = new Date()
+      const tomorrow11pm = new Date()
+      tomorrow11pm.setDate(tomorrow11pm.getDate() + 1)
       today1am.setHours(0, 0, 0, 0)
-      today11pm.setHours(23, 59, 59, 999)
+      tomorrow11pm.setHours(23, 59, 59, 999)
+
+      console.log(today1am, tomorrow11pm)
+
       return {
         outboundAirportCode: "ORD",
         inboundAirportCode: doc.iata,
         beginRangeSearch: today1am,
-        endRangeSearch: today11pm,
+        endRangeSearch: tomorrow11pm,
       }
     })
 
@@ -125,24 +133,30 @@ export default function Home() {
     // squash down and set queryData
     setQueryData(flightData.flat())
     setQueryLoading(false)
+    setQueryValue("")
   }
 
   function renderInput() {
     return (
       <>
-        <div className="text-center text-2xl my-3 font-bold px-20 text-white overflow-y-hidden">
+        { expanded && (<>
+          <div className="text-center text-2xl my-3 font-bold px-20 text-white overflow-y-hidden">
           Search for one-way flights
         </div>
         <div className="text-center text-md my-3 font-normal px-20 text-white overflow-y-hidden">
           Find one way flights to a destination within a date range. Save
           flights for later to your profile.
         </div>
+        </>)}
+        
         <div className="px-[50px] my-10">
           <div className="md:flex md:justify-center md:items-center">
             <FlightRequestForm
               setData={setData}
               setLoading={setLoading}
               reference={ref}
+              expanded={expanded}
+              setExpanded={setExpanded}
             />
           </div>
         </div>
@@ -169,27 +183,27 @@ export default function Home() {
       <>
         {/* TODO make querys work */}
         <div className="flex flex-col items-center">
-          <div className="text-center font-bold text-[#fafafa] text-2xl w-[400px] my-5">
-            Write a query to search up flights
-          </div>
-          <div className="text-center font-normal text-[#fafafa] w-[400px] my-5">
-            If you don't know where to go, you can write any query to search for
-            flights. Our query uses an AI language model to translate any valid
-            request into a flight searching extravaganza. For the moment, we have this set to assume you are leaving O'Hare in Chicago
-            mode -- it will search for flights from ORD to anywhere in the US, for today.
-          </div>
+          {queryExpanded && (<>
+            <div className="text-center font-bold text-[#fafafa] text-2xl w-[400px] my-5">
+              Write a query to search up flights
+            </div>
+            <div className="text-center font-normal text-[#fafafa] w-[400px] my-5">
+              If you don't know where to go, you can write any query to search for
+              flights. Our query uses an AI language model to translate any valid
+              request into a flight searching extravaganza. For the moment, we have this set to assume you are leaving O'Hare in Chicago
+              mode -- it will search for flights from ORD to anywhere in the US, for today.
+            </div>
+          </>)}
           <Input
-            className="max-w-[400px] bg-[#fafafa] text-black "
+            className="max-w-[400px] bg-[#fafafa] text-black mb-2"
             type="text"
             placeholder="Write query here"
             value={queryValue}
             onChange={(e) => setQueryValue(e.target.value)}
-            onSubmit={() => {
-              handleSubmitQuery();
-            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSubmitQuery();
+                setQueryExpanded(false);
               }
             }}
           ></Input>

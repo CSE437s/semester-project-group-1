@@ -59,10 +59,13 @@ type Props = {
   setData: (data: FlightOption[]) => void;
   setLoading: (loading: boolean) => void;
   reference: any;
+  expanded: boolean;
+  setExpanded: (expanded: boolean) => void;
 };
 
 export function FlightRequestForm(props: Props) {
-  const [expanded, setExpanded] = useState(true);
+  // const [expanded, setExpanded] = useState(true);
+  const { expanded, setExpanded } = props;
   const [data, setData] = useState<RequestFormData>();
   const handleClick = () => {
     props.reference.current?.scrollIntoView({ behavior: "smooth" });
