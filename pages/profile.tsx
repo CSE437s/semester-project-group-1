@@ -25,8 +25,14 @@ export default function Home() {
   const sb = useSupabaseClient();
   const user: User | null = useUser();
   const router = useRouter();
+  const [logOut, setLogOut] = useState(false);
+
+  if (user == null) {
+    router.push("/login");
+  }
 
   const handleLogout = async () => {
+    setLogOut(true);
     await router.push("/login");
     await sb.auth.signOut();
   };
@@ -40,7 +46,7 @@ export default function Home() {
       <div className=" flex flex-col justify-center items-center">
         <div className="flex flex-row items-center justify-between space-x-2.5 w-[30vw] my-5 text-lg">
           <Button
-            className="rounded-full hover:bg-slate-400 transition-all"
+            className="bg-white rounded-full hover:bg-slate-400 transition-all"
             onClick={() => changePage("")}
           >
             &#8592;
@@ -57,6 +63,9 @@ export default function Home() {
         </div>
         <div className="flex flex-row items-center w-[40vw] justify-center text-md my-5">
           <Button onClick={() => handleLogout()}>Log out</Button>
+        </div>
+        <div className="flex flex-row items-center w-[40vw] justify-center text-md my-5">
+          {logOut ? <div>Logging out...</div> : <></>}
         </div>
       </div>
     </div>
