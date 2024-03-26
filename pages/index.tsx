@@ -107,9 +107,9 @@ export default function Home() {
     const TOP = 7
     const fetchData: RequestFormData[] = documents.slice(0, TOP).map((doc) => {
       const today1am = new Date()
-
+      today1am.setDate(today1am.getDate() + 1)
       const tomorrow11pm = new Date()
-      tomorrow11pm.setDate(tomorrow11pm.getDate() + 1)
+      tomorrow11pm.setDate(tomorrow11pm.getDate() + 2)
       today1am.setHours(0, 0, 0, 0)
       tomorrow11pm.setHours(23, 59, 59, 999)
 
