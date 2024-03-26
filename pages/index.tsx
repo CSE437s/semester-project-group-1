@@ -9,6 +9,7 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
+import { StoredDataAvailabilityId, StoredFlightData } from "@/lib/route-types";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -21,6 +22,7 @@ import FlightStoreMobile from "@/components/FlightStoreMobile";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Input } from "@/components/ui/input";
 import { ReducedFlightRequestForm } from "@/components/ReducedFlightRequestForm";
+import SavedFlights from "@/components/SavedFlights";
 import { useRouter } from "next/router";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
@@ -31,7 +33,7 @@ export default function Home() {
   const router = useRouter();
 
   const [gotFlights, setGotFlights] = useState(false);
-  const [savedFlights, setSavedFlights] = useState<any>();
+  const [savedFlights, setSavedFlights] = useState<StoredDataAvailabilityId[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<FlightOption[] | undefined>();
@@ -115,11 +117,12 @@ export default function Home() {
   function renderSaved() {
     async function getSavedFlights() {
       if (user != null) {
-        let flights = await sb
+        const flights = await sb
           .from("saved_flights")
-          .select("flight_id")
+          .select("availability_id")
           .eq("user_id", user.id);
-        setSavedFlights(flights);
+        console.log("FLIGHTS", flights)
+        setSavedFlights(flights.data as StoredDataAvailabilityId[]); // TODO: un jank this
         setGotFlights(true);
       }
     }
@@ -142,6 +145,10 @@ export default function Home() {
             periodically check this page for the most up to date information
             regarding your saved flights.
           </div>
+          <SavedFlights 
+            flights={savedFlights}
+            setSavedFlights={setSavedFlights}
+          />
         </div>
       </>
     );
