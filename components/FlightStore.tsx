@@ -44,6 +44,8 @@ function FlightStore(props: Props) {
 
   const [dragging, setDragging] = useState<boolean>(false);
 
+  const [noResults, setNoResults] = useState<boolean>(props.data.length == 0);
+
   useEffect(() => {
     async function getData() {
       if (user != null) {
@@ -87,12 +89,13 @@ function FlightStore(props: Props) {
   const saveFlight = async (flight: FlightOption) => {
     // Check if flight has already departed
     if (new Date(flight.DepartsAt).getTime() < new Date().getTime()) {
-      toast.warning("Sorry, this flight has already departed. Try searching availability on a different day!");
+      toast.warning(
+        "Sorry, this flight has already departed. Try searching availability on a different day!"
+      );
       return;
     }
     setBoard((board) => [...board, flight]);
     if (user !== null) {
-
       const { error } = await sb.from("saved_flights").insert({
         flight_id: flight.ID,
         availability_id: flight.AvailabilityID,
@@ -141,7 +144,9 @@ function FlightStore(props: Props) {
           <Drawer open={dragging}>
             <DrawerContent ref={drop}>
               <div className="mx-auto w-full max-w-sm h-[35vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
-                <div className="text-center">Bookmark Flight</div>
+                <div className="text-center">
+                  Drop here to save flight for later
+                </div>
               </div>
             </DrawerContent>
           </Drawer>
@@ -150,9 +155,13 @@ function FlightStore(props: Props) {
         <></>
       )}
       <div className="flex flex-row justify-between mx-[10vw] mt-10 overflow-y-hidden">
-        <p className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
-          Flight Results
+        <p className="text-center text-lg my-3 font-bold mr-4 text-[#ee6c4d] overflow-y-hidden">
+          {props.data.length == 0
+            ? "No flight results for inputted options"
+            : "Flight results"}
         </p>
+        { props.data.length == 0 ? <></> :
+        (
         <FlightFilterPopover
           options={Object.values(SORT_METHODS).map((method) => ({
             value: method,
@@ -163,6 +172,7 @@ function FlightStore(props: Props) {
           results={numFlightsToReturn}
           setResults={setNumFlightsToReturn}
         />
+        )}
       </div>
 
       <div
@@ -209,9 +219,17 @@ function FlightStore(props: Props) {
         </div>
       )}
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
-        Current saved flights for this search
+        {props.data.length == 0
+          ? ""
+          : "Currently saved flights for this search"}
       </div>
-      <div className="flex flex-row justify-center overflow-y-hidden relative">
+      <div
+        className={
+          props.data.length == 0
+            ? "hidden"
+            : "flex flex-row justify-center overflow-y-hidden relative"
+        }
+      >
         {board.length > 2 && props.device == "desktop" ? (
           <div className="z-10 absolute top-[85px] right-20">
             <Button className="bg-black/75 rounded-full hover:cursor-default hover:bg-black/75">
