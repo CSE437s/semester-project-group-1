@@ -8,6 +8,16 @@ import FlightCard from "./FlightCard";
 import { ItemTypes } from "./Constants";
 import { useDrop } from "react-dnd";
 import FadeIn from "react-fade-in";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
 type Props = {
   data: FlightOption[];
@@ -112,12 +122,19 @@ function FlightStore(props: Props) {
     <div className="flex flex-col mb-10 no-scrollbar overflow-y-hidden">
       {dragging ? (
         <FadeIn transitionDuration={100}>
-          <div
+          {/* <div
             ref={drop}
             className="hover:bg-black/100 z-20 rounded-t-[60px] fixed h-[45vh] w-[100vw] top-[55vh] right-0 bg-black/75 flex justify-center items-center text-[#ee6c4d] font-bold text-2xl"
           >
             Drop flight here to save it for later!
-          </div>
+          </div> */}
+          <Drawer open={dragging}>
+            <DrawerContent ref={drop}>
+              <div className="mx-auto w-full max-w-sm flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
+                <div className="">Drop flight here to save it for later!</div>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </FadeIn>
       ) : (
         <></>
