@@ -52,9 +52,9 @@ async function grabAvailability(flightId: string) {
 
     const availability = (await response.json()) as AvailabilityResponseData;
     if (process.env.VERCEL_ENV !== "production") {
-        return availability.data
+        return availability.data.filter((flight) => new Date(flight.DepartsAt) > new Date())
     }
-    return availability.data.filter((flight) => flight.RemainingSeats > 0);
+    return availability.data.filter((flight) => flight.RemainingSeats > 0 && new Date(flight.DepartsAt) > new Date());
 }
 
 async function grabAvailibilities(flightIds: string[]) {

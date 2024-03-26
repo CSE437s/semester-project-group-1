@@ -89,14 +89,13 @@ function FlightStore(props: Props) {
   }));
 
   const saveFlight = async (flight: FlightOption) => {
+    // Check if flight has already departed
+    if (new Date(flight.DepartsAt).getTime() < new Date().getTime()) {
+      toast.warning("Sorry, this flight has already departed. Try searching availability on a different day!");
+      return;
+    }
     setBoard((board) => [...board, flight]);
     if (user !== null) {
-
-      // Check if flight has already departed
-      if (new Date(flight.DepartsAt).getTime() < new Date().getTime()) {
-        toast.warning("Sorry, this flight has already departed. Try searching availability on a different day!");
-        return;
-      }
 
       const { error } = await sb.from("saved_flights").insert({
         flight_id: flight.ID,
@@ -108,7 +107,7 @@ function FlightStore(props: Props) {
         console.error("Error saving flight", error);
       } else {
         toast("Saved flight to profile");
-        console.log("Saved flight", flight.ID);
+        console.log("Saved flight", flight.ID, flight.DepartsAt);
       }
     }
   };
@@ -146,7 +145,7 @@ function FlightStore(props: Props) {
           <Drawer open={dragging}>
             <DrawerContent ref={drop}>
               <div className="mx-auto w-full max-w-sm h-[35vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
-                <div className="">Drop flight here to save it for later!</div>
+                <div className="text-center">Bookmark Flight</div>
               </div>
             </DrawerContent>
           </Drawer>
