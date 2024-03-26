@@ -1,17 +1,12 @@
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { DropdownMenuRadioGroupWithOptions } from "./ui/DropdownMenuRadioGroup";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { SORT_METHODS } from "./FlightStore";
 
-export type DropdownOptions = {
-    value: SORT_METHODS
-    label: string
-}
-
 type Props = {
-    options: DropdownOptions[]
     selectedSort: SORT_METHODS
     setSelectedSort: (value: SORT_METHODS) => void
     results: number
@@ -44,9 +39,10 @@ export function FlightFilterPopover(props: Props) {
                         <div className="grid grid-cols-3 items-center gap-4">
                             <Label htmlFor="sort">Sort</Label>
                             <DropdownMenuRadioGroupWithOptions
-                                options={props.options}
                                 selectedSort={props.selectedSort}
-                                setSelectedSort={props.setSelectedSort} label={"Sort by"}                            />
+                                setSelectedSort={props.setSelectedSort} 
+                                label={"Sort by"}                            
+                            />
                         </div>
                     </div>
                 </div>

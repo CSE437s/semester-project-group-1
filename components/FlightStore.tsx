@@ -1,36 +1,33 @@
+import {
+  Drawer,
+  DrawerContent,
+} from "@/components/ui/drawer";
 import { FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
 import React, { useEffect, useState } from "react";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
+
 import { Button } from "@/components/ui/button";
 import { Device } from "@/lib/types";
-import { DropdownMenuRadioGroupWithOptions } from "./ui/DropdownMenuRadioGroup";
-import FlightCard from "./FlightCard";
-import { ItemTypes } from "./Constants";
-import { useDrop } from "react-dnd";
 import FadeIn from "react-fade-in";
-import { toast } from "sonner";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import FlightCard from "./FlightCard";
 import { FlightFilterPopover } from "./FlightFilterPopover";
+import { ItemTypes } from "./Constants";
+import { toast } from "sonner";
+import { useDrop } from "react-dnd";
 
 type Props = {
   data: FlightOption[];
   device: Device;
 };
 
-enum SORT_METHODS {
-  PRICE = "PRICE",
-  DURATION = "DURATION",
-  STOPS = "STOPS",
-};
+export const SORT_METHODS_LIST = ["PRICE", "DURATION", "STOPS"] as const;
+export type SORT_METHODS = "PRICE" | "DURATION" | "STOPS"
+
+// enum SORT_METHODS {
+//   PRICE = "PRICE",
+//   DURATION = "DURATION",
+//   STOPS = "STOPS",
+// };
 
 function FlightStore(props: Props) {
 
@@ -38,7 +35,7 @@ function FlightStore(props: Props) {
   const sb = useSupabaseClient();
   const user: User | null = useUser();
 
-  const [sortMethod, setSortMethod] = useState(SORT_METHODS.PRICE);
+  const [sortMethod, setSortMethod] = useState<SORT_METHODS>("PRICE");
   const [numFlightsToReturn, setNumFlightsToReturn] = useState(6); // TODO: enforce this number by screen size?
   // Could also implement a "show more" button
 
@@ -142,6 +139,7 @@ function FlightStore(props: Props) {
             Drop flight here to save it for later!
           </div> */}
           <Drawer open={dragging}>
+            {/* @ts-ignore */}
             <DrawerContent ref={drop}>
               <div className="mx-auto w-full max-w-sm h-[35vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
                 <div className="text-center">
@@ -163,10 +161,6 @@ function FlightStore(props: Props) {
         { props.data.length == 0 ? <></> :
         (
         <FlightFilterPopover
-          options={Object.values(SORT_METHODS).map((method) => ({
-            value: method,
-            label: method.slice(0, 1).toUpperCase() + method.slice(1).toLowerCase()
-          }))}
           selectedSort={sortMethod}
           setSelectedSort={setSortMethod}
           results={numFlightsToReturn}
@@ -183,9 +177,9 @@ function FlightStore(props: Props) {
         }
       >
         {FlightList.sort((a, b) => {
-          if (sortMethod === SORT_METHODS.PRICE) {
+          if (sortMethod === "PRICE") {
             return a.MileageCost - b.MileageCost;
-          } else if (sortMethod === SORT_METHODS.DURATION) {
+          } else if (sortMethod === "DURATION") {
             return a.TotalDuration - b.TotalDuration;
           } else {
             return a.Stops - b.Stops;
@@ -264,5 +258,4 @@ function FlightStore(props: Props) {
     </div>
   );
 }
-export { SORT_METHODS }
 export default FlightStore;

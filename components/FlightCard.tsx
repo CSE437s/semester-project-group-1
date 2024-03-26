@@ -1,21 +1,21 @@
 import { AvailabilitySegment, FlightOption } from "@/lib/availability-types";
-import React, { useEffect, useRef, useState } from "react";
-import airlines from "@/lib/airlines";
-import { Button } from "./ui/button";
-import Image from "next/image";
-import { ItemTypes } from "./Constants";
-import svg from "../public/drag-handle.svg";
-import { useDrag } from "react-dnd";
-
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/components/ui/dialog";
+import React, { useEffect, useRef, useState } from "react";
+
+import { Button } from "./ui/button";
+import Image from "next/image";
+import { ItemTypes } from "./Constants";
+import airlines from "@/lib/airlines";
+import svg from "../public/drag-handle.svg";
+import { useDrag } from "react-dnd";
 
 // Update props
 type Props = {
@@ -187,6 +187,7 @@ function FlightCard(props: Props) {
 
   return (
     <div
+      // @ts-ignore
       ref={props.isDraggable ? drag : null}
       style={{
         opacity: isDragging ? 0.5 : 1,
