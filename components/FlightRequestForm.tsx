@@ -79,6 +79,7 @@ export function FlightRequestForm(props: Props) {
   });
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    console.log("here");
     props.setLoading(true);
     setData(data);
     const res = await fetchFlights(data as BasicFlightRequest);
@@ -243,7 +244,7 @@ export function FlightRequestForm(props: Props) {
                     />
                   </div>
                 </div>
-                <div className="flex flex-row justify-between items-center w-[35vw]">
+                <div className="flex flex-row lg:flex-nowrap flex-wrap justify-between items-center w-[35vw]">
                   <FormField
                     control={form.control}
                     name="beginRangeSearch"
@@ -256,7 +257,7 @@ export function FlightRequestForm(props: Props) {
                               <Button
                                 variant={"outline"}
                                 className={cn(
-                                  "w-[240px] pl-3 text-left font-normal text-black",
+                                  "w-[175px] pl-3 text-left font-normal text-black",
                                   !field.value && "text-muted-foreground"
                                 )}
                               >
@@ -298,7 +299,7 @@ export function FlightRequestForm(props: Props) {
                               <Button
                                 variant={"outline"}
                                 className={cn(
-                                  "w-[240px] pl-3 text-left font-normal text-black",
+                                  "w-[175px] pl-3 text-left font-normal text-black",
                                   !field.value && "text-muted-foreground"
                                 )}
                               >
@@ -338,7 +339,7 @@ export function FlightRequestForm(props: Props) {
                   </Button>
                   {data && (
                     <Button
-                      className="bg-white text-black"
+                      className="bg-white text-black hover:bg-white"
                       onClick={() => setExpanded(false)}
                     >
                       Compress

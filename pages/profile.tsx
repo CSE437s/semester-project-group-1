@@ -27,8 +27,12 @@ export default function Home() {
   const router = useRouter();
   const [logOut, setLogOut] = useState(false);
 
+  const sendBack = async () => {
+    await router.push("/login");
+  };
+
   if (user == null) {
-    router.push("/login");
+    sendBack();
   }
 
   const handleLogout = async () => {
@@ -46,7 +50,7 @@ export default function Home() {
       <div className=" flex flex-col justify-center items-center">
         <div className="flex flex-row items-center justify-between space-x-2.5 w-[30vw] my-5 text-lg">
           <Button
-            className="bg-white rounded-full hover:bg-slate-400 transition-all"
+            className="bg-black rounded-full hover:bg-slate-400 transition-all"
             onClick={() => changePage("")}
           >
             &#8592;

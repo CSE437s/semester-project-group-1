@@ -27,15 +27,13 @@ export default function Home() {
   const router = useRouter();
 
   const [gotFlights, setGotFlights] = useState(false);
-  const [savedFlights, setSavedFlights] = useState<StoredFlightData[]>(
-    []
-  );
+  const [savedFlights, setSavedFlights] = useState<StoredFlightData[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<FlightOption[] | undefined>();
 
   // const [screen, setScreen] = useState(1001);
-  const isMobile = useIsMobile(680)
+  const isMobile = useIsMobile(680);
   // useEffect(() => {
   //   window.addEventListener("resize", () => setScreen(window.innerWidth));
   //   setScreen(window.innerWidth);
@@ -63,15 +61,21 @@ export default function Home() {
   function renderInput() {
     return (
       <>
-        <div className="text-center text-md my-3 font-normal text-white overflow-y-hidden">
-          Find one way flights to a destination within a date range
+        <div className="text-center text-2xl my-3 font-bold px-20 text-white overflow-y-hidden">
+          Search for one-way flights
         </div>
-        <div className="flex flex-col justify-center items-center h-auto m-10">
-          <FlightRequestForm
-            setData={setData}
-            setLoading={setLoading}
-            reference={ref}
-          />
+        <div className="text-center text-md my-3 font-normal px-20 text-white overflow-y-hidden">
+          Find one way flights to a destination within a date range. Save
+          flights for later to your profile.
+        </div>
+        <div className="px-[50px] my-10">
+          <div className="lg:flex lg:justify-center lg:items-center">
+            <FlightRequestForm
+              setData={setData}
+              setLoading={setLoading}
+              reference={ref}
+            />
+          </div>
         </div>
         <div ref={ref}>
           <div className="flex justify-center text-[#ee6c4d] font-bold text-xl">
