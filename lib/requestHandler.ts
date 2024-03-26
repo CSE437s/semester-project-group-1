@@ -19,6 +19,11 @@ async function fetchFlights(data: BasicFlightRequest) : Promise<FlightOption[]> 
 
         const airlineOptions = (await response.json()) as FlightResponseData;
 
+        // If not production, only do for first airline
+        if (process.env.VERCEL_ENV !== "production") {
+            airlineOptions.data = airlineOptions.data.slice(0, 1);
+        }
+
         const flightAvailability = await Promise.all(airlineOptions.data.map(async (item) => {
             return (await grabAvailability(item.ID))
         }))
