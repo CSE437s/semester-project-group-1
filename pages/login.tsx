@@ -106,6 +106,7 @@ export default function Login() {
   return (
     <div className="bg-white min-h-screen flex flex-col items-center relative overflow-y-hidden overflow-x-hidden">
       <div className="bg-gradient-to-r from-[#3d5a80] to-blue-300 w-[125vw] min-h-[80vh] z-0  rounded-b-full absolute top-0 -left-[12.5vw]"></div>
+
       <div className="text-4xl z-10 text-[#ee6c4d] font-bold mt-4">
         Travel you can't imagine
       </div>
@@ -116,6 +117,7 @@ export default function Login() {
         limitless.
       </div>
       <div className="flex z-10 items-center flex-col justify-center w-[350px] rounded-lg my-10 shadow-lg bg-[#e0fbfc] space-y-6 border border-gray-200 dark:border-gray-700 p-4 py-8 h-auto overflow-y-hidden overflow-x-hidden">
+
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Log In</h1>
           <p className="text-zinc-500 dark:text-zinc-400">

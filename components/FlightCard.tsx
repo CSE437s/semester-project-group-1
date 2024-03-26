@@ -1,6 +1,7 @@
 import { AvailabilitySegment, FlightOption } from "@/lib/availability-types";
 import React, { useEffect, useRef, useState } from "react";
 
+
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { ItemTypes } from "./Constants";
@@ -194,8 +195,9 @@ function FlightCard(props: Props) {
         <div
           onClick={() => {
             // if (props.x == false) {
-            // setModal(true);
-            // handleClick();
+
+            setModal(true);
+            handleClick();
             // }
           }}
           className="text-sm font-light flex flex-col pt-0"

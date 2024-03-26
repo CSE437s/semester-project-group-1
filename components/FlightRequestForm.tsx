@@ -36,18 +36,18 @@ const FormSchema = z.object({
   outboundAirportCode: z
     .string()
     .min(3, {
-      message: "Code must be at least 3 characters.",
+      message: "Enter an airport code.",
     })
     .max(3, {
-      message: "Code must be at most 3 characters.",
+      message: "Enter an airport code.",
     }),
   inboundAirportCode: z
     .string()
     .min(3, {
-      message: "Code must be at least 3 characters.",
+      message: "Enter an airport code.",
     })
     .max(3, {
-      message: "Code must be at most 3 characters.",
+      message: "Enter an airport code.",
     }),
   beginRangeSearch: z.date(),
   endRangeSearch: z.date(),
@@ -245,6 +245,7 @@ export function FlightRequestForm(props: Props) {
                   </div>
                 </div>
                 <div className="flex flex-row lg:flex-nowrap flex-wrap justify-between items-center w-[35vw]">
+
                   <FormField
                     control={form.control}
                     name="beginRangeSearch"
@@ -258,6 +259,7 @@ export function FlightRequestForm(props: Props) {
                                 variant={"outline"}
                                 className={cn(
                                   "w-[175px] pl-3 text-left font-normal text-black",
+
                                   !field.value && "text-muted-foreground"
                                 )}
                               >
@@ -299,7 +301,9 @@ export function FlightRequestForm(props: Props) {
                               <Button
                                 variant={"outline"}
                                 className={cn(
+
                                   "w-[175px] pl-3 text-left font-normal text-black",
+
                                   !field.value && "text-muted-foreground"
                                 )}
                               >
@@ -339,7 +343,9 @@ export function FlightRequestForm(props: Props) {
                   </Button>
                   {data && (
                     <Button
+
                       className="bg-white text-black hover:bg-white"
+
                       onClick={() => setExpanded(false)}
                     >
                       Compress

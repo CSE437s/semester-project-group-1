@@ -18,6 +18,9 @@ import SavedFlights from "@/components/SavedFlights";
 import { StoredFlightData } from "@/lib/route-types";
 import { useIsMobile } from "@/lib/utils";
 import { useRouter } from "next/router";
+import { DropdownMenu, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
+import { LogOut } from "lucide-react";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
 
@@ -165,7 +168,7 @@ export default function Home() {
         <div className="flex flex-row items-center justify-center w-[40vw] my-5">
           <Avatar>
             <AvatarFallback className="bg-cyan-200 transition-all rounded-full text-white">
-              {user == null ? "JD" : user.email?.substring(0, 2).toUpperCase()}
+              {user == null ? "" : user.email?.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </div>
@@ -236,19 +239,35 @@ export default function Home() {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-        <Avatar onClick={() => changePage("profile")}>
-          <AvatarFallback className="bg-[#ee6c4d] cursor-pointer p-1 rounded-full text-white hover:bg-black hover:text-white transition-all text-sm">
-            {user == null ? "JD" : user.email?.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar>
+              <AvatarFallback className="bg-[#ee6c4d] cursor-pointer p-1 rounded-full text-white hover:bg-black hover:text-white transition-all text-sm">
+                {user === null ? "" : user.email?.substring(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuItem className="text-sm text-white font-normal" disabled>
+              {user !== null ? user.email : ""}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Log out</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
       </div>
       {page == "input"
         ? renderInput()
         : page == "query"
-        ? renderQuery()
-        : page == "saved"
-        ? renderSaved()
-        : renderProfile()}
+          ? renderQuery()
+          : page == "saved"
+            ? renderSaved()
+            : renderProfile()}
     </div>
   );
 }
