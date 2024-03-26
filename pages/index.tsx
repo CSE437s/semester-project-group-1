@@ -1,5 +1,13 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FlightRequestForm, RequestFormData } from "@/components/FlightRequestForm";
+import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
@@ -8,26 +16,20 @@ import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { CreateEmbeddingResponse } from "openai/resources/index.mjs";
 import { DndProvider } from "react-dnd";
+import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import { FlightOption } from "@/lib/availability-types";
-import { FlightRequestForm } from "@/components/FlightRequestForm";
 import FlightStore from "@/components/FlightStore";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Input } from "@/components/ui/input";
+import { LogOut } from "lucide-react";
 import SavedFlights from "@/components/SavedFlights";
 import { StoredFlightData } from "@/lib/route-types";
+import { Toaster } from "sonner";
+import { fetchFlights } from "@/lib/requestHandler";
 import { useIsMobile } from "@/lib/utils";
 import { useRouter } from "next/router";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
-import { LogOut } from "lucide-react";
-import { Toaster } from "sonner";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
 
@@ -39,14 +41,12 @@ export default function Home() {
   const [gotFlights, setGotFlights] = useState(false);
 
   const [loading, setLoading] = useState(false);
+  const [queryLoading, setQueryLoading] = useState(false);
   const [data, setData] = useState<FlightOption[] | undefined>();
+  const [queryData, setQueryData] = useState<FlightOption[] | undefined>();
+  const [queryValue, setQueryValue] = useState("");
 
-  // const [screen, setScreen] = useState(1001);
   const isMobile = useIsMobile(680);
-  // useEffect(() => {
-  //   window.addEventListener("resize", () => setScreen(window.innerWidth));
-  //   setScreen(window.innerWidth);
-  // }, []);
 
   const [page, setPage] = useState("input");
 
@@ -61,11 +61,71 @@ export default function Home() {
     await router.push("/" + pageToChangeTo);
   };
 
-  // midnight today
-  const date1 = new Date();
-  date1.setHours(0, 0, 0, 0);
-  const date2 = new Date();
-  date2.setHours(23, 59, 59, 999);
+  type EmbeddingSearchResponse = {
+    iata: string;
+    id: number;
+    similarity: number;
+  }
+
+  const getQueryEmbedding = async (query: string) => {
+    // fetch to 'get-embedding' endpoint
+    const res = await fetch('/api/get-embedding', {
+      method: 'POST',
+      body: JSON.stringify({ query }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return res.json();
+  }
+
+  const trimEmbedding = (embedding: number[]) => {
+    return embedding.slice(0, 512);
+  }
+
+  const handleSubmitQuery = async () => {
+    setQueryLoading(true);
+
+    const res: CreateEmbeddingResponse = await getQueryEmbedding(queryValue);
+    const embedding = trimEmbedding(res.data[0].embedding)
+
+
+
+    const { data: documents } = await sb.rpc('match_documents', {
+      query_embedding: embedding, // Pass the embedding you want to compare
+      match_threshold: 0.3, // Choose an appropriate threshold for your data
+      match_count: 10, // Choose the number of matches
+    }) as { data: EmbeddingSearchResponse[] }
+
+    console.log(documents)
+
+    // fetch flights for the top 3 matches
+    const TOP = 7
+    const fetchData: RequestFormData[] = documents.slice(0, TOP).map((doc) => {
+      const today1am = new Date()
+      const today11pm = new Date()
+      today1am.setHours(0, 0, 0, 0)
+      today11pm.setHours(23, 59, 59, 999)
+      return {
+        outboundAirportCode: "ORD",
+        inboundAirportCode: doc.iata,
+        beginRangeSearch: today1am,
+        endRangeSearch: today11pm,
+      }
+    })
+
+    console.log(fetchData)
+
+    const flightData = await Promise.all(fetchData.map(async (data) => {
+      return fetchFlights(data)
+    }))
+
+    console.log(flightData)
+
+    // squash down and set queryData
+    setQueryData(flightData.flat())
+    setQueryLoading(false)
+  }
 
   function renderInput() {
     return (
@@ -115,13 +175,38 @@ export default function Home() {
           <div className="text-center font-normal text-[#fafafa] w-[400px] my-5">
             If you don't know where to go, you can write any query to search for
             flights. Our query uses an AI language model to translate any valid
-            request into a flight searching extravaganza.
+            request into a flight searching extravaganza. For the moment, we have this set to assume you are leaving O'Hare in Chicago
+            mode -- it will search for flights from ORD to anywhere in the US, for today.
           </div>
           <Input
             className="max-w-[400px] bg-[#fafafa] text-black "
             type="text"
             placeholder="Write query here"
+            value={queryValue}
+            onChange={(e) => setQueryValue(e.target.value)}
+            onSubmit={() => {
+              handleSubmitQuery();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSubmitQuery();
+              }
+            }}
           ></Input>
+        </div>
+        <div ref={ref}>
+          <div className="flex justify-center text-[#ee6c4d] font-bold text-xl">
+            {queryLoading && <div>Loading...</div>}
+          </div>
+          {queryData !== undefined ? (
+            !isMobile ? (
+              renderDragCards(queryData)
+            ) : (
+              renderMobileCards(queryData)
+            )
+          ) : (
+            <></>
+          )}
         </div>
       </>
     );
