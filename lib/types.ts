@@ -80,6 +80,8 @@ interface SearchClientInterface {
     cached_search: (params: SearchParams) => Promise<FlightResponseData>
 }
 
+type Device = "mobile" | "desktop"
+
 type SearchParams = {
     origin_airport: string | REGION,
     destination_airport: string | REGION,
@@ -149,4 +151,5 @@ export {
     type SeatsParams,
     type Airport,
     type AirportMap,
+    type Device
 }

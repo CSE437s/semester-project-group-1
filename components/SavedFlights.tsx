@@ -1,16 +1,25 @@
+import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { useEffect, useState } from "react";
 
 import FlightCard from "./FlightCard";
 import { FlightOption } from "@/lib/availability-types";
-import { StoredDataAvailabilityId } from "@/lib/route-types";
+import { StoredFlightData } from "@/lib/route-types";
 import { grabAvailibilities } from "@/lib/requestHandler";
-import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 
 type Props = {
   device: string;
-  flights: StoredDataAvailabilityId[];
-  setSavedFlights: (flights: StoredDataAvailabilityId[]) => void;
+  flights: StoredFlightData[];
+  setSavedFlights: (flights: StoredFlightData[]) => void;
 };
+
+const filterFlightsToFlightIds = (savedFlights: StoredFlightData[], flightOptions: FlightOption[]): FlightOption[] => {
+    // match flight ids to ids in flightOptions
+    const filtered = flightOptions.filter((flightOption) => {
+        return savedFlights.some((savedFlight) => savedFlight.flight_id === flightOption.ID);
+    })
+    .filter((value, index, self) => self.map((x) => x.ID).indexOf(value.ID) === index);
+    return filtered !== undefined ? filtered : [];
+}
 
 export default function SavedFlights(props: Props) {
   const sb = useSupabaseClient();
@@ -26,7 +35,7 @@ export default function SavedFlights(props: Props) {
       const res = await grabAvailibilities(
         props.flights.map((flight) => flight.availability_id)
       );
-      setFlights(res.flat());
+      setFlights(filterFlightsToFlightIds(props.flights, res.flat()));
       setLoading(false);
     };
     fetchFlights();
@@ -34,7 +43,7 @@ export default function SavedFlights(props: Props) {
 
   const deleteSavedFlight = async (flight: FlightOption) => {
     props.setSavedFlights(
-      props.flights.filter((f) => f.availability_id !== flight.ID)
+      props.flights.filter((f) => f.flight_id !== flight.ID)
     );
     if (user !== null) {
       await sb
@@ -55,7 +64,7 @@ export default function SavedFlights(props: Props) {
               <FlightCard
                 key={flight.ID}
                 item={flight}
-                x={false}
+                isSaved={true}
                 handleRemove={deleteSavedFlight}
                 device={props.device}
                 isDraggable={false}
@@ -65,8 +74,4 @@ export default function SavedFlights(props: Props) {
       </div>
     </>
   );
-}
-
-function grabAvailabilities(arg0: string[]) {
-  throw new Error("Function not implemented.");
 }
