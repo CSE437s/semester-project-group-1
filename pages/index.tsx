@@ -36,7 +36,6 @@ export default function Home() {
   const router = useRouter();
 
   const [gotFlights, setGotFlights] = useState(false);
-  const [savedFlights, setSavedFlights] = useState<StoredFlightData[]>([]);
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<FlightOption[] | undefined>();
@@ -128,20 +127,7 @@ export default function Home() {
   }
 
   function renderSaved() {
-    async function getSavedFlights() {
-      if (user != null) {
-        const flights = await sb
-          .from("saved_flights")
-          .select("availability_id, flight_id")
-          .eq("user_id", user.id);
-        console.log("FLIGHTS", flights);
-        setSavedFlights(flights.data as StoredFlightData[]); // TODO: un jank this
-        setGotFlights(true);
-      }
-    }
-    if (!gotFlights) {
-      getSavedFlights();
-    }
+    
 
     return (
       <>
@@ -160,8 +146,6 @@ export default function Home() {
           </div>
           <SavedFlights
             device={!isMobile ? "desktop" : "mobile"}
-            flights={savedFlights}
-            setSavedFlights={setSavedFlights}
           />
         </div>
       </>

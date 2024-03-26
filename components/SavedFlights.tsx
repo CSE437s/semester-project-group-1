@@ -8,31 +8,45 @@ import { grabAvailibilities } from "@/lib/requestHandler";
 
 type Props = {
   device: string;
-  flights: StoredFlightData[];
-  setSavedFlights: (flights: StoredFlightData[]) => void;
 };
 
-const filterFlightsToFlightIds = (
-  savedFlights: StoredFlightData[],
-  flightOptions: FlightOption[]
-): FlightOption[] => {
-  // match flight ids to ids in flightOptions
-  const filtered = flightOptions
-    .filter((flightOption) => {
-      return savedFlights.some(
-        (savedFlight) => savedFlight.flight_id === flightOption.ID
-      );
-    })
-    .filter(
-      (value, index, self) => self.map((x) => x.ID).indexOf(value.ID) === index
-    );
-  return filtered !== undefined ? filtered : [];
-};
+// const filterFlightsToFlightIds = (
+//   savedFlights: StoredFlightData[],
+//   flightOptions: FlightOption[]
+// ): FlightOption[] => {
+//   // match flight ids to ids in flightOptions
+//   const filtered = flightOptions
+//     .filter((flightOption) => {
+//       return savedFlights.some(
+//         (savedFlight) => savedFlight.flight_id === flightOption.ID
+//       );
+//     })
+//     .filter(
+//       (value, index, self) => self.map((x) => x.ID).indexOf(value.ID) === index
+//     );
+//   return filtered !== undefined ? filtered : [];
+// };
+
+// async function getSavedFlights() {
+//   if (user != null) {
+//     const flights = await sb
+//       .from("saved_flights")
+//       .select("availability_id, flight_id")
+//       .eq("user_id", user.id);
+//     console.log("FLIGHTS", flights);
+//     setSavedFlights(flights.data as StoredFlightData[]); // TODO: un jank this
+//     setGotFlights(true);
+//   }
+// }
+// if (!gotFlights) {
+//   getSavedFlights();
+// }
 
 export default function SavedFlights(props: Props) {
   const sb = useSupabaseClient();
   const user: User | null = useUser();
-  const [flights, setFlights] = useState<FlightOption[] | undefined>();
+  const [savedFlights, setSavedFlights] = useState<FlightOption[]>([]);
+  const [flights, setFlights] = useState<FlightOption[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -40,18 +54,40 @@ export default function SavedFlights(props: Props) {
     // setFlights with the result
     const fetchFlights = async () => {
       setLoading(true);
-      const res = await grabAvailibilities(
-        props.flights.map((flight) => flight.availability_id)
-      );
-      setFlights(filterFlightsToFlightIds(props.flights, res.flat()));
+
+      if (user === null) {
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await sb.from("saved_flights").select("availability_id, flight_id").eq("user_id", user.id)
+
+      if (error) {
+        console.error("Error fetching saved flights", error);
+        setLoading(false);
+        return;
+      }
+
+      if (data === null || data.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      const res = (await grabAvailibilities(
+        data.map((flight) => flight.availability_id)
+      )).flat()
+
+      const filteredResults = res.filter((flight) => data.some((d) => d.flight_id === flight.ID))
+      console.log(filteredResults)
       setLoading(false);
-    };
+    }
+
     fetchFlights();
-  }, [props.flights]);
+  }, []);
 
   const deleteSavedFlight = async (flight: FlightOption) => {
-    props.setSavedFlights(
-      props.flights.filter((f) => f.flight_id !== flight.ID)
+    setSavedFlights(
+      flights.filter((f) => f.ID !== flight.ID)
     );
     if (user !== null) {
       await sb

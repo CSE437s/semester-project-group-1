@@ -81,11 +81,16 @@ function FlightStore(props: Props) {
   const saveFlight = async (flight: FlightOption) => {
     setBoard((board) => [...board, flight]);
     if (user !== null) {
-      await sb.from("saved_flights").insert({
+      const { error} = await sb.from("saved_flights").insert({
         flight_id: flight.ID,
         availability_id: flight.AvailabilityID,
         user_id: user.id,
       });
+      if (error) {
+        console.error("Error saving flight", error);
+      } else {
+        console.log("Saved flight", flight.ID);
+      }
     }
   };
 
