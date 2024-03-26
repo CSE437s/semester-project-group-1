@@ -22,6 +22,7 @@ export default function SavedFlights(props: Props) {
     // setFlights with the result
 
     const fetchFlights = async () => {
+      console.log("ping")
       if (flights.length != 0) return;
 
       setLoading(true);
@@ -33,7 +34,7 @@ export default function SavedFlights(props: Props) {
 
       const { data, error } = await sb
         .from("saved_flights")
-        .select("availability_id, flight_id")
+        .select("availability_id, flight_id, departure")
         .eq("user_id", user.id);
 
       if (error) {
@@ -47,8 +48,31 @@ export default function SavedFlights(props: Props) {
         return;
       }
 
+      // Filter data to not include flights that have already departed
+      const currentTime = new Date().getTime();
+      const filteredData = data.filter(
+        (d) => new Date(d.departure).getTime() > currentTime
+      );
+      
+      const departedFlights = data.filter(
+        (d) => new Date(d.departure).getTime() <= currentTime
+      )
+
+      if (departedFlights.length > 0) {
+        const { error } = await sb
+          .from("saved_flights")
+          .delete()
+          .eq("user_id", user.id)
+          .in("flight_id", departedFlights.map((d) => d.flight_id));
+        if (error) {
+          console.error("Error deleting departed flights", error);
+        }
+
+        toast.warning("Flights that have already departed have been removed from your profile")
+      }
+
       const uniqueAvailabilityIds = Array.from(
-        new Set(data.map((d) => d.availability_id))
+        new Set(filteredData.map((d) => d.availability_id))
       );
 
       const res = (
@@ -86,7 +110,29 @@ export default function SavedFlights(props: Props) {
       if (error) {
         console.error("Error deleting saved flight", error);
       } else {
-        // toast("Deleted flight from profile");
+        let completed = false;
+        toast.success("Deleted flight from profile", {
+          action: {
+            label: "Undo",
+            onClick: async () => {
+              console.log("click")
+              if (completed) return;
+              completed = true;
+              setFlights([...flights, flight]);
+              const { error } = await sb.from("saved_flights").insert([
+                {
+                  user_id: user.id,
+                  flight_id: flight.ID,
+                  availability_id: flight.AvailabilityID,
+                },
+              ]);
+              if (error) {
+                toast.error("Error saving flight: " + error);
+              }
+              console.log(flights.length)
+            }
+          }
+        });
       }
     }
   };

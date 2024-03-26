@@ -42,6 +42,8 @@ function FlightStore(props: Props) {
 
   const [dragging, setDragging] = useState<boolean>(false);
 
+  const [noResults, setNoResults] = useState<boolean>(props.data.length == 0);
+
   // if (dragging) {
   //   console.log("I am dragging");
   // } else {
@@ -51,7 +53,6 @@ function FlightStore(props: Props) {
   useEffect(() => {
     async function getData() {
       if (user != null) {
-        console.log("ping sb");
         const { data } = await sb
           .from("saved_flights")
           .select("flight_id")
@@ -90,18 +91,26 @@ function FlightStore(props: Props) {
   }));
 
   const saveFlight = async (flight: FlightOption) => {
+    // Check if flight has already departed
+    if (new Date(flight.DepartsAt).getTime() < new Date().getTime()) {
+      toast.warning(
+        "Sorry, this flight has already departed. Try searching availability on a different day!"
+      );
+      return;
+    }
     setBoard((board) => [...board, flight]);
     if (user !== null) {
       const { error } = await sb.from("saved_flights").insert({
         flight_id: flight.ID,
         availability_id: flight.AvailabilityID,
         user_id: user.id,
+        departure: flight.DepartsAt,
       });
       if (error) {
         console.error("Error saving flight", error);
       } else {
         toast("Saved flight to profile");
-        console.log("Saved flight", flight.ID);
+        console.log("Saved flight", flight.ID, flight.DepartsAt);
       }
     }
   };
@@ -139,7 +148,9 @@ function FlightStore(props: Props) {
           <Drawer open={dragging}>
             <DrawerContent ref={drop}>
               <div className="mx-auto w-full max-w-sm h-[35vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
-                <div className="">Drop flight here to save it for later!</div>
+                <div className="text-center">
+                  Drop here to save flight for later
+                </div>
               </div>
             </DrawerContent>
           </Drawer>
@@ -148,19 +159,25 @@ function FlightStore(props: Props) {
         <></>
       )}
       <div className="flex flex-row justify-between mx-[10vw] mt-10 overflow-y-hidden">
-        <p className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
-          Flight Results
+        <p className="text-center text-lg my-3 font-bold mr-4 text-[#ee6c4d] overflow-y-hidden">
+          {props.data.length == 0
+            ? "No flight results for inputted options"
+            : "Flight results"}
         </p>
-        <DropdownMenuRadioGroupWithOptions
-          options={[
-            { value: SORT_METHODS.PRICE, label: "Price" },
-            { value: SORT_METHODS.DURATION, label: "Duration" },
-            { value: SORT_METHODS.STOPS, label: "Stops" },
-          ]}
-          label="Sort by"
-          selected={sortMethod}
-          setSelected={setSortMethod}
-        />
+        {props.data.length == 0 ? (
+          <></>
+        ) : (
+          <DropdownMenuRadioGroupWithOptions
+            options={[
+              { value: SORT_METHODS.PRICE, label: "Price" },
+              { value: SORT_METHODS.DURATION, label: "Duration" },
+              { value: SORT_METHODS.STOPS, label: "Stops" },
+            ]}
+            label="Sort by"
+            selected={sortMethod}
+            setSelected={setSortMethod}
+          />
+        )}
       </div>
 
       <div
@@ -201,9 +218,17 @@ function FlightStore(props: Props) {
           })}
       </div>
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
-        Current saved flights for this search
+        {props.data.length == 0
+          ? ""
+          : "Currently saved flights for this search"}
       </div>
-      <div className="flex flex-row justify-center overflow-y-hidden relative">
+      <div
+        className={
+          props.data.length == 0
+            ? "hidden"
+            : "flex flex-row justify-center overflow-y-hidden relative"
+        }
+      >
         {board.length > 2 && props.device == "desktop" ? (
           <div className="z-10 absolute top-[85px] right-20">
             <Button className="bg-black/75 rounded-full hover:cursor-default hover:bg-black/75">

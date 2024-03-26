@@ -59,10 +59,13 @@ type Props = {
   setData: (data: FlightOption[]) => void;
   setLoading: (loading: boolean) => void;
   reference: any;
+  expanded: boolean;
+  setExpanded: (expanded: boolean) => void;
 };
 
 export function FlightRequestForm(props: Props) {
-  const [expanded, setExpanded] = useState(true);
+  // const [expanded, setExpanded] = useState(true);
+  const { expanded, setExpanded } = props;
   const [data, setData] = useState<RequestFormData>();
   const handleClick = () => {
     props.reference.current?.scrollIntoView({ behavior: "smooth" });
@@ -124,9 +127,9 @@ export function FlightRequestForm(props: Props) {
                                 >
                                   {field.value
                                     ? airports.find(
-                                        (airport) =>
-                                          `${airport.iata}` === field.value
-                                      )?.name
+                                      (airport) =>
+                                        `${airport.iata}` === field.value
+                                    )?.name
                                     : "Select Airport"}
                                   <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
@@ -142,7 +145,7 @@ export function FlightRequestForm(props: Props) {
                                 <CommandGroup>
                                   {airports.map((airport) => (
                                     <CommandItem
-                                      value={`${airport.name} (${airport.iata})`}
+                                      value={`${airport.city}, ${airport.state} (${airport.iata})`}
                                       key={airport.iata}
                                       onSelect={() => {
                                         form.setValue(
@@ -151,7 +154,7 @@ export function FlightRequestForm(props: Props) {
                                         );
                                       }}
                                     >
-                                      {`${airport.name} (${airport.iata})`}
+                                      {`${airport.city}, ${airport.state} (${airport.iata})`}
                                       <CheckIcon
                                         className={cn(
                                           "ml-auto h-4 w-4",
@@ -192,9 +195,9 @@ export function FlightRequestForm(props: Props) {
                                 >
                                   {field.value
                                     ? airports.find(
-                                        (airport) =>
-                                          `${airport.iata}` === field.value
-                                      )?.name
+                                      (airport) =>
+                                        `${airport.iata}` === field.value
+                                    )?.name
                                     : "Select Airport"}
                                   <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
@@ -210,7 +213,7 @@ export function FlightRequestForm(props: Props) {
                                 <CommandGroup>
                                   {airports.map((airport) => (
                                     <CommandItem
-                                      value={`${airport.name} (${airport.iata})`}
+                                      value={`${airport.city}, ${airport.state} (${airport.iata})`}
                                       key={airport.iata}
                                       onSelect={() => {
                                         form.setValue(
@@ -219,7 +222,7 @@ export function FlightRequestForm(props: Props) {
                                         );
                                       }}
                                     >
-                                      {`${airport.name} (${airport.iata})`}
+                                      {`${airport.city}, ${airport.state} (${airport.iata})`}
                                       <CheckIcon
                                         className={cn(
                                           "ml-auto h-4 w-4",
