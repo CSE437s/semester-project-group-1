@@ -49,4 +49,10 @@ async function grabAvailability(flightId: string) {
     return availability.data.filter((flight) => flight.RemainingSeats > 0);
 }
 
-export { fetchFlights }
+async function grabAvailibilities(flightIds: string[]) {
+    return await Promise.all(flightIds.map(async (id) => {
+        return (await grabAvailability(id));
+    }));
+}
+
+export { fetchFlights, grabAvailability, grabAvailibilities }

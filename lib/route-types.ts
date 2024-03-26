@@ -109,6 +109,18 @@ type FlightIdRequest = {
     flightId: string;
 }
 
+type StoredFlightData = {
+  id: number,
+  created_at: string,
+  user_id: string,
+  availability_id: string,
+  flight_id: string,
+}
+
+type StoredDataAvailabilityId = {
+  availability_id: string,
+}
+
 export type {
     BasicFlightRequest,
     BasicFlightRequestStringified,
@@ -120,4 +132,6 @@ export type {
     TripResponseData,
     QueryFlightRequest,
     FlightIdRequest,
+    StoredFlightData,
+    StoredDataAvailabilityId,
 }

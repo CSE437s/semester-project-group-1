@@ -13,6 +13,7 @@ type Props = {
   title?: string;
   x: boolean;
   handleRemove: (flight: FlightOption) => void;
+  isDraggable?: boolean;
 };
 
 const getOriginAirport = (segments: AvailabilitySegment[]) => {
@@ -64,7 +65,8 @@ function FlightCard(props: Props) {
     ref.current?.scrollIntoView({ behavior: "auto" });
   };
 
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging }, drag] = !props.isDraggable ? [{ isDragging: false }, null]
+   : useDrag(() => ({
     type: ItemTypes.CARD,
     item: props.item,
     collect: (monitor) => ({
@@ -87,9 +89,6 @@ function FlightCard(props: Props) {
               <div className="text-3xl">x</div>
             </div>
           </div>
-          {/* <div className="text-xl font-bold text-center text-cyan-300">
-            {"Flight: " + (item.idx + 1)}
-          </div> */}
           <div className="text-base text-center font-normal">
             Date: {item.DepartsAt}  {/*  TODO: may not be what we want to display */}
           </div>
@@ -120,12 +119,12 @@ function FlightCard(props: Props) {
 
   return (
     <div
-      ref={drag}
+      ref={props.isDraggable ? drag : null}
       style={{
         opacity: isDragging ? 0.5 : 1,
         fontSize: 25,
         fontWeight: "bold",
-        cursor: "move",
+        cursor: props.isDraggable ? "move": "pointer",
       }}
     >
       {showModal == true ? displayModal(props, setModal, props.item) : <></>}
@@ -150,13 +149,14 @@ function FlightCard(props: Props) {
           <></>
         )}
         <div className="flex justify-center m-0 p-0 text-sm">
-          <Image
+          {props.isDraggable && <Image
             className="rotate-90 -mt-3"
             width={30}
             height={30}
             src={svg}
             alt="draggable"
           />
+          }
         </div>
         <div className="text-sm font-light flex flex-col">
           <p>{getFlightNumbers(props.item)}</p>

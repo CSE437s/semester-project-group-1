@@ -1,6 +1,7 @@
 import { FlightResponseData, FlightsByIdsRequest, TripResponseData } from "@/lib/route-types";
-import { SeatsAero } from "@/lib/server/AeroClient";
 import type { NextApiRequest, NextApiResponse } from "next";
+
+import { SeatsAero } from "@/lib/server/AeroClient";
 
 export default async function handler(
   req: NextApiRequest,
