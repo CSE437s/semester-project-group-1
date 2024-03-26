@@ -13,22 +13,22 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 import { Button } from "@/components/ui/button"
+import { SORT_METHODS } from "../FlightStore"
 
 export type DropdownOptions = {
-    value: string
+    value: SORT_METHODS
     label: string
 }
 
 type Props = {
     options: DropdownOptions[]
     label: string
-    selected: string
-    setSelected: (value: string) => void
+    selectedSort: SORT_METHODS
+    setSelectedSort: (value: SORT_METHODS) => void
 }
 
 export function DropdownMenuRadioGroupWithOptions(props: Props) {
     const options = props.options
-//   const [position, setPosition] = React.useState(options[0].value)
 
   return (
     <DropdownMenu>
@@ -38,7 +38,7 @@ export function DropdownMenuRadioGroupWithOptions(props: Props) {
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>{props.label}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup value={props.selected} onValueChange={props.setSelected}>
+        <DropdownMenuRadioGroup value={props.selectedSort} onValueChange={props.setSelectedSort}>
             {options.map((option) => (
                 <DropdownMenuRadioItem key={option.value} value={option.value}>
                 {option.label}
