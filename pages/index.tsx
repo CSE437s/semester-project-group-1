@@ -1,5 +1,13 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { FlightRequestForm, RequestFormData } from "@/components/FlightRequestForm";
+import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
@@ -8,26 +16,20 @@ import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { CreateEmbeddingResponse } from "openai/resources/index.mjs";
 import { DndProvider } from "react-dnd";
+import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import { FlightOption } from "@/lib/availability-types";
-import { FlightRequestForm } from "@/components/FlightRequestForm";
 import FlightStore from "@/components/FlightStore";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Input } from "@/components/ui/input";
+import { LogOut } from "lucide-react";
 import SavedFlights from "@/components/SavedFlights";
 import { StoredFlightData } from "@/lib/route-types";
+import { Toaster } from "sonner";
+import { fetchFlights } from "@/lib/requestHandler";
 import { useIsMobile } from "@/lib/utils";
 import { useRouter } from "next/router";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
-import { LogOut } from "lucide-react";
-import { Toaster } from "sonner";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
 
@@ -40,14 +42,12 @@ export default function Home() {
   const [queryExpanded, setQueryExpanded] = useState(true);
 
   const [loading, setLoading] = useState(false);
+  const [queryLoading, setQueryLoading] = useState(false);
   const [data, setData] = useState<FlightOption[] | undefined>();
+  const [queryData, setQueryData] = useState<FlightOption[] | undefined>();
+  const [queryValue, setQueryValue] = useState("");
 
-  // const [screen, setScreen] = useState(1001);
   const isMobile = useIsMobile(680);
-  // useEffect(() => {
-  //   window.addEventListener("resize", () => setScreen(window.innerWidth));
-  //   setScreen(window.innerWidth);
-  // }, []);
 
   const [page, setPage] = useState("input");
 
@@ -94,7 +94,7 @@ export default function Home() {
       return
     }
     const embedding = trimEmbedding(res.data[0].embedding)
-
+    
     const { data: documents } = await sb.rpc('match_documents', {
       query_embedding: embedding, // Pass the embedding you want to compare
       match_threshold: 0.3, // Choose an appropriate threshold for your data
@@ -107,12 +107,14 @@ export default function Home() {
     const TOP = 7
     const fetchData: RequestFormData[] = documents.slice(0, TOP).map((doc) => {
       const today1am = new Date()
+
       const tomorrow11pm = new Date()
       tomorrow11pm.setDate(tomorrow11pm.getDate() + 1)
       today1am.setHours(0, 0, 0, 0)
       tomorrow11pm.setHours(23, 59, 59, 999)
 
       console.log(today1am, tomorrow11pm)
+
 
       return {
         outboundAirportCode: "ORD",
@@ -207,6 +209,20 @@ export default function Home() {
               }
             }}
           ></Input>
+        </div>
+        <div ref={ref}>
+          <div className="flex justify-center text-[#ee6c4d] font-bold text-xl">
+            {queryLoading && <div>Loading...</div>}
+          </div>
+          {queryData !== undefined ? (
+            !isMobile ? (
+              renderDragCards(queryData)
+            ) : (
+              renderMobileCards(queryData)
+            )
+          ) : (
+            <></>
+          )}
         </div>
       </>
     );
