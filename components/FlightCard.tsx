@@ -1,7 +1,4 @@
-import {
-  AvailabilitySegment,
-  FlightOption,
-} from "@/lib/availability-types";
+import { AvailabilitySegment, FlightOption } from "@/lib/availability-types";
 import React, { useRef, useState } from "react";
 
 import { Button } from "./ui/button";
@@ -15,7 +12,7 @@ type Props = {
   item: FlightOption;
   description?: string;
   title?: string;
-  isSaved: boolean
+  isSaved: boolean;
   handleRemove: (flight: FlightOption) => void;
   isDraggable: boolean;
   device: string;
@@ -164,7 +161,7 @@ function FlightCard(props: Props) {
           <></>
         )}
         <div className="flex justify-center m-0 p-0 text-sm overflow-y-hidden">
-          {props.isDraggable && (
+          {props.isDraggable && props.isSaved == false && (
             <Image
               className="rotate-90"
               width={30}
@@ -177,8 +174,8 @@ function FlightCard(props: Props) {
         <div
           onClick={() => {
             // if (props.x == false) {
-              setModal(true);
-              handleClick();
+            setModal(true);
+            handleClick();
             // }
           }}
           className="text-sm font-light flex flex-col pt-0"
@@ -194,27 +191,25 @@ function FlightCard(props: Props) {
                   ? "stops"
                   : "stop"
               }`}</p>
-          {props.device == "desktop" ? (
+          {props.device == "desktop" && props.isSaved == false ? (
             <p>{`Duration: ${displayDuration(
               getFlightDuration(props.item.AvailabilitySegments)
             )}`}</p>
           ) : (
             <></>
           )}
-          {props.device == "desktop" ? (
+          {props.device == "desktop" && props.isSaved == false ? (
             <p>{"Airline: " + props.item.Carriers}</p>
           ) : (
             <></>
           )}
-          {props.device == "desktop" ? (
+          {props.device == "desktop" && props.isSaved == false ? (
             <p>{"Points: " + props.item.MileageCost}</p>
           ) : (
             <></>
           )}
         </div>
-        <div className=" text-xs font-thin">
-          Click for more flight details
-        </div>
+        <div className=" text-xs font-thin">Click for more flight details</div>
         <div className="flex justify-center">
           {!props.isSaved &&
           props.device === "mobile" &&

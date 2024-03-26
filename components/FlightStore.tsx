@@ -87,7 +87,7 @@ function FlightStore(props: Props) {
   };
 
   const cardGridLaptopClasses =
-    "flex flex-row justify-center flex-wrap max-w-[90vw]";
+    "flex flex-row justify-center flex-wrap max-w-[900px]";
   const cardGridMobileClasses = "flex  items-center justify-center flex-col";
 
   const boardMobileClasses =
