@@ -1,7 +1,6 @@
 import { AvailabilitySegment, FlightOption } from "@/lib/availability-types";
 import React, { useEffect, useRef, useState } from "react";
 
-
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { ItemTypes } from "./Constants";
@@ -106,6 +105,7 @@ function FlightCard(props: Props) {
     setModal: React.Dispatch<React.SetStateAction<boolean>>,
     item: FlightOption
   ) => {
+    console.log(item);
     return (
       <div className="z-40 drop-shadow-lg text-black h-[100vh] absolute top-0 left-0 flex justify-center items-center w-screen bg-slate-600/80 overflow-y-hidden">
         <div className="w-[50vw] h-[50vh] p-8 pb-10 border-solid b-1 border-slate-200 bg-white relative rounded-lg overflow-y-hidden">
@@ -120,7 +120,7 @@ function FlightCard(props: Props) {
               <div className="text-3xl">x</div>
             </div>
           </div>
-          <div className="text-base text-center font-normal overflow-y-hidden">
+          <div className="text-base text-center font-normal mt-2 overflow-y-hidden">
             Date: {item.DepartsAt}{" "}
           </div>
           <div className="text-base text-center font-normal overflow-y-hidden">
@@ -128,21 +128,25 @@ function FlightCard(props: Props) {
             {getDestinationAirport(item.AvailabilitySegments)}
           </div>
           <div className="text-lg font-normal text-center mb-2 overflow-y-hidden">
-            Flight Options
+            Flight Details
           </div>
-          <div className="grid grid-rows-2 grid-cols-2 gap-4 overflow-y-hidden">
+          <div className="grid grid-rows-1 grid-cols-1 gap-4 overflow-y-hidden">
             <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
               <div className="text-sm font-semibold">
                 Airline: {item.Carriers}
               </div>
+              <div className="text-sm font-normal">Cabin: {item.Cabin}</div>
               <div className="text-sm font-normal">
-                Direct Flight: {item.Stops === 0 ? "Yes" : "No"}
+                Direct Flight: {item.Stops === 0 ? "Yes" : "No, " + item.Stops}
               </div>
               <div className="text-sm font-normal">
                 Remaining Seats: {item.RemainingSeats}
               </div>
               <div className="text-sm font-normal">
                 Points: {item.MileageCost}
+              </div>
+              <div className="text-sm font-normal">
+                Dollar Estimate: {"$" + item.MileageCost * 0.006}
               </div>
             </div>
           </div>
