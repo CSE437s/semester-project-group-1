@@ -12,14 +12,22 @@ type Props = {
   setSavedFlights: (flights: StoredFlightData[]) => void;
 };
 
-const filterFlightsToFlightIds = (savedFlights: StoredFlightData[], flightOptions: FlightOption[]): FlightOption[] => {
-    // match flight ids to ids in flightOptions
-    const filtered = flightOptions.filter((flightOption) => {
-        return savedFlights.some((savedFlight) => savedFlight.flight_id === flightOption.ID);
+const filterFlightsToFlightIds = (
+  savedFlights: StoredFlightData[],
+  flightOptions: FlightOption[]
+): FlightOption[] => {
+  // match flight ids to ids in flightOptions
+  const filtered = flightOptions
+    .filter((flightOption) => {
+      return savedFlights.some(
+        (savedFlight) => savedFlight.flight_id === flightOption.ID
+      );
     })
-    .filter((value, index, self) => self.map((x) => x.ID).indexOf(value.ID) === index);
-    return filtered !== undefined ? filtered : [];
-}
+    .filter(
+      (value, index, self) => self.map((x) => x.ID).indexOf(value.ID) === index
+    );
+  return filtered !== undefined ? filtered : [];
+};
 
 export default function SavedFlights(props: Props) {
   const sb = useSupabaseClient();
@@ -57,7 +65,7 @@ export default function SavedFlights(props: Props) {
     <>
       <div className="flex flex-col items-center justify-center w-full h-full">
         <h1 className="text-2xl font-bold">Saved Flights</h1>
-        <div className="w-full flex flex-col items-center justify-center">
+        <div className="max-w-[900px] flex flex-row flex-wrap items-center justify-center">
           {loading && <p>Loading...</p>}
           {flights &&
             flights.map((flight) => (

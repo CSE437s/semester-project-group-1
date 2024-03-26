@@ -18,7 +18,13 @@ import SavedFlights from "@/components/SavedFlights";
 import { StoredFlightData } from "@/lib/route-types";
 import { useIsMobile } from "@/lib/utils";
 import { useRouter } from "next/router";
-import { DropdownMenu, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import { LogOut } from "lucide-react";
 
@@ -72,7 +78,7 @@ export default function Home() {
           flights for later to your profile.
         </div>
         <div className="px-[50px] my-10">
-          <div className="lg:flex lg:justify-center lg:items-center">
+          <div className="md:flex md:justify-center md:items-center">
             <FlightRequestForm
               setData={setData}
               setLoading={setLoading}
@@ -249,7 +255,10 @@ export default function Home() {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuItem className="text-sm text-white font-normal" disabled>
+            <DropdownMenuItem
+              className="text-sm text-white font-normal"
+              disabled
+            >
               {user !== null ? user.email : ""}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -259,15 +268,14 @@ export default function Home() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
       </div>
       {page == "input"
         ? renderInput()
         : page == "query"
-          ? renderQuery()
-          : page == "saved"
-            ? renderSaved()
-            : renderProfile()}
+        ? renderQuery()
+        : page == "saved"
+        ? renderSaved()
+        : renderProfile()}
     </div>
   );
 }
