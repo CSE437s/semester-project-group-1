@@ -1,15 +1,9 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
-import { StoredDataAvailabilityId, StoredFlightData } from "@/lib/route-types";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 import { useEffect, useRef, useState } from "react";
 
@@ -18,11 +12,11 @@ import { DndProvider } from "react-dnd";
 import { FlightOption } from "@/lib/availability-types";
 import { FlightRequestForm } from "@/components/FlightRequestForm";
 import FlightStore from "@/components/FlightStore";
-import FlightStoreMobile from "@/components/FlightStoreMobile";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Input } from "@/components/ui/input";
-import { ReducedFlightRequestForm } from "@/components/ReducedFlightRequestForm";
 import SavedFlights from "@/components/SavedFlights";
+import { StoredFlightData } from "@/lib/route-types";
+import { useIsMobile } from "@/lib/utils";
 import { useRouter } from "next/router";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
@@ -33,18 +27,19 @@ export default function Home() {
   const router = useRouter();
 
   const [gotFlights, setGotFlights] = useState(false);
-  const [savedFlights, setSavedFlights] = useState<StoredDataAvailabilityId[]>(
+  const [savedFlights, setSavedFlights] = useState<StoredFlightData[]>(
     []
   );
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<FlightOption[] | undefined>();
 
-  const [screen, setScreen] = useState(1001);
-  useEffect(() => {
-    window.addEventListener("resize", () => setScreen(window.innerWidth));
-    setScreen(window.innerWidth);
-  }, []);
+  // const [screen, setScreen] = useState(1001);
+  const isMobile = useIsMobile(680)
+  // useEffect(() => {
+  //   window.addEventListener("resize", () => setScreen(window.innerWidth));
+  //   setScreen(window.innerWidth);
+  // }, []);
 
   const [page, setPage] = useState("input");
 
@@ -83,7 +78,7 @@ export default function Home() {
             {loading && <div>Loading...</div>}
           </div>
           {data !== undefined ? (
-            screen >= 1000 ? (
+            !isMobile ? (
               renderDragCards(data)
             ) : (
               renderMobileCards(data)
@@ -124,10 +119,10 @@ export default function Home() {
       if (user != null) {
         const flights = await sb
           .from("saved_flights")
-          .select("availability_id")
+          .select("availability_id, flight_id")
           .eq("user_id", user.id);
         console.log("FLIGHTS", flights);
-        setSavedFlights(flights.data as StoredDataAvailabilityId[]); // TODO: un jank this
+        setSavedFlights(flights.data as StoredFlightData[]); // TODO: un jank this
         setGotFlights(true);
       }
     }
@@ -151,7 +146,7 @@ export default function Home() {
             regarding your saved flights.
           </div>
           <SavedFlights
-            device={screen < 1000 ? "desktop" : "mobile"}
+            device={!isMobile ? "desktop" : "mobile"}
             flights={savedFlights}
             setSavedFlights={setSavedFlights}
           />

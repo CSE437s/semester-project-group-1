@@ -1,11 +1,10 @@
 import {
   AvailabilitySegment,
   FlightOption,
-  FlightOptionWIndex,
 } from "@/lib/availability-types";
 import React, { useRef, useState } from "react";
-import { Button } from "./ui/button";
 
+import { Button } from "./ui/button";
 import Image from "next/image";
 import { ItemTypes } from "./Constants";
 import svg from "../public/drag-handle.svg";
@@ -16,7 +15,7 @@ type Props = {
   item: FlightOption;
   description?: string;
   title?: string;
-  x: boolean;
+  isSaved: boolean
   handleRemove: (flight: FlightOption) => void;
   isDraggable: boolean;
   device: string;
@@ -105,7 +104,6 @@ function FlightCard(props: Props) {
           </div>
           <div className="text-base text-center font-normal overflow-y-hidden">
             Date: {item.DepartsAt}{" "}
-            {/*  TODO: may not be what we want to display */}
           </div>
           <div className="text-base text-center font-normal overflow-y-hidden">
             From: {getOriginAirport(item.AvailabilitySegments)} to{" "}
@@ -153,9 +151,9 @@ function FlightCard(props: Props) {
       {showModal == true ? displayModal(props, setModal, props.item) : <></>}
       <div
         ref={ref}
-        className={props.x == true ? cardInBoardClasses : cardInGridClasses}
+        className={props.isSaved ? cardInBoardClasses : cardInGridClasses}
       >
-        {props.x == true || (props.x == false && props.isDraggable == false) ? (
+        {props.isSaved ? (
           <div
             onClick={() => props.handleRemove(props.item)}
             className="z-2 absolute top-0 right-0 text-sm p-2 rounded-full cursor-pointer hover:bg-slate-200"
@@ -166,7 +164,7 @@ function FlightCard(props: Props) {
           <></>
         )}
         <div className="flex justify-center m-0 p-0 text-sm overflow-y-hidden">
-          {props.isDraggable && props.device == "desktop" && (
+          {props.isDraggable && (
             <Image
               className="rotate-90"
               width={30}
@@ -178,10 +176,10 @@ function FlightCard(props: Props) {
         </div>
         <div
           onClick={() => {
-            if (props.x == false) {
+            // if (props.x == false) {
               setModal(true);
               handleClick();
-            }
+            // }
           }}
           className="text-sm font-light flex flex-col pt-0"
         >
@@ -214,20 +212,16 @@ function FlightCard(props: Props) {
             <></>
           )}
         </div>
-        {props.x == false ? (
-          <div className=" text-xs font-thin">
-            Click for more flight details
-          </div>
-        ) : (
-          <></>
-        )}
+        <div className=" text-xs font-thin">
+          Click for more flight details
+        </div>
         <div className="flex justify-center">
-          {props.x == false &&
-          props.device == "mobile" &&
-          props.isDraggable == false ? (
+          {!props.isSaved &&
+          props.device === "mobile" &&
+          props.isDraggable === false ? (
             <Button
               onClick={() => {
-                if (props.x == false && props.addToBoard !== undefined) {
+                if (!props.isSaved && props.addToBoard !== undefined) {
                   props.addToBoard(props.item);
                 }
               }}

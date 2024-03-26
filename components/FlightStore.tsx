@@ -1,13 +1,8 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
 import { FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
 import React, { useEffect, useState } from "react";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
 
+import { Device } from "@/lib/types";
 import { DropdownMenuRadioGroupWithOptions } from "./ui/DropdownMenuRadioGroup";
 import FlightCard from "./FlightCard";
 import { ItemTypes } from "./Constants";
@@ -15,7 +10,7 @@ import { useDrop } from "react-dnd";
 
 type Props = {
   data: FlightOption[];
-  device: string;
+  device: Device;
 };
 
 function FlightStore(props: Props) {
@@ -146,8 +141,8 @@ function FlightStore(props: Props) {
                   item={flight}
                   handleRemove={deleteSavedFlight}
                   addToBoard={saveFlight}
-                  x={false}
-                  isDraggable={true}
+                  isSaved={false}
+                  isDraggable={props.device === "desktop"}
                   device={props.device == "desktop" ? "desktop" : "mobile"}
                 />
               );
@@ -171,8 +166,8 @@ function FlightStore(props: Props) {
                 description={"description"}
                 title={"title"}
                 item={flight}
-                x={true}
-                isDraggable={true}
+                isSaved={true}
+                isDraggable={props.device === "desktop"}
                 addToBoard={saveFlight}
                 handleRemove={deleteSavedFlight}
                 device={props.device == "desktop" ? "desktop" : "mobile"}
