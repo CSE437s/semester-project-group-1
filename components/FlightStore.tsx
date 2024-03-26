@@ -19,36 +19,32 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { FlightFilterPopover } from "./FlightFilterPopover";
 
 type Props = {
   data: FlightOption[];
   device: Device;
 };
 
+enum SORT_METHODS {
+  PRICE = "PRICE",
+  DURATION = "DURATION",
+  STOPS = "STOPS",
+};
+
 function FlightStore(props: Props) {
-  const SORT_METHODS = {
-    PRICE: "PRICE",
-    DURATION: "DURATION",
-    STOPS: "STOPS",
-  };
 
   const [board, setBoard] = useState<FlightOption[] | []>([]);
   const sb = useSupabaseClient();
   const user: User | null = useUser();
 
   const [sortMethod, setSortMethod] = useState(SORT_METHODS.PRICE);
-  const [numFlightsToReturn, setNumFlightsToReturn] = useState(8); // TODO: enforce this number by screen size?
+  const [numFlightsToReturn, setNumFlightsToReturn] = useState(6); // TODO: enforce this number by screen size?
   // Could also implement a "show more" button
 
   const [dragging, setDragging] = useState<boolean>(false);
 
   const [noResults, setNoResults] = useState<boolean>(props.data.length == 0);
-
-  // if (dragging) {
-  //   console.log("I am dragging");
-  // } else {
-  //   console.log("I am not dragging");
-  // }
 
   useEffect(() => {
     async function getData() {
@@ -109,8 +105,8 @@ function FlightStore(props: Props) {
       if (error) {
         console.error("Error saving flight", error);
       } else {
-        toast("Saved flight to profile");
-        console.log("Saved flight", flight.ID, flight.DepartsAt);
+        toast("Saved flight to profile", {});
+        // console.log("Saved flight", flight.ID, flight.DepartsAt);
       }
     }
   };
@@ -164,19 +160,18 @@ function FlightStore(props: Props) {
             ? "No flight results for inputted options"
             : "Flight results"}
         </p>
-        {props.data.length == 0 ? (
-          <></>
-        ) : (
-          <DropdownMenuRadioGroupWithOptions
-            options={[
-              { value: SORT_METHODS.PRICE, label: "Price" },
-              { value: SORT_METHODS.DURATION, label: "Duration" },
-              { value: SORT_METHODS.STOPS, label: "Stops" },
-            ]}
-            label="Sort by"
-            selected={sortMethod}
-            setSelected={setSortMethod}
-          />
+        { props.data.length == 0 ? <></> :
+        (
+        <FlightFilterPopover
+          options={Object.values(SORT_METHODS).map((method) => ({
+            value: method,
+            label: method.slice(0, 1).toUpperCase() + method.slice(1).toLowerCase()
+          }))}
+          selectedSort={sortMethod}
+          setSelectedSort={setSortMethod}
+          results={numFlightsToReturn}
+          setResults={setNumFlightsToReturn}
+        />
         )}
       </div>
 
@@ -217,6 +212,12 @@ function FlightStore(props: Props) {
             }
           })}
       </div>
+      {FlightList.length > numFlightsToReturn && (
+        <div className="flex flex-row justify-center mt-5">
+          <Button className="bg-white text-black hover:bg-black hover:text-white hover:cursor-pointer" 
+          onClick={() => setNumFlightsToReturn(numFlightsToReturn + 6)}>Show More</Button>
+        </div>
+      )}
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
         {props.data.length == 0
           ? ""
@@ -263,5 +264,5 @@ function FlightStore(props: Props) {
     </div>
   );
 }
-
+export { SORT_METHODS }
 export default FlightStore;
