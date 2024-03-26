@@ -106,7 +106,7 @@ function FlightStore(props: Props) {
         console.error("Error saving flight", error);
       } else {
         toast("Saved flight to profile", {});
-        console.log("Saved flight", flight.ID, flight.DepartsAt);
+        // console.log("Saved flight", flight.ID, flight.DepartsAt);
       }
     }
   };
