@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 import { LogOut } from "lucide-react";
+import { Toaster } from "sonner";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
 
@@ -127,16 +128,12 @@ export default function Home() {
   }
 
   function renderSaved() {
-    
-
     return (
       <>
         {/* TODO make api calls for all flights from db to get information with te flights in savedFlights */}
 
         <div className="flex flex-col items-center">
-          <div className="text-center font-bold text-[#fafafa] text-2xl w-[400px] my-5">
-            See your saved flights here
-          </div>
+          <h1 className="text-2xl font-bold">Saved Flights</h1>
           <div className="text-center font-normal text-[#fafafa] w-[400px] my-5">
             Due to the nature of airline points and flights, flight information
             changes all the time. Flight prices might be higher or lower
@@ -174,6 +171,7 @@ export default function Home() {
 
   return (
     <div className="bg-[#1f1b24] text-[#fafafa] overflow-x-hidden w-screen max-w-[100vw] min-h-[100vh] flex flex-col  relative">
+      <Toaster />
       <div className="flex m-5 flex-col justify-center items-center min-[1000px]:space-x-14 w-full min-[1000px]:flex-row text-xs min-[1000px]:text-sm">
         <div className="text-white font-bold text-lg">
           Fli<span className="text-cyan-300">ghts</span>
