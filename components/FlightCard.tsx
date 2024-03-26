@@ -1,6 +1,6 @@
 import { AvailabilitySegment, FlightOption } from "@/lib/availability-types";
 import React, { useEffect, useRef, useState } from "react";
-
+import airlines from "@/lib/airlines";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { ItemTypes } from "./Constants";
@@ -101,12 +101,32 @@ function FlightCard(props: Props) {
     }
   }, [isDragging]);
 
+  function getCarrier(carrier: string): string {
+    let carriers: string[] = carrier.split(",");
+    for (let i = 0; i < carriers.length; i++) {
+      carriers[i] = carriers[i].trim();
+    }
+    function removeDuplicates(arr: string[]) {
+      return new Set<string>(arr);
+    }
+    let noDupes = removeDuplicates(carriers);
+    let airlineString = "";
+    noDupes.forEach((element) => {
+      let temp = airlines.find((item) => {
+        return item.code == element;
+      });
+      airlineString += temp?.airline;
+    });
+    console.log(airlineString);
+    return airlineString;
+  }
+
   const displayModal = (
     props: Props,
     setModal: React.Dispatch<React.SetStateAction<boolean>>,
     item: FlightOption
   ) => {
-    console.log(item);
+    // console.log(item);
     return (
       <Dialog open={showModal} onOpenChange={() => setModal(false)}>
         <DialogContent className="sm:max-w-[425px]">
@@ -123,8 +143,8 @@ function FlightCard(props: Props) {
             </div>
             <div className="grid grid-rows-1 grid-cols-1 mt-5">
               <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
-                <div className="text-sm font-semibold">
-                  Airline: {item.Carriers}
+                <div className="text-sm">
+                  Airline: {getCarrier(item.Carriers)}
                 </div>
                 <div className="text-sm font-normal">Cabin: {item.Cabin}</div>
                 <div className="text-sm font-normal">
