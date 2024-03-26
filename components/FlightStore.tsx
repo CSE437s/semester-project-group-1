@@ -91,10 +91,18 @@ function FlightStore(props: Props) {
   const saveFlight = async (flight: FlightOption) => {
     setBoard((board) => [...board, flight]);
     if (user !== null) {
+
+      // Check if flight has already departed
+      if (new Date(flight.DepartsAt).getTime() < new Date().getTime()) {
+        toast.warning("Sorry, this flight has already departed. Try searching availability on a different day!");
+        return;
+      }
+
       const { error } = await sb.from("saved_flights").insert({
         flight_id: flight.ID,
         availability_id: flight.AvailabilityID,
         user_id: user.id,
+        departure: flight.DepartsAt,
       });
       if (error) {
         console.error("Error saving flight", error);
