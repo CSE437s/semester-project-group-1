@@ -141,9 +141,7 @@ export default function Home() {
             periodically check this page for the most up to date information
             regarding your saved flights.
           </div>
-          <SavedFlights
-            device={!isMobile ? "desktop" : "mobile"}
-          />
+          <SavedFlights device={!isMobile ? "desktop" : "mobile"} />
         </div>
       </>
     );

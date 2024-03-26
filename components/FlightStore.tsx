@@ -8,6 +8,7 @@ import FlightCard from "./FlightCard";
 import { ItemTypes } from "./Constants";
 import { useDrop } from "react-dnd";
 import FadeIn from "react-fade-in";
+import { toast } from "sonner";
 import {
   Drawer,
   DrawerClose,
@@ -41,11 +42,11 @@ function FlightStore(props: Props) {
 
   const [dragging, setDragging] = useState<boolean>(false);
 
-  if (dragging) {
-    console.log("I am dragging");
-  } else {
-    console.log("I am not dragging");
-  }
+  // if (dragging) {
+  //   console.log("I am dragging");
+  // } else {
+  //   console.log("I am not dragging");
+  // }
 
   useEffect(() => {
     async function getData() {
@@ -91,7 +92,7 @@ function FlightStore(props: Props) {
   const saveFlight = async (flight: FlightOption) => {
     setBoard((board) => [...board, flight]);
     if (user !== null) {
-      const { error} = await sb.from("saved_flights").insert({
+      const { error } = await sb.from("saved_flights").insert({
         flight_id: flight.ID,
         availability_id: flight.AvailabilityID,
         user_id: user.id,
@@ -99,6 +100,7 @@ function FlightStore(props: Props) {
       if (error) {
         console.error("Error saving flight", error);
       } else {
+        toast("Saved flight to profile");
         console.log("Saved flight", flight.ID);
       }
     }
@@ -111,6 +113,7 @@ function FlightStore(props: Props) {
         .from("saved_flights")
         .delete()
         .match({ flight_id: flight.ID, user_id: user.id });
+      toast("Deleted flight from profile");
     }
   };
 
@@ -135,7 +138,7 @@ function FlightStore(props: Props) {
           </div> */}
           <Drawer open={dragging}>
             <DrawerContent ref={drop}>
-              <div className="mx-auto w-full max-w-sm flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
+              <div className="mx-auto w-full max-w-sm h-[45vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
                 <div className="">Drop flight here to save it for later!</div>
               </div>
             </DrawerContent>
