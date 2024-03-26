@@ -1,4 +1,9 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
 import React, { useEffect, useState } from "react";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
@@ -10,6 +15,7 @@ import { useDrop } from "react-dnd";
 
 type Props = {
   data: FlightOption[];
+  device: string;
 };
 
 function FlightStore(props: Props) {
@@ -30,16 +36,18 @@ function FlightStore(props: Props) {
   useEffect(() => {
     async function getData() {
       if (user != null) {
-        console.log("ping sb")
-        const {data} = await sb
+        console.log("ping sb");
+        const { data } = await sb
           .from("saved_flights")
           .select("flight_id")
           .eq("user_id", user.id);
-        
+
         // Add all matching flight IDs to board
-        if (data !== null){
-          const matchingFlights = props.data.filter((flight) => data.some((item) => item.flight_id === flight.ID));
-          setBoard(matchingFlights)
+        if (data !== null) {
+          const matchingFlights = props.data.filter((flight) =>
+            data.some((item) => item.flight_id === flight.ID)
+          );
+          setBoard(matchingFlights);
         }
       }
     }
@@ -50,7 +58,7 @@ function FlightStore(props: Props) {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
     drop: (item: any) => {
-      saveFlight(item)
+      saveFlight(item);
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -65,9 +73,11 @@ function FlightStore(props: Props) {
   const saveFlight = async (flight: FlightOption) => {
     setBoard((board) => [...board, flight]);
     if (user !== null) {
-      await sb
-        .from("saved_flights")
-        .insert({ flight_id: flight.ID, availability_id: flight.AvailabilityID, user_id: user.id });
+      await sb.from("saved_flights").insert({
+        flight_id: flight.ID,
+        availability_id: flight.AvailabilityID,
+        user_id: user.id,
+      });
     }
   };
 
@@ -81,10 +91,21 @@ function FlightStore(props: Props) {
     }
   };
 
+  const cardGridLaptopClasses =
+    "flex flex-row justify-center flex-wrap max-w-[90vw]";
+  const cardGridMobileClasses = "flex  items-center justify-center flex-col";
+
+  const boardMobileClasses =
+    "w-[80vw] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-col flex-nowrap overflow-y-scroll   overflow-x-hidden h-auto justify-center bg-[#2c2c2c]";
+  const boardLaptopClasses =
+    "max-w-[800px] min-h-[200px] min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden overflow-x-scroll h-auto justify-start bg-[#2c2c2c]";
+
   return (
-    <div className="flex flex-col mb-10 no-scrollbar">
-      <div className="flex flex-row justify-between mx-[10vw]">
-        <p className="text-center text-lg my-3 font-bold text-[#ee6c4d]">Flight Results</p>
+    <div className="flex flex-col mb-10 no-scrollbar overflow-y-hidden">
+      <div className="flex flex-row justify-between mx-[10vw] mt-10 overflow-y-hidden">
+        <p className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
+          Flight Results
+        </p>
         <DropdownMenuRadioGroupWithOptions
           options={[
             { value: SORT_METHODS.PRICE, label: "Price" },
@@ -97,7 +118,13 @@ function FlightStore(props: Props) {
         />
       </div>
 
-      <div className="flex flex-row justify-center flex-wrap max-w-[90vw]">
+      <div
+        className={
+          props.device == "desktop"
+            ? cardGridLaptopClasses
+            : cardGridMobileClasses
+        }
+      >
         {FlightList.sort((a, b) => {
           if (sortMethod === SORT_METHODS.PRICE) {
             return a.MileageCost - b.MileageCost;
@@ -106,7 +133,8 @@ function FlightStore(props: Props) {
           } else {
             return a.Stops - b.Stops;
           }
-        }).slice(0, numFlightsToReturn)
+        })
+          .slice(0, numFlightsToReturn)
           .map((flight) => {
             // Only show flights that are not already saved
             if (!board.some((savedFlight) => savedFlight.ID === flight.ID)) {
@@ -117,18 +145,23 @@ function FlightStore(props: Props) {
                   title="title"
                   item={flight}
                   handleRemove={deleteSavedFlight}
+                  addToBoard={saveFlight}
                   x={false}
+                  isDraggable={true}
+                  device={props.device == "desktop" ? "desktop" : "mobile"}
                 />
-              )
+              );
             }
           })}
       </div>
-      <div className="text-center text-lg my-3 font-bold text-[#ee6c4d]">
+      <div className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
         Drag any flights below to save them for later
       </div>
-      <div className="flex flex-row justify-center">
+      <div className="flex flex-row justify-center overflow-y-hidden">
         <div
-          className="max-w-[800px] min-h-[200px] min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden   overflow-x-scroll h-auto justify-start bg-[#2c2c2c]"
+          className={
+            props.device == "desktop" ? boardLaptopClasses : boardMobileClasses
+          }
           ref={drop}
         >
           {board.map((flight) => {
@@ -139,7 +172,10 @@ function FlightStore(props: Props) {
                 title={"title"}
                 item={flight}
                 x={true}
+                isDraggable={true}
+                addToBoard={saveFlight}
                 handleRemove={deleteSavedFlight}
+                device={props.device == "desktop" ? "desktop" : "mobile"}
               />
             );
           })}

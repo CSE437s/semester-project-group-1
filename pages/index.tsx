@@ -33,7 +33,9 @@ export default function Home() {
   const router = useRouter();
 
   const [gotFlights, setGotFlights] = useState(false);
-  const [savedFlights, setSavedFlights] = useState<StoredDataAvailabilityId[]>([]);
+  const [savedFlights, setSavedFlights] = useState<StoredDataAvailabilityId[]>(
+    []
+  );
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<FlightOption[] | undefined>();
@@ -66,6 +68,9 @@ export default function Home() {
   function renderInput() {
     return (
       <>
+        <div className="text-center text-md my-3 font-normal text-white overflow-y-hidden">
+          Find one way flights to a destination within a date range
+        </div>
         <div className="flex flex-col justify-center items-center h-auto m-10">
           <FlightRequestForm
             setData={setData}
@@ -121,7 +126,7 @@ export default function Home() {
           .from("saved_flights")
           .select("availability_id")
           .eq("user_id", user.id);
-        console.log("FLIGHTS", flights)
+        console.log("FLIGHTS", flights);
         setSavedFlights(flights.data as StoredDataAvailabilityId[]); // TODO: un jank this
         setGotFlights(true);
       }
@@ -145,7 +150,8 @@ export default function Home() {
             periodically check this page for the most up to date information
             regarding your saved flights.
           </div>
-          <SavedFlights 
+          <SavedFlights
+            device={screen < 1000 ? "desktop" : "mobile"}
             flights={savedFlights}
             setSavedFlights={setSavedFlights}
           />
@@ -181,7 +187,7 @@ export default function Home() {
     return (
       <DndProvider backend={HTML5Backend}>
         <div className="flex flex-row justify-center h-auto -m-10">
-          <FlightStore data={data} />
+          <FlightStore data={data} device="desktop" />
         </div>
       </DndProvider>
     );
@@ -190,7 +196,9 @@ export default function Home() {
   function renderMobileCards(data: FlightOption[]) {
     return (
       <div>
-        <FlightStoreMobile data={data} />
+        <DndProvider backend={HTML5Backend}>
+          <FlightStore data={data} device="mobile" />
+        </DndProvider>
       </div>
     );
   }
@@ -238,10 +246,10 @@ export default function Home() {
       {page == "input"
         ? renderInput()
         : page == "query"
-          ? renderQuery()
-          : page == "saved"
-            ? renderSaved()
-            : renderProfile()}
+        ? renderQuery()
+        : page == "saved"
+        ? renderSaved()
+        : renderProfile()}
     </div>
   );
 }
