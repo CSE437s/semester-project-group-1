@@ -1,11 +1,21 @@
 import { AvailabilitySegment, FlightOption } from "@/lib/availability-types";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
 
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { ItemTypes } from "./Constants";
 import svg from "../public/drag-handle.svg";
 import { useDrag } from "react-dnd";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // Update props
 type Props = {
@@ -17,6 +27,7 @@ type Props = {
   isDraggable: boolean;
   device: string;
   addToBoard?: (flight: FlightOption) => void;
+  setCurrentlyDragging?: any; // use state function
 };
 
 const getOriginAirport = (segments: AvailabilitySegment[]) => {
@@ -79,6 +90,16 @@ function FlightCard(props: Props) {
           isDragging: !!monitor.isDragging(),
         }),
       }));
+
+  // const [dragging, setDragging] = useState(isDragging);
+
+  // setDragging(isDragging)
+
+  useEffect(() => {
+    if (props.setCurrentlyDragging !== undefined) {
+      props.setCurrentlyDragging(isDragging);
+    }
+  }, [isDragging]);
 
   const displayModal = (
     props: Props,
@@ -174,6 +195,7 @@ function FlightCard(props: Props) {
         <div
           onClick={() => {
             // if (props.x == false) {
+
             setModal(true);
             handleClick();
             // }

@@ -1,12 +1,13 @@
 import { FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
 import React, { useEffect, useState } from "react";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
-
+import { Button } from "@/components/ui/button";
 import { Device } from "@/lib/types";
 import { DropdownMenuRadioGroupWithOptions } from "./ui/DropdownMenuRadioGroup";
 import FlightCard from "./FlightCard";
 import { ItemTypes } from "./Constants";
 import { useDrop } from "react-dnd";
+import FadeIn from "react-fade-in";
 
 type Props = {
   data: FlightOption[];
@@ -27,6 +28,14 @@ function FlightStore(props: Props) {
   const [sortMethod, setSortMethod] = useState(SORT_METHODS.PRICE);
   const [numFlightsToReturn, setNumFlightsToReturn] = useState(8); // TODO: enforce this number by screen size?
   // Could also implement a "show more" button
+
+  const [dragging, setDragging] = useState<boolean>(false);
+
+  if (dragging) {
+    console.log("I am dragging");
+  } else {
+    console.log("I am not dragging");
+  }
 
   useEffect(() => {
     async function getData() {
@@ -59,6 +68,10 @@ function FlightStore(props: Props) {
       isOver: !!monitor.isOver(),
     }),
   }));
+
+  useEffect(() => {
+    setDragging(false);
+  }, [board.length]);
 
   const FlightList: FlightOptionWIndex[] = props.data.map((item, idx) => ({
     ...item,
@@ -93,10 +106,22 @@ function FlightStore(props: Props) {
   const boardMobileClasses =
     "w-[80vw] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-col flex-nowrap overflow-y-scroll   overflow-x-hidden h-auto justify-center bg-[#2c2c2c]";
   const boardLaptopClasses =
-    "max-w-[800px] min-h-[200px] min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden overflow-x-scroll h-auto justify-start bg-[#2c2c2c]";
+    "max-w-[800px] min-h-[200px] cursor-pointer relative min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden overflow-x-scroll h-auto justify-start bg-[#2c2c2c]";
 
   return (
     <div className="flex flex-col mb-10 no-scrollbar overflow-y-hidden">
+      {dragging ? (
+        <FadeIn transitionDuration={100}>
+          <div
+            ref={drop}
+            className="hover:bg-black/100 z-20 rounded-t-[60px] fixed h-[45vh] w-[100vw] top-[55vh] right-0 bg-black/75 flex justify-center items-center text-[#ee6c4d] font-bold text-2xl"
+          >
+            Drop flight here to save it for later!
+          </div>
+        </FadeIn>
+      ) : (
+        <></>
+      )}
       <div className="flex flex-row justify-between mx-[10vw] mt-10 overflow-y-hidden">
         <p className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
           Flight Results
@@ -142,6 +167,7 @@ function FlightStore(props: Props) {
                   handleRemove={deleteSavedFlight}
                   addToBoard={saveFlight}
                   isSaved={false}
+                  setCurrentlyDragging={setDragging}
                   isDraggable={props.device === "desktop"}
                   device={props.device == "desktop" ? "desktop" : "mobile"}
                 />
@@ -150,14 +176,22 @@ function FlightStore(props: Props) {
           })}
       </div>
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
-        Drag any flights below to save them for later
+        Current saved flights for this search
       </div>
-      <div className="flex flex-row justify-center overflow-y-hidden">
+      <div className="flex flex-row justify-center overflow-y-hidden relative">
+        {board.length > 2 && props.device == "desktop" ? (
+          <div className="z-10 absolute top-[85px] right-20">
+            <Button className="bg-black/75 rounded-full hover:cursor-default hover:bg-black/75">
+              {">"}
+            </Button>{" "}
+          </div>
+        ) : (
+          <></>
+        )}
         <div
           className={
             props.device == "desktop" ? boardLaptopClasses : boardMobileClasses
           }
-          ref={drop}
         >
           {board.map((flight) => {
             return (
