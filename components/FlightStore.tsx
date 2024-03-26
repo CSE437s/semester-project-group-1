@@ -51,7 +51,6 @@ function FlightStore(props: Props) {
   useEffect(() => {
     async function getData() {
       if (user != null) {
-        console.log("ping sb");
         const { data } = await sb
           .from("saved_flights")
           .select("flight_id")
