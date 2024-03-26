@@ -77,7 +77,7 @@ export default function SavedFlights(props: Props) {
 
   return (
     <div className="flex flex-col items-center justify-center w-full h-full">
-      <div className="max-w-[900px] flex flex-row flex-wrap items-center justify-center">
+      <div className="max-w-[900px] flex lg:flex-row lg:flex-wrap flex-col flex-nowrap items-center justify-center">
         {loading && <p>Loading...</p>}
         {flights &&
           flights.map((flight) => (

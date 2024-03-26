@@ -81,7 +81,7 @@ export function FlightRequestForm(props: Props) {
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     props.setLoading(true);
     setData(data);
-    const res: FlightOption[] = await fetchFlights(data)
+    const res: FlightOption[] = await fetchFlights(data);
     props.setData(res);
     props.setLoading(false);
     setExpanded(false);
@@ -132,7 +132,7 @@ export function FlightRequestForm(props: Props) {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="max-w-[200px] p-0 items-start">
+                            <PopoverContent className="max-w-[200px] max-h-[300px] overflow-y-scroll p-0 items-start overscroll-contain">
                               <Command>
                                 <CommandInput
                                   placeholder="Search airports..."
@@ -200,7 +200,7 @@ export function FlightRequestForm(props: Props) {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="max-w-[200px] p-0 items-start">
+                            <PopoverContent className="max-w-[200px] max-h-[300px] overflow-y-scroll overscroll-contain p-0 items-start">
                               <Command>
                                 <CommandInput
                                   placeholder="Search airports..."
@@ -244,7 +244,6 @@ export function FlightRequestForm(props: Props) {
                   </div>
                 </div>
                 <div className="flex flex-row lg:flex-nowrap flex-wrap justify-between items-center w-[35vw]">
-
                   <FormField
                     control={form.control}
                     name="beginRangeSearch"
@@ -300,7 +299,6 @@ export function FlightRequestForm(props: Props) {
                               <Button
                                 variant={"outline"}
                                 className={cn(
-
                                   "w-[175px] pl-3 text-left font-normal text-black",
 
                                   !field.value && "text-muted-foreground"
@@ -342,9 +340,7 @@ export function FlightRequestForm(props: Props) {
                   </Button>
                   {data && (
                     <Button
-
                       className="bg-white text-black hover:bg-white"
-
                       onClick={() => setExpanded(false)}
                     >
                       Compress
