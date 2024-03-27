@@ -24,6 +24,7 @@ import FlightStore from "@/components/FlightStore";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Input } from "@/components/ui/input";
 import { LogOut } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import SavedFlights from "@/components/SavedFlights";
 import { StoredFlightData } from "@/lib/route-types";
 import { Toaster } from "sonner";
@@ -32,6 +33,8 @@ import { useIsMobile } from "@/lib/utils";
 import { useRouter } from "next/router";
 
 export const dynamic = "force-dynamic"; // TODO: this was here for a reason, figure out why
+
+type QueryLoadingStatus = "done" | "calling_openai" | "calling_supabase" | "loading_flights"
 
 export default function Home() {
   const sb = useSupabaseClient();
@@ -42,10 +45,11 @@ export default function Home() {
   const [queryExpanded, setQueryExpanded] = useState(true);
 
   const [loading, setLoading] = useState(false);
-  const [queryLoading, setQueryLoading] = useState(false);
+  const [queryLoading, setQueryLoading] = useState<QueryLoadingStatus>("done");
   const [data, setData] = useState<FlightOption[] | undefined>();
   const [queryData, setQueryData] = useState<FlightOption[] | undefined>();
   const [queryValue, setQueryValue] = useState("");
+  const [flightCallingStatus, setFlightCallingStatus] = useState(0);
 
   const isMobile = useIsMobile(680);
 
@@ -56,10 +60,6 @@ export default function Home() {
   const handleLogout = async () => {
     await sb.auth.signOut();
     await router.push("/login");
-  };
-
-  const changePage = async (pageToChangeTo: string) => {
-    await router.push("/" + pageToChangeTo);
   };
 
   type EmbeddingSearchResponse = {
@@ -80,20 +80,48 @@ export default function Home() {
     return res.json();
   }
 
+  const statusToProgress = (status: QueryLoadingStatus, flightCallingStatus: number) => {
+    switch (status) {
+      case "done":
+        return 100
+      case "calling_openai":
+        return 20
+      case "calling_supabase":
+        return 40
+      case "loading_flights":
+        return 60 + flightCallingStatus * .4
+    }
+  }
+
+  const statusToMessage = (status: QueryLoadingStatus, flightCallingStatus: number) => {
+    switch (status) {
+      case "done":
+        return "Done"
+      case "calling_openai":
+        return "Preparing your query..."
+      case "calling_supabase":
+        return "In the oven..."
+      case "loading_flights":
+        return `Grabbing flights -- ${flightCallingStatus}%`
+    }
+  }
+
   const trimEmbedding = (embedding: number[]) => {
     return embedding.slice(0, 512);
   }
 
   const handleSubmitQuery = async () => {
-    setQueryLoading(true);
+    setQueryLoading("calling_openai");
 
     const res: CreateEmbeddingResponse = await getQueryEmbedding(queryValue);
     if (!res.data || res.data.length === 0) {
       console.error('Error fetching embedding', res)
-      setQueryLoading(false)
+      setQueryLoading("done")
       return
     }
     const embedding = trimEmbedding(res.data[0].embedding)
+
+    setQueryLoading("calling_supabase")
     
     const { data: documents } = await sb.rpc('match_documents', {
       query_embedding: embedding, // Pass the embedding you want to compare
@@ -113,9 +141,6 @@ export default function Home() {
       today1am.setHours(0, 0, 0, 0)
       tomorrow11pm.setHours(23, 59, 59, 999)
 
-      console.log(today1am, tomorrow11pm)
-
-
       return {
         outboundAirportCode: "ORD",
         inboundAirportCode: doc.iata,
@@ -124,17 +149,35 @@ export default function Home() {
       }
     })
 
-    console.log(fetchData)
+    setQueryLoading("loading_flights")
 
-    const flightData = await Promise.all(fetchData.map(async (data) => {
-      return fetchFlights(data)
-    }))
+    const numFlightsToFetch = fetchData.length
 
-    console.log(flightData)
+    function updateFlightCallingStatus(completedFetches: number, totalFetches: number, setFlightCallingStatus: (status: number) => void){
+      const percentageComplete = Math.floor(100 * completedFetches / totalFetches);
+      setFlightCallingStatus(percentageComplete);
+    }
+    
+    const flightDataPromises = fetchData.map((data, idx) => 
+      fetchFlights(data)
+        .then(result => {
+          // After each fetch, increment the count of completed fetches and update the status
+          completionTracker[idx] = true;
+          const completedFetches = completionTracker.filter(Boolean).length;
+          updateFlightCallingStatus(completedFetches, numFlightsToFetch, setFlightCallingStatus);
+          return result;
+        })
+    );
+    
+    // Initialize an array to keep track of which fetches have completed
+    const completionTracker = new Array(numFlightsToFetch).fill(false);
+    
+    const flightData = await Promise.all(flightDataPromises);
 
     // squash down and set queryData
     setQueryData(flightData.flat())
-    setQueryLoading(false)
+    setQueryLoading("done")
+    setFlightCallingStatus(0)
     setQueryValue("")
   }
 
@@ -212,7 +255,12 @@ export default function Home() {
         </div>
         <div ref={ref}>
           <div className="flex justify-center text-[#ee6c4d] font-bold text-xl">
-            {queryLoading && <div>Loading...</div>}
+            {queryLoading !== "done" && (
+              <div className="flex flex-col">
+                <p className="text-[#fafafa] font-light text-base">{statusToMessage(queryLoading, flightCallingStatus)}</p>
+                <Progress value={statusToProgress(queryLoading, flightCallingStatus)} className="w-[40vw]" />
+              </div>
+          )}
           </div>
           {queryData !== undefined ? (
             !isMobile ? (
