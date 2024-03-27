@@ -153,14 +153,31 @@ export default function Home() {
 
     const numFlightsToFetch = fetchData.length
 
-    const flightData = await Promise.all(fetchData.map(async (data, idx) => {
-      setFlightCallingStatus(Math.floor(100 * (idx + 1) / numFlightsToFetch))
-      return fetchFlights(data)
-    }))
+    function updateFlightCallingStatus(completedFetches: number, totalFetches: number, setFlightCallingStatus: (status: number) => void){
+      const percentageComplete = Math.floor(100 * completedFetches / totalFetches);
+      setFlightCallingStatus(percentageComplete);
+    }
+    
+    const flightDataPromises = fetchData.map((data, idx) => 
+      fetchFlights(data)
+        .then(result => {
+          // After each fetch, increment the count of completed fetches and update the status
+          completionTracker[idx] = true;
+          const completedFetches = completionTracker.filter(Boolean).length;
+          updateFlightCallingStatus(completedFetches, numFlightsToFetch, setFlightCallingStatus);
+          return result;
+        })
+    );
+    
+    // Initialize an array to keep track of which fetches have completed
+    const completionTracker = new Array(numFlightsToFetch).fill(false);
+    
+    const flightData = await Promise.all(flightDataPromises);
 
     // squash down and set queryData
     setQueryData(flightData.flat())
     setQueryLoading("done")
+    setFlightCallingStatus(0)
     setQueryValue("")
   }
 
