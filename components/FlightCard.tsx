@@ -3,19 +3,36 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import React, { useEffect, useRef, useState } from "react";
-
+import { ExternalLinkIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
+import { TbCoins } from "react-icons/tb";
 import { Button } from "./ui/button";
 import Image from "next/image";
 import { ItemTypes } from "./Constants";
 import airlines from "@/lib/airlines";
 import svg from "../public/drag-handle.svg";
 import { useDrag } from "react-dnd";
+import { FaPlaneDeparture, FaRegMap } from "react-icons/fa";
+import { MdAccessTime } from "react-icons/md";
+import {
+  Clock,
+  Coins,
+  CoinsIcon,
+  Hash,
+  Map,
+  Octagon,
+  OctagonIcon,
+  Plane,
+  PlaneIcon,
+  PlaneTakeoff,
+  RockingChair,
+  RockingChairIcon,
+} from "lucide-react";
 
 // Update props
 type Props = {
@@ -43,9 +60,7 @@ const getFlightNumbers = (item: FlightOption) => {
     return flightNums.split(",").map((num) => num.trim());
   };
   const flightNums = parseFlightNumsFromString(item.FlightNumbers);
-  return `Flight #${flightNums.length > 1 ? "s" : ""}: ${flightNums.join(
-    ", "
-  )}`;
+  return `${flightNums.join(", ")}`;
 };
 
 const getStops = (segments: AvailabilitySegment[]) => {
@@ -66,7 +81,7 @@ const displayDuration = (duration: number) => {
     const hours = Math.floor(duration / 60);
     const minutes = duration % 60;
 
-    return `${hours} hour${hours > 1 ? "s" : ""}, ${minutes} minutes`;
+    return `${hours}hr${hours > 1 ? "s" : ""}, ${minutes}m`;
   }
 };
 
@@ -131,7 +146,6 @@ function FlightCard(props: Props) {
     setModal: React.Dispatch<React.SetStateAction<boolean>>,
     item: FlightOption
   ) => {
-
     return (
       <Dialog open={showModal} onOpenChange={() => setModal(false)}>
         <DialogContent className="sm:max-w-[425px]">
@@ -139,51 +153,105 @@ function FlightCard(props: Props) {
             <DialogTitle>Flight Details</DialogTitle>
           </DialogHeader>
           <div className="">
-            <div className="text-center">
-              <div>Date: {item.DepartsAt} </div>
-              <div>
-                From: {getOriginAirport(item.AvailabilitySegments)} to{" "}
+            <div className="text-left">
+              <div>{new Date(item.DepartsAt).toLocaleString()} </div>
+              <div className="font-bold">
+                {getOriginAirport(item.AvailabilitySegments)} to{" "}
                 {getDestinationAirport(item.AvailabilitySegments)}
               </div>
             </div>
-            <div className="grid grid-rows-1 grid-cols-1 mt-5">
-              <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
-                <div className="text-sm">
-                  Airline: {getCarrier(item.Carriers)}
+            <div className="grid grid-rows-2 grid-cols-2 mt-5">
+              <div className="flex justify-center flex-col items-center mb-2">
+                <PlaneIcon size={30} strokeWidth={1} className="mb-[2px]" />
+                <div className="w-[150px] border-slate-400 border text-sm h-[100px] p-2 rounded-md flex justify-center items-center flex-col">
+                  <div>{getFlightNumbers(props.item)}</div>
+                  <div>{getCarrier(item.Carriers)}</div>
                 </div>
-                <div className="text-sm font-normal">
-                  Cabin: {item.Cabin[0].toUpperCase() + item.Cabin.slice(1)}
+              </div>
+              <div className="flex justify-center flex-col items-center mb-2">
+                <RockingChairIcon
+                  size={30}
+                  strokeWidth={1}
+                  className="mb-[2px]"
+                />
+                <div className="w-[150px] border-slate-400 border text-sm h-[100px] p-2 rounded-md flex justify-center items-center flex-col">
+                  <div>{item.Cabin[0].toUpperCase() + item.Cabin.slice(1)}</div>
+                  <div>{item.RemainingSeats + " seats left"}</div>
                 </div>
+              </div>
+              <div className="flex justify-center flex-col items-center">
+                <Octagon size={30} strokeWidth={1} className="mb-[2px]" />
+                <div className="w-[150px] border-slate-400 border text-sm h-[100px] p-2 rounded-md flex justify-center items-center flex-col">
+                  <div>
+                    {item.Stops === 0
+                      ? "Direct Flight"
+                      : item.Stops >= 2
+                      ? "" + item.Stops + " stops"
+                      : "" + item.Stops + " stop"}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-center flex-col items-center">
+                <Coins size={30} strokeWidth={1} className="mb-[2px]" />
+                <div className="w-[150px] border-slate-400 border text-sm h-[100px] p-2 rounded-md flex justify-center items-center flex-col">
+                  <div>{item.MileageCost + " points"} </div>
+                  <div>{"Fees: " + displayDollarAmount(item.TotalTaxes)}</div>
+                </div>
+              </div>
+              {/* <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
+                <div className="text-md flex justify-start space-x-0 items-center">
+                  <Plane strokeWidth={2} size={16} className="mr-[5px]" />
+                  {getCarrier(item.Carriers)}
+                </div>
+                <div className="text-md flex justify-start space-x-0 items-center mb-[20px]">
+                  <RockingChair
+                    strokeWidth={2}
+                    size={16}
+                    className="mr-[5px]"
+                  />
+                  {item.Cabin[0].toUpperCase() + item.Cabin.slice(1)}
+                </div>
+
                 <div className="text-sm font-normal">
                   Direct Flight:{" "}
                   {item.Stops === 0
                     ? "Yes"
                     : item.Stops >= 2
-                    ? "No, " + item.Stops + " stops"
-                    : "No, " + item.Stops + " stop"}
+                    ? "" + item.Stops + " stops"
+                    : "" + item.Stops + " stop"}
                 </div>
-                <div className="text-sm font-normal">
+                <div className="text-sm font-normal mb-[20px]">
                   Remaining Seats: {item.RemainingSeats}
                 </div>
-                <div className="text-sm font-normal">
-                  Points: {item.MileageCost}
+                <div className="text-md font-normal flex justify-start items-center">
+                  <TbCoins className="mr-[5px]" />{" "}
+                  {item.MileageCost + " points"}
                 </div>
                 <div className="text-sm font-normal">
                   Taxes & Fees: {displayDollarAmount(item.TotalTaxes)}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
+          <DialogFooter>
+            <a
+              target="_blank"
+              href="https://www.nerdwallet.com/article/travel/how-do-airline-miles-work#:~:text=Airline%20miles%20or%20points%20%E2%80%94%20the,and%20shopping%20with%20specific%20partners."
+            >
+              <div className="text-xs no-underline flex space-x-2 justify-between hover:text-slate-400 transition">
+                Airline miles <ExternalLinkIcon className="ml-[3px]" />{" "}
+              </div>
+            </a>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
-
     );
   };
 
   const cardInGridClasses =
-    "z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg w-[250px] h-auto p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black";
+    "z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg w-[220px] h-auto p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black";
   const cardInBoardClasses =
-    "z-0 relative bg-[#fafafa] overflow-y-hidden drop-shadow-md  transition-all  rounded-lg w-[250px] h-auto p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black";
+    "z-0 relative bg-[#fafafa] overflow-y-hidden drop-shadow-md  transition-all  rounded-lg w-[250px] h-auto p-4 pt-8 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black";
 
   return (
     <div
@@ -211,7 +279,7 @@ function FlightCard(props: Props) {
         ) : (
           <></>
         )}
-        <div className="flex justify-center m-0 p-0 text-sm overflow-y-hidden">
+        <div className="flex justify-center -mt-4 p-0 text-sm overflow-y-hidden">
           {props.isDraggable && props.isSaved == false && (
             <Image
               className="rotate-90"
@@ -232,36 +300,54 @@ function FlightCard(props: Props) {
           }}
           className="text-sm font-light flex flex-col pt-0"
         >
-          <p>{getFlightNumbers(props.item)}</p>
-          <p>{`Departs: ${new Date(props.item.DepartsAt).toLocaleString()}`}</p>
-          <p>{`Arrives: ${new Date(props.item.ArrivesAt).toLocaleString()}`}</p>
-          <p>{`${getOriginAirport(props.item.AvailabilitySegments)} -> 
-              ${getDestinationAirport(props.item.AvailabilitySegments)}, 
-              ${getStops(props.item.AvailabilitySegments)} 
-              ${
-                getStops(props.item.AvailabilitySegments) !== 1
-                  ? "stops"
-                  : "stop"
-              }`}</p>
+          {props.isSaved && (
+            <div className="flex justify-start items-center">
+              <Hash strokeWidth={2} size={16} className="mr-[5px]" />
+              {getFlightNumbers(props.item)}
+            </div>
+          )}
+          {/* <p>{getFlightNumbers(props.item)}</p> */}
+          <div className="flex justify-start items-center">
+            <PlaneTakeoff strokeWidth={2} size={16} className="mr-[5px]" />
+            {`${new Date(props.item.DepartsAt).toLocaleString()}`}
+          </div>
+          {/* <p>{`Arrives: ${new Date(props.item.ArrivesAt).toLocaleString()}`}</p> */}
+          <div className="flex justify-start items-center">
+            <Map strokeWidth={2} size={16} className="mr-[5px]" />
+            {`${getOriginAirport(props.item.AvailabilitySegments)} -> 
+              ${getDestinationAirport(props.item.AvailabilitySegments)}
+              `}
+          </div>
           {props.device == "desktop" && props.isSaved == false ? (
-            <p>{`Duration: ${displayDuration(
-              getFlightDuration(props.item.AvailabilitySegments)
-            )}`}</p>
+            <div className="flex justify-start items-center">
+              <Clock strokeWidth={2} size={16} className="mr-[5px]" />
+              {`${displayDuration(
+                getFlightDuration(props.item.AvailabilitySegments)
+              )}`}
+            </div>
           ) : (
             <></>
           )}
-          {props.device == "desktop" && props.isSaved == false ? (
+
+          {/* {props.device == "desktop" && props.isSaved == false ? (
             <p>{"Airline: " + props.item.Carriers}</p>
           ) : (
             <></>
-          )}
+          )} */}
           {props.device == "desktop" && props.isSaved == false ? (
-            <p>{"Cost: " + props.item.MileageCost + "pts + " + displayDollarAmount(props.item.TotalTaxes) }</p>
+            <div className="flex justify-start items-center">
+              <Coins strokeWidth={2} size={16} className="mr-[5px]" />
+              {props.item.MileageCost +
+                "pts + " +
+                displayDollarAmount(props.item.TotalTaxes)}
+            </div>
           ) : (
             <></>
           )}
         </div>
-        <div className=" text-xs font-thin">Click for more flight details</div>
+        <div className=" text-xs font-thin text-right">
+          Click for more flight details
+        </div>
         <div className="flex justify-center">
           {!props.isSaved &&
           props.device === "mobile" &&

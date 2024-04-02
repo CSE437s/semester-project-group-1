@@ -46,6 +46,7 @@
     "react-dom": "^18",
     "react-fade-in": "^2.0.1",
     "react-hook-form": "^7.50.1",
+    "react-icons": "^5.0.1",
     "sonner": "^1.4.41",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.2.1",

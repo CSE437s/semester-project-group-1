@@ -1,7 +1,4 @@
-import {
-  Drawer,
-  DrawerContent,
-} from "@/components/ui/drawer";
+import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
 import React, { useEffect, useState } from "react";
 import { User, useSupabaseClient, useUser } from "@supabase/auth-helpers-react";
@@ -14,6 +11,8 @@ import { FlightFilterPopover } from "./FlightFilterPopover";
 import { ItemTypes } from "./Constants";
 import { toast } from "sonner";
 import { useDrop } from "react-dnd";
+import { ArrowDownToLine, BookMarked } from "lucide-react";
+// import "./store.css";
 
 type Props = {
   data: FlightOption[];
@@ -21,7 +20,7 @@ type Props = {
 };
 
 export const SORT_METHODS_LIST = ["PRICE", "DURATION", "STOPS"] as const;
-export type SORT_METHODS = "PRICE" | "DURATION" | "STOPS"
+export type SORT_METHODS = "PRICE" | "DURATION" | "STOPS";
 
 // enum SORT_METHODS {
 //   PRICE = "PRICE",
@@ -30,7 +29,6 @@ export type SORT_METHODS = "PRICE" | "DURATION" | "STOPS"
 // };
 
 function FlightStore(props: Props) {
-
   const [board, setBoard] = useState<FlightOption[] | []>([]);
   const sb = useSupabaseClient();
   const user: User | null = useUser();
@@ -120,16 +118,57 @@ function FlightStore(props: Props) {
   };
 
   const cardGridLaptopClasses =
-    "flex flex-row justify-center flex-wrap max-w-[900px]";
+    "flex flex-row justify-center flex-wrap max-w-[850px] overflow-x-hidden";
   const cardGridMobileClasses = "flex  items-center justify-center flex-col";
 
   const boardMobileClasses =
     "w-[80vw] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-col flex-nowrap overflow-y-scroll   overflow-x-hidden h-auto justify-center bg-[#2c2c2c]";
   const boardLaptopClasses =
     "max-w-[800px] min-h-[200px] cursor-pointer relative min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden overflow-x-scroll h-auto justify-start bg-[#2c2c2c]";
+  const boardLaptopClassesScroll =
+    "max-w-[800px] min-h-[200px] cursor-pointer relative min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden overflow-x-scroll h-auto justify-start bg-[#2c2c2c] shadow-[inset_-50px_0_5px_-1px_hsla(0,0%,0%,.15)]";
 
   return (
-    <div className="flex flex-col mb-10 no-scrollbar overflow-y-hidden">
+    <div className="flex flex-col mb-10 overflow-x-hidden overscroll-contain">
+      {/* <div
+        id="container"
+        className="flex justify-center items-center fixed top-[30%] left-0 w-[75px] h-[75px] rounded-r-lg border-r-2 border-y-2 border-solid border-[#ee6c4d] bg-[#2c2c2c]"
+      >
+        <BookMarked size={32} color="#ee6c4d" strokeWidth={1} />
+      </div>
+      {props.device == "desktop" ? (
+        <div
+          id="store"
+          className="transition-all fixed z-10000 top-0 left-[-22vw] h-[100vh] w-[22vw] p-4 border-r-2 border-solid border-[#ee6c4d] bg-[#2c2c2c]"
+        >
+          <div className="text-center text-lg my-3 font-bold text-[#ee6c4d]">
+            Currently saved flights for this search
+          </div>
+          <div
+            id="store"
+            className="overflow-y-scoll no-scrollbar h-[85vh] overflow-x-hidden flex flex-col flex-nowrap  items-start shadow-[0_10px_40px_-10px_rgba(0, 0, 0, 0.4)]"
+          >
+            {board.map((flight) => {
+              return (
+                <FlightCard
+                  key={flight.ID}
+                  description={"description"}
+                  title={"title"}
+                  item={flight}
+                  isSaved={true}
+                  isDraggable={props.device === "desktop"}
+                  addToBoard={saveFlight}
+                  handleRemove={deleteSavedFlight}
+                  device={props.device == "desktop" ? "desktop" : "mobile"}
+                />
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        <></>
+      )} */}
+
       {dragging ? (
         <FadeIn transitionDuration={100}>
           {/* <div
@@ -142,8 +181,8 @@ function FlightStore(props: Props) {
             {/* @ts-ignore */}
             <DrawerContent ref={drop}>
               <div className="mx-auto w-full max-w-sm h-[35vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
-                <div className="text-center">
-                  Drop here to save flight for later
+                <div className="text-center flex justify-center items-center">
+                  <ArrowDownToLine size={64} color="#ee6c4d" strokeWidth={2} />
                 </div>
               </div>
             </DrawerContent>
@@ -152,20 +191,21 @@ function FlightStore(props: Props) {
       ) : (
         <></>
       )}
-      <div className="flex flex-row justify-between mx-[10vw] mt-10 overflow-y-hidden">
-        <p className="text-center text-lg my-3 font-bold mr-4 text-[#ee6c4d] overflow-y-hidden">
+      <div className="flex flex-row justify-between mx-[10vw] mt-10 overflow-y-hidden overflow-x-hidden">
+        <p className="text-center text-lg my-3 font-bold mr-4 text-[#ee6c4d] overflow-y-hidden overflow-x-hidden">
           {props.data.length == 0
             ? "No flight results for inputted options"
             : "Flight results"}
         </p>
-        { props.data.length == 0 ? <></> :
-        (
-        <FlightFilterPopover
-          selectedSort={sortMethod}
-          setSelectedSort={setSortMethod}
-          results={numFlightsToReturn}
-          setResults={setNumFlightsToReturn}
-        />
+        {props.data.length == 0 ? (
+          <></>
+        ) : (
+          <FlightFilterPopover
+            selectedSort={sortMethod}
+            setSelectedSort={setSortMethod}
+            results={numFlightsToReturn}
+            setResults={setNumFlightsToReturn}
+          />
         )}
       </div>
 
@@ -208,8 +248,12 @@ function FlightStore(props: Props) {
       </div>
       {FlightList.length > numFlightsToReturn && (
         <div className="flex flex-row justify-center mt-5">
-          <Button className="bg-white text-black hover:bg-black hover:text-white hover:cursor-pointer" 
-          onClick={() => setNumFlightsToReturn(numFlightsToReturn + 6)}>Show More</Button>
+          <Button
+            className="bg-white text-black hover:bg-black hover:text-white hover:cursor-pointer"
+            onClick={() => setNumFlightsToReturn(numFlightsToReturn + 6)}
+          >
+            Show More
+          </Button>
         </div>
       )}
       <div className="text-center text-lg my-3 font-bold text-[#ee6c4d] overflow-y-hidden">
