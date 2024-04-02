@@ -1,3 +1,4 @@
+import { ArrowDownToLine, BookMarked, X } from "lucide-react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { FlightOption, FlightOptionWIndex } from "@/lib/availability-types";
 import React, { useEffect, useState } from "react";
@@ -11,7 +12,7 @@ import { FlightFilterPopover } from "./FlightFilterPopover";
 import { ItemTypes } from "./Constants";
 import { toast } from "sonner";
 import { useDrop } from "react-dnd";
-import { ArrowDownToLine, BookMarked, X } from "lucide-react";
+
 // import "./store.css";
 
 type Props = {
@@ -199,7 +200,7 @@ function FlightStore(props: Props) {
       ) : (
         <></>
       )}
-      <div className="flex flex-row justify-between min-w-[300px] mx-[10vw] mt-10 overflow-y-hidden overflow-x-hidden">
+      <div className="flex flex-row justify-between min-w-[300px] mx-[10vw] mt-1 overflow-y-hidden overflow-x-hidden">
         <p className="text-center text-lg my-3 font-bold mr-4 text-[#ee6c4d] overflow-y-hidden overflow-x-hidden">
           {props.data.length == 0
             ? "No flight results for inputted options"

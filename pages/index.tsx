@@ -29,6 +29,7 @@ import SavedFlights from "@/components/SavedFlights";
 import { StoredFlightData } from "@/lib/route-types";
 import { Toaster } from "sonner";
 import { fetchFlights } from "@/lib/requestHandler";
+import { set } from "date-fns";
 import { useIsMobile } from "@/lib/utils";
 import { useRouter } from "next/router";
 
@@ -54,6 +55,15 @@ export default function Home() {
   const isMobile = useIsMobile(680);
 
   const [page, setPage] = useState("input");
+
+  const handleSetPage = (page: string) => {
+    setPage(page);
+    setExpanded(true);
+    setQueryExpanded(true);
+    setQueryValue("");
+    setData(undefined);
+    setQueryData(undefined);
+  }
 
   const ref = useRef<any>(null);
 
@@ -240,11 +250,16 @@ export default function Home() {
             </div>
           </>)}
           <Input
-            className="max-w-[400px] bg-[#fafafa] text-black mb-2"
+            className="max-w-[400px] bg-[#fafafa] text-black mb-2 h-12"
             type="text"
             placeholder="Write query here"
             value={queryValue}
-            onChange={(e) => setQueryValue(e.target.value)}
+            onChange={(e) => {
+              // check if the change was an enter key press, if not update the query value. remember that e is a ChangeEvent<HTMLInputElement>
+              if (e.target.value !== "\n") {
+                setQueryValue(e.target.value)
+              }
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSubmitQuery();
@@ -299,7 +314,7 @@ export default function Home() {
   function renderDragCards(data: FlightOption[]) {
     return (
       <DndProvider backend={HTML5Backend}>
-        <div className="flex flex-row justify-center h-auto -m-10">
+        <div className="flex flex-row justify-center h-auto">
           <FlightStore data={data} device="desktop" />
         </div>
       </DndProvider>
@@ -329,7 +344,8 @@ export default function Home() {
               className={`hover:bg-slate-200 hover:text-black transition-all cursor-pointer p-2 rounded-md
                 ${page == "input" ? "text-[#ee6c4d]" : "text-white"}
                 `}
-              onClick={() => setPage("input")}
+              onClick={() => handleSetPage("input")
+              }
             >
               Input Search
             </NavigationMenuItem>
@@ -337,7 +353,7 @@ export default function Home() {
               className={`hover:bg-slate-200 hover:text-black transition-all cursor-pointer p-2 rounded-md
               ${page == "query" ? "text-[#ee6c4d]" : "text-white"}
               `}
-              onClick={() => setPage("query")}
+              onClick={() => handleSetPage("query")}
             >
               Query Search
             </NavigationMenuItem>
@@ -345,7 +361,7 @@ export default function Home() {
               className={`hover:bg-slate-200 hover:text-black transition-all cursor-pointer p-2 rounded-md
               ${page == "saved" ? "text-[#ee6c4d]" : "text-white"}
               `}
-              onClick={() => setPage("saved")}
+              onClick={() => handleSetPage("saved")}
             >
               Saved Flights
             </NavigationMenuItem>
