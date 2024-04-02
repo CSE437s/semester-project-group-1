@@ -16,7 +16,7 @@ export function ReducedFlightRequestForm(props: Props) {
   return (
     <div className="flex flex-row items-center">
       {props.data === undefined ? (
-        <></>
+        <>test</>
       ) : (
         <>
           <div className="flex flex-row justify-between max-w-[600px] items-center w-auto bg-white rounded-lg shadow-md px-4 py-2">
