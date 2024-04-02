@@ -12,8 +12,18 @@ import { FlightFilterPopover } from "./FlightFilterPopover";
 import { ItemTypes } from "./Constants";
 import { toast } from "sonner";
 import { useDrop } from "react-dnd";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
-// import "./store.css";
+import "./store.css";
 
 type Props = {
   data: FlightOption[];
