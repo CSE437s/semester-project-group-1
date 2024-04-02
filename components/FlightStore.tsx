@@ -92,6 +92,7 @@ function FlightStore(props: Props) {
       return;
     }
     setBoard((board) => [...board, flight]);
+    setNotification(true);
     if (user !== null) {
       const { error } = await sb.from("saved_flights").insert({
         flight_id: flight.ID,
@@ -119,31 +120,58 @@ function FlightStore(props: Props) {
     }
   };
 
+  const [notification, setNotification] = useState<boolean>(false);
+  useEffect(() => {
+    setTimeout(() => {
+      setNotification(false);
+    }, 750);
+  }, [notification]);
+
   const cardGridLaptopClasses =
     "flex flex-row justify-center flex-wrap max-w-[850px] overflow-x-hidden";
   const cardGridMobileClasses = "flex  items-center justify-center flex-col";
 
   const boardMobileClasses =
     "w-[80vw] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-col flex-nowrap overflow-y-scroll   overflow-x-hidden h-auto justify-center bg-[#2c2c2c]";
-  const boardLaptopClasses =
-    "max-w-[800px] min-h-[200px] cursor-pointer relative min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden overflow-x-scroll h-auto justify-start bg-[#2c2c2c]";
-  const boardLaptopClassesScroll =
-    "max-w-[800px] min-h-[200px] cursor-pointer relative min-w-[800px] no-scrollbar rounded-xl p-8 border-2 border-solid border-[#ee6c4d] flex flex-row flex-nowrap overflow-y-hidden overflow-x-scroll h-auto justify-start bg-[#2c2c2c] shadow-[inset_-50px_0_5px_-1px_hsla(0,0%,0%,.15)]";
+
+  const notificationClasses =
+    "absolute top-[-10px] right-[-10px] flex p-2  w-[28px] h-[28px] justify-center items-center rounded-full bg-[#ee6c4d] text-[#2c2c2c]";
+  const notificationClassesPing =
+    "animate-ping absolute top-[-10px] right-[-10px] flex p-2  w-[28px] h-[28px] justify-center items-center rounded-full bg-[#ee6c4d] text-[#2c2c2c]";
 
   return (
     <div className="flex flex-col mb-10 overflow-x-hidden overscroll-contain">
       {props.device == "desktop" ? (
-        <div
-          onClick={() => setShowStore(true)}
-          className="cursor-pointer flex justify-center items-center fixed top-[30%] left-0 w-[75px] h-[75px] rounded-r-lg border-r-2 border-y-2 border-solid border-[#ee6c4d] bg-[#2c2c2c]"
-        >
-          <BookMarked size={32} color="#ee6c4d" strokeWidth={1} />
+        <div className="relative">
+          <div
+            onClick={() => setShowStore(true)}
+            className="cursor-pointer flex justify-center items-center fixed top-[30%] left-0 w-[75px] h-[75px] rounded-r-lg border-r-2 border-y-2 border-solid border-[#ee6c4d] bg-[#2c2c2c]"
+          >
+            {board.length > 0 ? (
+              <div>
+                <div className={notificationClasses}>{board.length}</div>
+                <div
+                  className={
+                    notification ? notificationClassesPing : notificationClasses
+                  }
+                >
+                  {board.length}
+                </div>
+              </div>
+            ) : (
+              <></>
+            )}
+            <BookMarked size={32} color="#ee6c4d" strokeWidth={1} />
+          </div>
         </div>
       ) : (
         <></>
       )}
       {props.device == "desktop" && showStore ? (
-        <div className="transition-all fixed z-10000 top-0 left-0 h-[100vh] w-[22vw] p-4 border-r-2 border-solid border-[#ee6c4d] bg-[#2c2c2c]">
+        <div
+          id="store"
+          className="transition-all fixed z-10000 left-0 top-0 h-[100vh] w-[22vw] p-4 border-r-2 border-solid border-[#ee6c4d] bg-[#2c2c2c]"
+        >
           <div className="relative">
             <X
               onClick={() => setShowStore(false)}
@@ -190,7 +218,12 @@ function FlightStore(props: Props) {
             <DrawerContent ref={drop}>
               <div className="mx-auto w-full max-w-sm h-[35vh] flex justify-center items-center text-[#ee6c4d] font-bold text-2xl">
                 <div className="text-center flex justify-center items-center">
-                  <ArrowDownToLine size={64} color="#ee6c4d" strokeWidth={2} />
+                  <ArrowDownToLine
+                    className="animate-bounce"
+                    size={64}
+                    color="#ee6c4d"
+                    strokeWidth={2}
+                  />
                 </div>
               </div>
             </DrawerContent>
