@@ -1,0 +1,12 @@
+@keyframes animation {
+  from {
+    left: -22vw;
+  }
+  to {
+    left: 0;
+  }
+}
+
+#store {
+  animation: 0.5s animation;
+}
