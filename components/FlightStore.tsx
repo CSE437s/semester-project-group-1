@@ -11,19 +11,7 @@ import FlightCard from "./FlightCard";
 import { FlightFilterPopover } from "./FlightFilterPopover";
 import { ItemTypes } from "./Constants";
 import { toast } from "sonner";
-import { useDrop } from "react-dnd";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-
-import "./store.css";
+import { useDrop } from "react-dnd"
 
 type Props = {
   data: FlightOption[];
@@ -181,7 +169,7 @@ function FlightStore(props: Props) {
       {props.device == "desktop" && showStore ? (
         <div
           id="store"
-          className="transition-all fixed z-10000 left-0 top-0 h-[100vh] w-[22vw] p-4 border-r-2 border-solid border-[#ee6c4d] bg-[#2c2c2c]"
+          className="animate-slide transition-all fixed z-10000 left-0 top-0 h-[100vh] w-[22vw] p-4 border-r-2 border-solid border-[#ee6c4d] bg-[#2c2c2c]"
         >
           <div className="relative">
             <X
