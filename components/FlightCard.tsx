@@ -32,6 +32,7 @@ import {
   PlaneTakeoff,
   RockingChair,
   RockingChairIcon,
+  X,
 } from "lucide-react";
 
 // Update props
@@ -270,12 +271,12 @@ function FlightCard(props: Props) {
         className={props.isSaved ? cardInBoardClasses : cardInGridClasses}
       >
         {props.isSaved ? (
-          <div
+          <X
             onClick={() => props.handleRemove(props.item)}
-            className="z-2 absolute top-0 right-0 text-sm p-2 rounded-full cursor-pointer hover:bg-slate-200"
-          >
-            x
-          </div>
+            className="cursor-pointer absolute top-[0px] right-[0px] bg-[#ffffff] p-2 rounded-full hover:bg-slate-200"
+            size={32}
+            strokeWidth={2}
+          />
         ) : (
           <></>
         )}
