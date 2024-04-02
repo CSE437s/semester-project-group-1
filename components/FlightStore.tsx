@@ -147,7 +147,7 @@ function FlightStore(props: Props) {
           <div className="relative">
             <X
               onClick={() => setShowStore(false)}
-              className="cursor-pointer absolute top-[-15px] right-[-5px] bg-[#2c2c2c] p-2 rounded-full hover:bg-slate-400"
+              className="cursor-pointer absolute top-[-15px] right-[-5px] bg-[#2c2c2c] p-2 rounded-full hover:bg-slate-600"
               size={32}
               strokeWidth={2}
             />
