@@ -112,7 +112,7 @@ export function FlightRequestForm(props: Props) {
                       control={form.control}
                       name="outboundAirportCode"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col pb-2">
+                        <FormItem className="flex max-w-[300px] flex-col pb-2">
                           <FormLabel>Outbound Airport</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -180,7 +180,7 @@ export function FlightRequestForm(props: Props) {
                       control={form.control}
                       name="inboundAirportCode"
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem className="flex flex-col max-w-[400px] min-w-[300px]">
                           <FormLabel>Inbound Airport</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -189,7 +189,7 @@ export function FlightRequestForm(props: Props) {
                                   variant="outline"
                                   role="combobox"
                                   className={cn(
-                                    "min-w-[400px] justify-between text-black",
+                                    " justify-between text-black",
                                     !field.value && "text-muted-foreground"
                                   )}
                                 >
