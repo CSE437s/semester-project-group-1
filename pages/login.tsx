@@ -119,7 +119,7 @@ export default function Login() {
       <div className="flex z-10 items-center flex-col justify-center w-[350px] rounded-lg my-10 shadow-lg bg-[#e0fbfc] space-y-6 border border-gray-200 dark:border-gray-700 p-4 py-8 h-auto overflow-y-hidden overflow-x-hidden">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">Log In</h1>
-          <p className="text-zinc-500 dark:text-zinc-400">
+          <p className="text-zinc-500 dark:text-zinc-400 px-5">
             {sent
               ? "Enter the one-time code sent to your email"
               : "Enter your email to log in"}
