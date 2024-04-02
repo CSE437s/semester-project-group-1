@@ -127,15 +127,15 @@ export function FlightRequestForm(props: Props) {
                                 >
                                   {field.value
                                     ? airports.find(
-                                      (airport) =>
-                                        `${airport.iata}` === field.value
-                                    )?.name
+                                        (airport) =>
+                                          `${airport.iata}` === field.value
+                                      )?.name
                                     : "Select Airport"}
                                   <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="max-w-[200px] max-h-[300px] overflow-y-scroll p-0 items-start overscroll-contain">
+                            <PopoverContent className="max-w-400px] max-h-[300px] overflow-y-scroll p-0 items-start overscroll-contain">
                               <Command>
                                 <CommandInput
                                   placeholder="Search airports..."
@@ -195,15 +195,15 @@ export function FlightRequestForm(props: Props) {
                                 >
                                   {field.value
                                     ? airports.find(
-                                      (airport) =>
-                                        `${airport.iata}` === field.value
-                                    )?.name
+                                        (airport) =>
+                                          `${airport.iata}` === field.value
+                                      )?.name
                                     : "Select Airport"}
                                   <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="max-w-[200px] max-h-[300px] overflow-y-scroll overscroll-contain p-0 items-start">
+                            <PopoverContent className="max-w-[400px] max-h-[300px] overflow-y-scroll overscroll-contain p-0 items-start">
                               <Command>
                                 <CommandInput
                                   placeholder="Search airports..."
