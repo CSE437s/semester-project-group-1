@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import * as React from "react"
+import * as React from 'react'
 
 import {
   DropdownMenu,
@@ -10,54 +10,60 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { SORT_METHODS, SORT_METHODS_LIST } from "../FlightStore"
+} from '@/components/ui/dropdown-menu'
+import { type SORT_METHODS, SORT_METHODS_LIST } from '../FlightStore'
 
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button'
 
-export type DropdownOptions = {
-    value: string
-    label: string
+export interface DropdownOptions {
+  value: string
+  label: string
 }
 
-type Props = {
-    // options: SORT_METHODS
-    label: string
-    selectedSort: SORT_METHODS
-    setSelectedSort: (value: SORT_METHODS) => void
+interface Props {
+  // options: SORT_METHODS
+  label: string
+  selectedSort: SORT_METHODS
+  setSelectedSort: (value: SORT_METHODS) => void
 }
 
 const valueInOptions = (value: string) => {
-    for (const option in SORT_METHODS_LIST) {
-        if (option === value) {
-            return true
-        }
-    } return false
+  for (const option in SORT_METHODS_LIST) {
+    if (option === value) {
+      return true
+    }
   }
+  return false
+}
 
 export function DropdownMenuRadioGroupWithOptions(props: Props) {
   const handleValueChange = (value: string) => {
-    if (value === "PRICE" || value === "DURATION" || value === "STOPS") {
+    if (value === 'PRICE' || value === 'DURATION' || value === 'STOPS') {
       props.setSelectedSort(value)
     } else {
-      props.setSelectedSort("PRICE")
+      props.setSelectedSort('PRICE')
     }
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="text-black ">Filter By</Button>
+        <Button variant='outline' className='text-black '>
+          Filter By
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56">
+      <DropdownMenuContent className='w-56'>
         <DropdownMenuLabel>{props.label}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup value={props.selectedSort} onValueChange={handleValueChange}>
-            {SORT_METHODS_LIST.map((option) => (
-                <DropdownMenuRadioItem key={option} value={option}>
-                {option}
-                </DropdownMenuRadioItem>
-            ))}
+        <DropdownMenuRadioGroup
+          value={props.selectedSort}
+          onValueChange={handleValueChange}
+        >
+          {SORT_METHODS_LIST.map((option) => (
+            <DropdownMenuRadioItem key={option} value={option}>
+              {option}
+            </DropdownMenuRadioItem>
+          ))}
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>

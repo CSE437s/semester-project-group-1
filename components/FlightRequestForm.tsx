@@ -1,11 +1,11 @@
-import { CaretSortIcon, CheckIcon } from "@radix-ui/react-icons";
+import { CaretSortIcon, CheckIcon } from '@radix-ui/react-icons'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "./ui/command";
+} from './ui/command'
 import {
   Form,
   FormControl,
@@ -14,115 +14,115 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+} from '@/components/ui/form'
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 
-import { BasicFlightRequest } from "@/lib/route-types";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "./ui/calendar";
-import { CalendarIcon } from "lucide-react";
-import { FlightOption } from "@/lib/availability-types";
-import { ReducedFlightRequestForm } from "./ReducedFlightRequestForm";
-import airports from "@/lib/airports";
-import { cn } from "@/lib/utils";
-import { fetchFlights } from "@/lib/requestHandler";
-import { format } from "date-fns";
-import { useForm } from "react-hook-form";
-import { useState } from "react";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { BasicFlightRequest } from '@/lib/route-types'
+import { Button } from '@/components/ui/button'
+import { Calendar } from './ui/calendar'
+import { CalendarIcon } from 'lucide-react'
+import { type FlightOption } from '@/lib/availability-types'
+import { ReducedFlightRequestForm } from './ReducedFlightRequestForm'
+import airports from '@/lib/airports'
+import { cn } from '@/lib/utils'
+import { fetchFlights } from '@/lib/requestHandler'
+import { format } from 'date-fns'
+import { useForm } from 'react-hook-form'
+import { useState } from 'react'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const FormSchema = z.object({
   outboundAirportCode: z
     .string()
     .min(3, {
-      message: "Enter an airport code.",
+      message: 'Enter an airport code.',
     })
     .max(3, {
-      message: "Enter an airport code.",
+      message: 'Enter an airport code.',
     }),
   inboundAirportCode: z
     .string()
     .min(3, {
-      message: "Enter an airport code.",
+      message: 'Enter an airport code.',
     })
     .max(3, {
-      message: "Enter an airport code.",
+      message: 'Enter an airport code.',
     }),
   beginRangeSearch: z.date(),
   endRangeSearch: z.date(),
-});
+})
 
-export type RequestFormData = z.infer<typeof FormSchema>;
+export type RequestFormData = z.infer<typeof FormSchema>
 
-type Props = {
-  setData: (data: FlightOption[]) => void;
-  setLoading: (loading: boolean) => void;
-  reference: any;
-  expanded: boolean;
-  setExpanded: (expanded: boolean) => void;
-};
+interface Props {
+  setData: (data: FlightOption[]) => void
+  setLoading: (loading: boolean) => void
+  reference: any
+  expanded: boolean
+  setExpanded: (expanded: boolean) => void
+}
 
 export function FlightRequestForm(props: Props) {
   // const [expanded, setExpanded] = useState(true);
-  const { expanded, setExpanded } = props;
-  const [data, setData] = useState<RequestFormData>();
+  const { expanded, setExpanded } = props
+  const [data, setData] = useState<RequestFormData>()
   const handleClick = () => {
-    props.reference.current?.scrollIntoView({ behavior: "smooth" });
-  };
+    props.reference.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      outboundAirportCode: "",
-      inboundAirportCode: "",
+      outboundAirportCode: '',
+      inboundAirportCode: '',
       beginRangeSearch: new Date(),
       endRangeSearch: new Date(),
     },
-  });
+  })
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    props.setLoading(true);
-    setData(data);
-    const res: FlightOption[] = await fetchFlights(data);
-    props.setData(res);
-    props.setLoading(false);
-    setExpanded(false);
-    handleClick();
-    window.scrollTo({ top: 700, behavior: "smooth" });
-  };
+    props.setLoading(true)
+    setData(data)
+    const res: FlightOption[] = await fetchFlights(data)
+    props.setData(res)
+    props.setLoading(false)
+    setExpanded(false)
+    handleClick()
+    window.scrollTo({ top: 700, behavior: 'smooth' })
+  }
 
   return (
     <div>
       {!expanded ? (
         <ReducedFlightRequestForm data={data} setExpanded={setExpanded} />
       ) : (
-        <div className="flex flex-row items-center">
+        <div className='flex flex-row items-center'>
           {airports.length === 0 ? (
             <p>Loading...</p>
           ) : (
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="w-2/3 space-y-6 h-auto"
+                className='h-auto w-2/3 space-y-6'
               >
-                <div className="flex flex-row justify-between items-center w-[35vw]">
-                  <div className="flex flex-col">
+                <div className='flex w-[35vw] flex-row items-center justify-between'>
+                  <div className='flex flex-col'>
                     <FormField
                       control={form.control}
-                      name="outboundAirportCode"
+                      name='outboundAirportCode'
                       render={({ field }) => (
-                        <FormItem className="flex flex-col pb-2">
+                        <FormItem className='flex flex-col pb-2'>
                           <FormLabel>Outbound Airport</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
                                 <Button
-                                  variant="outline"
-                                  role="combobox"
+                                  variant='outline'
+                                  role='combobox'
                                   className={cn(
-                                    "justify-between text-black",
-                                    !field.value && "text-muted-foreground"
+                                    'justify-between text-black',
+                                    !field.value && 'text-muted-foreground'
                                   )}
                                 >
                                   {field.value
@@ -130,16 +130,16 @@ export function FlightRequestForm(props: Props) {
                                         (airport) =>
                                           `${airport.iata}` === field.value
                                       )?.name
-                                    : "Select Airport"}
-                                  <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    : 'Select Airport'}
+                                  <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="max-w-400px] max-h-[300px] overflow-y-scroll p-0 items-start overscroll-contain">
+                            <PopoverContent className='max-w-400px] max-h-[300px] items-start overflow-y-scroll overscroll-contain p-0'>
                               <Command>
                                 <CommandInput
-                                  placeholder="Search airports..."
-                                  className="h-9"
+                                  placeholder='Search airports...'
+                                  className='h-9'
                                 />
                                 <CommandEmpty>No airport found.</CommandEmpty>
                                 <CommandGroup>
@@ -149,18 +149,18 @@ export function FlightRequestForm(props: Props) {
                                       key={airport.iata}
                                       onSelect={() => {
                                         form.setValue(
-                                          "outboundAirportCode",
+                                          'outboundAirportCode',
                                           airport.iata
-                                        );
+                                        )
                                       }}
                                     >
                                       {`${airport.city}, ${airport.state} (${airport.iata})`}
                                       <CheckIcon
                                         className={cn(
-                                          "ml-auto h-4 w-4",
+                                          'ml-auto h-4 w-4',
                                           airport.iata === field.value
-                                            ? "opacity-100"
-                                            : "opacity-0"
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
                                         )}
                                       />
                                     </CommandItem>
@@ -178,19 +178,19 @@ export function FlightRequestForm(props: Props) {
                     />
                     <FormField
                       control={form.control}
-                      name="inboundAirportCode"
+                      name='inboundAirportCode'
                       render={({ field }) => (
-                        <FormItem className="flex flex-col">
+                        <FormItem className='flex flex-col'>
                           <FormLabel>Inbound Airport</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
                                 <Button
-                                  variant="outline"
-                                  role="combobox"
+                                  variant='outline'
+                                  role='combobox'
                                   className={cn(
-                                    "min-w-[400px] justify-between text-black",
-                                    !field.value && "text-muted-foreground"
+                                    'min-w-[400px] justify-between text-black',
+                                    !field.value && 'text-muted-foreground'
                                   )}
                                 >
                                   {field.value
@@ -198,16 +198,16 @@ export function FlightRequestForm(props: Props) {
                                         (airport) =>
                                           `${airport.iata}` === field.value
                                       )?.name
-                                    : "Select Airport"}
-                                  <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                    : 'Select Airport'}
+                                  <CaretSortIcon className='ml-2 h-4 w-4 shrink-0 opacity-50' />
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="max-w-[400px] max-h-[300px] overflow-y-scroll overscroll-contain p-0 items-start">
+                            <PopoverContent className='max-h-[300px] max-w-[400px] items-start overflow-y-scroll overscroll-contain p-0'>
                               <Command>
                                 <CommandInput
-                                  placeholder="Search airports..."
-                                  className="h-9"
+                                  placeholder='Search airports...'
+                                  className='h-9'
                                 />
                                 <CommandEmpty>No airport found.</CommandEmpty>
                                 <CommandGroup>
@@ -217,18 +217,18 @@ export function FlightRequestForm(props: Props) {
                                       key={airport.iata}
                                       onSelect={() => {
                                         form.setValue(
-                                          "inboundAirportCode",
+                                          'inboundAirportCode',
                                           airport.iata
-                                        );
+                                        )
                                       }}
                                     >
                                       {`${airport.city}, ${airport.state} (${airport.iata})`}
                                       <CheckIcon
                                         className={cn(
-                                          "ml-auto h-4 w-4",
+                                          'ml-auto h-4 w-4',
                                           airport.iata === field.value
-                                            ? "opacity-100"
-                                            : "opacity-0"
+                                            ? 'opacity-100'
+                                            : 'opacity-0'
                                         )}
                                       />
                                     </CommandItem>
@@ -246,36 +246,36 @@ export function FlightRequestForm(props: Props) {
                     />
                   </div>
                 </div>
-                <div className="flex flex-row lg:flex-nowrap flex-wrap justify-between items-center w-[35vw]">
+                <div className='flex w-[35vw] flex-row flex-wrap items-center justify-between lg:flex-nowrap'>
                   <FormField
                     control={form.control}
-                    name="beginRangeSearch"
+                    name='beginRangeSearch'
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem className='flex flex-col'>
                         <FormLabel>Date Range Start</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
                               <Button
-                                variant={"outline"}
+                                variant={'outline'}
                                 className={cn(
-                                  "w-[175px] pl-3 text-left font-normal text-black",
+                                  'w-[175px] pl-3 text-left font-normal text-black',
 
-                                  !field.value && "text-muted-foreground"
+                                  !field.value && 'text-muted-foreground'
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "PPP")
+                                  format(field.value, 'PPP')
                                 ) : (
                                   <span>Pick a date</span>
                                 )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
+                          <PopoverContent className='w-auto p-0' align='start'>
                             <Calendar
-                              mode="single"
+                              mode='single'
                               selected={field.value}
                               onSelect={field.onChange}
                               disabled={(date) => date < new Date()}
@@ -292,38 +292,38 @@ export function FlightRequestForm(props: Props) {
                   />
                   <FormField
                     control={form.control}
-                    name="endRangeSearch"
+                    name='endRangeSearch'
                     render={({ field }) => (
-                      <FormItem className="flex flex-col">
+                      <FormItem className='flex flex-col'>
                         <FormLabel>Date Range End</FormLabel>
                         <Popover>
                           <PopoverTrigger asChild>
                             <FormControl>
                               <Button
-                                variant={"outline"}
+                                variant={'outline'}
                                 className={cn(
-                                  "w-[175px] pl-3 text-left font-normal text-black",
+                                  'w-[175px] pl-3 text-left font-normal text-black',
 
-                                  !field.value && "text-muted-foreground"
+                                  !field.value && 'text-muted-foreground'
                                 )}
                               >
                                 {field.value ? (
-                                  format(field.value, "PPP")
+                                  format(field.value, 'PPP')
                                 ) : (
                                   <span>Pick a date</span>
                                 )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                               </Button>
                             </FormControl>
                           </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
+                          <PopoverContent className='w-auto p-0' align='start'>
                             <Calendar
-                              mode="single"
+                              mode='single'
                               selected={field.value}
                               onSelect={field.onChange}
                               disabled={(date) =>
                                 date < new Date() ||
-                                date < form.getValues("beginRangeSearch")
+                                date < form.getValues('beginRangeSearch')
                               }
                               initialFocus
                             />
@@ -337,14 +337,16 @@ export function FlightRequestForm(props: Props) {
                     )}
                   />
                 </div>
-                <div className="flex flex-row justify-between w-full">
-                  <Button className="bg-[#ee6c4d]" type="submit">
+                <div className='flex w-full flex-row justify-between'>
+                  <Button className='bg-[#ee6c4d]' type='submit'>
                     Submit
                   </Button>
                   {data && (
                     <Button
-                      className="bg-white text-black hover:bg-white"
-                      onClick={() => setExpanded(false)}
+                      className='bg-white text-black hover:bg-white'
+                      onClick={() => {
+                        setExpanded(false)
+                      }}
                     >
                       Compress
                     </Button>
@@ -356,5 +358,5 @@ export function FlightRequestForm(props: Props) {
         </div>
       )}
     </div>
-  );
+  )
 }

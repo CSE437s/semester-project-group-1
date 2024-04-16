@@ -2,139 +2,139 @@
  * v0 by Vercel.
  * @see https://v0.dev/t/XNlTLb7
  */
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { validEmail } from "@/lib/utils";
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { validEmail } from '@/lib/utils'
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { REGEXP_ONLY_DIGITS } from "input-otp";
+} from '@/components/ui/input-otp'
+import { REGEXP_ONLY_DIGITS } from 'input-otp'
 
 export default function Login() {
-  const supabaseClient = useSupabaseClient();
-  const router = useRouter();
+  const supabaseClient = useSupabaseClient()
+  const router = useRouter()
 
-  const [sent, setSent] = useState(false);
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false)
+  const [email, setEmail] = useState('')
+  const [code, setCode] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
+    setEmail(e.target.value)
+  }
 
   const handleCodeSubmit = async () => {
-    console.log(code);
-    if (code === "" || code == null) {
-      alert("Please enter a code.");
-      return;
+    console.log(code)
+    if (code === '' || code == null) {
+      alert('Please enter a code.')
+      return
     }
-    setLoading(true);
+    setLoading(true)
     const {
       data: { session },
       error,
     } = await supabaseClient.auth.verifyOtp({
       email,
       token: code,
-      type: "email",
-    });
+      type: 'email',
+    })
 
     if (error) {
-      alert("Incorrect OTP. Please try again."); // TODO: make better
-      setLoading(false);
-      setSent(true);
-      return;
+      alert('Incorrect OTP. Please try again.') // TODO: make better
+      setLoading(false)
+      setSent(true)
+      return
     }
-    setLoading(false);
+    setLoading(false)
     if (session) {
-      setLoading(true);
-      await supabaseClient.auth.setSession(session);
-      await router.push("/");
+      setLoading(true)
+      await supabaseClient.auth.setSession(session)
+      await router.push('/')
     }
-  };
+  }
 
   const handleClick = async () => {
     try {
-      if (email === "") {
-        alert("Please enter an email.");
-        return;
+      if (email === '') {
+        alert('Please enter an email.')
+        return
       }
       if (!validEmail(email)) {
-        alert("Please enter a valid email.");
-        return;
+        alert('Please enter a valid email.')
+        return
       }
-      setLoading(true);
+      setLoading(true)
       const { error } = await supabaseClient.auth.signInWithOtp({
-        email: email,
-      });
+        email,
+      })
       if (error) {
-        console.log(error.message);
+        console.log(error.message)
         switch (error.message) {
-          case "Signups not allowed for otp":
-            alert("No account exists. Please sign up"); //FIXME:
-            break;
-          case "Email rate limit exceeded":
+          case 'Signups not allowed for otp':
+            alert('No account exists. Please sign up') // FIXME:
+            break
+          case 'Email rate limit exceeded':
             alert(
-              "Email rate limit exceeded due to Supabase free tier limitations. Please try again later."
-            );
-          case "For security purposes, you can only request this once every 60 seconds":
-            alert("60 second rate limit hit, please try again in a minute");
-            break;
+              'Email rate limit exceeded due to Supabase free tier limitations. Please try again later.'
+            )
+          case 'For security purposes, you can only request this once every 60 seconds':
+            alert('60 second rate limit hit, please try again in a minute')
+            break
           default:
-            alert("There was an error. Please try again."); // TODO: make better
-            break;
+            alert('There was an error. Please try again.') // TODO: make better
+            break
         }
-        setLoading(false);
-        setEmail("");
-        return;
+        setLoading(false)
+        setEmail('')
+        return
       }
-      setLoading(false);
-      setSent(true);
+      setLoading(false)
+      setSent(true)
     } catch (e) {
       // alert("There was an error. Please try again.") // TODO: make better
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="bg-white min-h-screen flex flex-col items-center relative overflow-y-hidden overflow-x-hidden">
-      <div className="bg-gradient-to-r from-[#3d5a80] to-blue-300 w-[125vw] min-h-[80vh] z-0  rounded-b-full absolute top-0 -left-[12.5vw]"></div>
+    <div className='relative flex min-h-screen flex-col items-center overflow-x-hidden overflow-y-hidden bg-white'>
+      <div className='absolute -left-[12.5vw] top-0 z-0 min-h-[80vh] w-[125vw]  rounded-b-full bg-gradient-to-r from-[#3d5a80] to-blue-300'></div>
 
-      <div className="text-4xl z-10 text-[#ee6c4d] text-center font-bold mt-4 px-20">
+      <div className='z-10 mt-4 px-20 text-center text-4xl font-bold text-[#ee6c4d]'>
         Travel you can't imagine
       </div>
-      <div className="text-xl z-10 text-white mt-4 w-[500px] text-center  my-5 px-20">
+      <div className='z-10 my-5 mt-4 w-[500px] px-20 text-center  text-xl text-white'>
         Find and save flights at your finger tips. Search with complicated
         queries if you don't know where to go, or input dates and locations if
         you know where you want to go. With TYCI, the possibilities are
         limitless.
       </div>
-      <div className="flex z-10 items-center flex-col justify-center w-[350px] rounded-lg my-10 shadow-lg bg-[#e0fbfc] space-y-6 border border-gray-200 dark:border-gray-700 p-4 py-8 h-auto overflow-y-hidden overflow-x-hidden">
-        <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold">Log In</h1>
-          <p className="text-zinc-500 dark:text-zinc-400 px-5">
+      <div className='z-10 my-10 flex h-auto w-[350px] flex-col items-center justify-center space-y-6 overflow-x-hidden overflow-y-hidden rounded-lg border border-gray-200 bg-[#e0fbfc] p-4 py-8 shadow-lg dark:border-gray-700'>
+        <div className='space-y-2 text-center'>
+          <h1 className='text-3xl font-bold'>Log In</h1>
+          <p className='px-5 text-zinc-500 dark:text-zinc-400'>
             {sent
-              ? "Enter the one-time code sent to your email"
-              : "Enter your email to log in"}
+              ? 'Enter the one-time code sent to your email'
+              : 'Enter your email to log in'}
           </p>
         </div>
-        <div className="space-y-4">
-          <div className="space-y-2">
+        <div className='space-y-4'>
+          <div className='space-y-2'>
             {loading ? (
-              <p className="text-center">Loading...</p>
+              <p className='text-center'>Loading...</p>
             ) : (
               <>
-                <Label className="text-center" htmlFor="email">
-                  {sent ? "One-Time Code" : "Email"}
+                <Label className='text-center' htmlFor='email'>
+                  {sent ? 'One-Time Code' : 'Email'}
                 </Label>
-                <div className="flex flex-row">
+                <div className='flex flex-row'>
                   {sent ? (
                     <>
                       {/* <Input
@@ -155,15 +155,17 @@ export default function Login() {
                       <InputOTP
                         maxLength={6}
                         pattern={REGEXP_ONLY_DIGITS}
-                        id="otp"
+                        id='otp'
                         required
-                        onChange={(e) => setCode(e)}
+                        onChange={(e) => {
+                          setCode(e)
+                        }}
                         onSubmit={(e) => {
-                          handleCodeSubmit();
+                          handleCodeSubmit()
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleCodeSubmit();
+                          if (e.key === 'Enter') {
+                            handleCodeSubmit()
                           }
                         }}
                       >
@@ -177,13 +179,13 @@ export default function Login() {
                         </InputOTPGroup>
                       </InputOTP>
                       <Button
-                        className="mx-2"
+                        className='mx-2'
                         onClick={(e) => {
-                          handleCodeSubmit();
+                          handleCodeSubmit()
                         }}
                         onKeyDown={(e: { key: string }) => {
-                          if (e.key === "Enter") {
-                            handleCodeSubmit();
+                          if (e.key === 'Enter') {
+                            handleCodeSubmit()
                           }
                         }}
                       >
@@ -193,25 +195,25 @@ export default function Login() {
                   ) : (
                     <>
                       <Input
-                        id="email"
-                        placeholder={"m@example.com"}
+                        id='email'
+                        placeholder={'m@example.com'}
                         required
-                        type="email"
+                        type='email'
                         value={email}
                         onChange={handleChange}
                         onSubmit={handleClick}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleClick();
+                          if (e.key === 'Enter') {
+                            handleClick()
                           }
                         }}
                       />
                       <Button
-                        className="mx-2"
+                        className='mx-2'
                         onClick={handleClick}
                         onKeyDown={(e: { key: string }) => {
-                          if (e.key === "Enter") {
-                            handleClick();
+                          if (e.key === 'Enter') {
+                            handleClick()
                           }
                         }}
                       >
@@ -226,5 +228,5 @@ export default function Login() {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -1,18 +1,18 @@
-import { useState } from "react";
-import "/styles/globals.css";
+import { useState } from 'react'
+import '../../../../../styles/globals.css'
 import {
   type Session,
   createPagesBrowserClient,
-} from "@supabase/auth-helpers-nextjs";
-import { SessionContextProvider } from "@supabase/auth-helpers-react";
-import { type AppProps } from "next/app";
-import Navbar from "@/components/Navbar";
+} from '@supabase/auth-helpers-nextjs'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { type AppProps } from 'next/app'
+import Navbar from '@/components/Navbar'
 
 function MyApp({
   Component,
   pageProps,
 }: AppProps<{ initialSession: Session }>) {
-  const [supabaseClient] = useState(() => createPagesBrowserClient());
+  const [supabaseClient] = useState(() => createPagesBrowserClient())
   return (
     <SessionContextProvider
       supabaseClient={supabaseClient}
@@ -20,7 +20,7 @@ function MyApp({
     >
       <Component {...pageProps} />
     </SessionContextProvider>
-  );
+  )
 }
 
-export default MyApp;
+export default MyApp
