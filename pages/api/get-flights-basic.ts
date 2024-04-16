@@ -1,9 +1,13 @@
-import { BasicFlightRequest, BasicFlightRequestStringified, FlightResponseData } from "@/lib/route-types";
-import type { NextApiRequest, NextApiResponse } from "next";
+import {
+  BasicFlightRequest,
+  type BasicFlightRequestStringified,
+  type FlightResponseData,
+} from '@/lib/route-types'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { basicFlightRequestToSeatsCachedSearchParams } from "@/lib/utils";
-import { SeatsAero } from "@/lib/server/AeroClient";
-import { SEAT_CLASS, SeatsCachedSearchParams } from "@/lib/types";
+import { basicFlightRequestToSeatsCachedSearchParams } from '@/lib/utils'
+import { SeatsAero } from '@/lib/server/AeroClient'
+import { SEAT_CLASS, type SeatsCachedSearchParams } from '@/lib/types'
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,7 +21,7 @@ export default async function handler(
     destination_airport: data.destination_airport,
     cabin: SEAT_CLASS.ECONOMY,
     start_date: data.start_date,
-    end_date: data.end_date // TODO: as of now, the end_date is not optional
+    end_date: data.end_date, // TODO: as of now, the end_date is not optional
   }
   try {
     const apiResponse = await seatsAero.cached_search(searchParams)

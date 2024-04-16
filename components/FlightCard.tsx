@@ -1,4 +1,7 @@
-import { AvailabilitySegment, FlightOption } from "@/lib/availability-types";
+import {
+  type AvailabilitySegment,
+  type FlightOption,
+} from '@/lib/availability-types'
 import {
   Dialog,
   DialogClose,
@@ -7,18 +10,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import React, { useEffect, useRef, useState } from "react";
-import { ExternalLinkIcon, PaperPlaneIcon } from "@radix-ui/react-icons";
-import { TbCoins } from "react-icons/tb";
-import { Button } from "./ui/button";
-import Image from "next/image";
-import { ItemTypes } from "./Constants";
-import airlines from "@/lib/airlines";
-import svg from "../public/drag-handle.svg";
-import { useDrag } from "react-dnd";
-import { FaPlaneDeparture, FaRegMap } from "react-icons/fa";
-import { MdAccessTime } from "react-icons/md";
+} from '@/components/ui/dialog'
+import React, { useEffect, useRef, useState } from 'react'
+import { ExternalLinkIcon, PaperPlaneIcon } from '@radix-ui/react-icons'
+import { TbCoins } from 'react-icons/tb'
+import { Button } from './ui/button'
+import Image from 'next/image'
+import { ItemTypes } from './Constants'
+import airlines from '@/lib/airlines'
+import svg from '../public/drag-handle.svg'
+import { useDrag } from 'react-dnd'
+import { FaPlaneDeparture, FaRegMap } from 'react-icons/fa'
+import { MdAccessTime } from 'react-icons/md'
 import {
   Clock,
   Coins,
@@ -33,74 +36,74 @@ import {
   RockingChair,
   RockingChairIcon,
   X,
-} from "lucide-react";
+} from 'lucide-react'
 
 // Update props
-type Props = {
-  item: FlightOption;
-  description?: string;
-  title?: string;
-  isSaved: boolean;
-  handleRemove: (flight: FlightOption) => void;
-  isDraggable: boolean;
-  device: string;
-  addToBoard?: (flight: FlightOption) => void;
-  setCurrentlyDragging?: any; // use state function
-};
+interface Props {
+  item: FlightOption
+  description?: string
+  title?: string
+  isSaved: boolean
+  handleRemove: (flight: FlightOption) => void
+  isDraggable: boolean
+  device: string
+  addToBoard?: (flight: FlightOption) => void
+  setCurrentlyDragging?: any // use state function
+}
 
 const getOriginAirport = (segments: AvailabilitySegment[]) => {
-  return segments[0].OriginAirport;
-};
+  return segments[0].OriginAirport
+}
 
 const getDestinationAirport = (segments: AvailabilitySegment[]) => {
-  return segments[segments.length - 1].DestinationAirport;
-};
+  return segments[segments.length - 1].DestinationAirport
+}
 
 const getFlightNumbers = (item: FlightOption) => {
   const parseFlightNumsFromString = (flightNums: string): string[] => {
-    return flightNums.split(",").map((num) => num.trim());
-  };
-  const flightNums = parseFlightNumsFromString(item.FlightNumbers);
-  return `${flightNums.join(", ")}`;
-};
+    return flightNums.split(',').map((num) => num.trim())
+  }
+  const flightNums = parseFlightNumsFromString(item.FlightNumbers)
+  return `${flightNums.join(', ')}`
+}
 
 const getStops = (segments: AvailabilitySegment[]) => {
-  return segments.length - 1;
-};
+  return segments.length - 1
+}
 
 const getFlightDuration = (segments: AvailabilitySegment[]) => {
-  const firstDeparture = new Date(segments[0].DepartsAt);
-  const lastArrival = new Date(segments[segments.length - 1].ArrivesAt);
-  return (lastArrival.getTime() - firstDeparture.getTime()) / 60000;
-};
+  const firstDeparture = new Date(segments[0].DepartsAt)
+  const lastArrival = new Date(segments[segments.length - 1].ArrivesAt)
+  return (lastArrival.getTime() - firstDeparture.getTime()) / 60000
+}
 
 const displayDuration = (duration: number) => {
   // if under an hour, display in minutes. Otherwise, display in hours and minutes
   if (duration < 60) {
-    return `${duration} minutes`;
+    return `${duration} minutes`
   } else {
-    const hours = Math.floor(duration / 60);
-    const minutes = duration % 60;
+    const hours = Math.floor(duration / 60)
+    const minutes = duration % 60
 
-    return `${hours}hr${hours > 1 ? "s" : ""}, ${minutes}m`;
+    return `${hours}hr${hours > 1 ? 's' : ''}, ${minutes}m`
   }
-};
+}
 
 const displayDollarAmount = (cents: number) => {
-  const dollars = cents / 100;
-  return `$${dollars.toFixed(2)}`;
-};
+  const dollars = cents / 100
+  return `$${dollars.toFixed(2)}`
+}
 
 function FlightCard(props: Props) {
-  const [showModal, setModal] = useState(false);
-  const ref = useRef<any>(null);
+  const [showModal, setModal] = useState(false)
+  const ref = useRef<any>(null)
   const handleClick = () => {
-    window.scrollTo({ top: 0, behavior: "auto" });
-  };
+    window.scrollTo({ top: 0, behavior: 'auto' })
+  }
 
   const handleClick2 = () => {
-    ref.current?.scrollIntoView({ behavior: "auto" });
-  };
+    ref.current?.scrollIntoView({ behavior: 'auto' })
+  }
 
   const [{ isDragging }, drag] = !props.isDraggable
     ? [{ isDragging: false }, null]
@@ -110,7 +113,7 @@ function FlightCard(props: Props) {
         collect: (monitor) => ({
           isDragging: !!monitor.isDragging(),
         }),
-      }));
+      }))
 
   // const [dragging, setDragging] = useState(isDragging);
 
@@ -118,28 +121,28 @@ function FlightCard(props: Props) {
 
   useEffect(() => {
     if (props.setCurrentlyDragging !== undefined) {
-      props.setCurrentlyDragging(isDragging);
+      props.setCurrentlyDragging(isDragging)
     }
-  }, [isDragging]);
+  }, [isDragging])
 
   function getCarrier(carrier: string): string {
-    let carriers: string[] = carrier.split(",");
+    const carriers: string[] = carrier.split(',')
     for (let i = 0; i < carriers.length; i++) {
-      carriers[i] = carriers[i].trim();
+      carriers[i] = carriers[i].trim()
     }
     function removeDuplicates(arr: string[]) {
-      return new Set<string>(arr);
+      return new Set<string>(arr)
     }
-    let noDupes = removeDuplicates(carriers);
-    let airlineString = "";
+    const noDupes = removeDuplicates(carriers)
+    let airlineString = ''
     noDupes.forEach((element) => {
-      let temp = airlines.find((item) => {
-        return item.code == element;
-      });
-      airlineString += temp?.airline;
-    });
+      const temp = airlines.find((item) => {
+        return item.code == element
+      })
+      airlineString += temp?.airline
+    })
     // console.log(airlineString);
-    return airlineString;
+    return airlineString
   }
 
   const displayModal = (
@@ -148,55 +151,60 @@ function FlightCard(props: Props) {
     item: FlightOption
   ) => {
     return (
-      <Dialog open={showModal} onOpenChange={() => setModal(false)}>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog
+        open={showModal}
+        onOpenChange={() => {
+          setModal(false)
+        }}
+      >
+        <DialogContent className='sm:max-w-[425px]'>
           <DialogHeader>
             <DialogTitle>Flight Details</DialogTitle>
           </DialogHeader>
-          <div className="">
-            <div className="text-left">
+          <div className=''>
+            <div className='text-left'>
               <div>{new Date(item.DepartsAt).toLocaleString()} </div>
-              <div className="font-bold">
-                {getOriginAirport(item.AvailabilitySegments)} to{" "}
+              <div className='font-bold'>
+                {getOriginAirport(item.AvailabilitySegments)} to{' '}
                 {getDestinationAirport(item.AvailabilitySegments)}
               </div>
             </div>
-            <div className="grid grid-rows-2 grid-cols-2 mt-5">
-              <div className="flex justify-center flex-col items-center mb-2">
-                <PlaneIcon size={30} strokeWidth={1} className="mb-[2px]" />
-                <div className="w-[150px] border-slate-400 border text-sm h-[100px] p-2 rounded-md flex justify-center items-center flex-col">
+            <div className='mt-5 grid grid-cols-2 grid-rows-2'>
+              <div className='mb-2 flex flex-col items-center justify-center'>
+                <PlaneIcon size={30} strokeWidth={1} className='mb-[2px]' />
+                <div className='flex h-[100px] w-[150px] flex-col items-center justify-center rounded-md border border-slate-400 p-2 text-sm'>
                   <div>{getFlightNumbers(props.item)}</div>
                   <div>{getCarrier(item.Carriers)}</div>
                 </div>
               </div>
-              <div className="flex justify-center flex-col items-center mb-2">
+              <div className='mb-2 flex flex-col items-center justify-center'>
                 <RockingChairIcon
                   size={30}
                   strokeWidth={1}
-                  className="mb-[2px]"
+                  className='mb-[2px]'
                 />
-                <div className="w-[150px] border-slate-400 border text-sm h-[100px] p-2 rounded-md flex justify-center items-center flex-col">
+                <div className='flex h-[100px] w-[150px] flex-col items-center justify-center rounded-md border border-slate-400 p-2 text-sm'>
                   <div>{item.Cabin[0].toUpperCase() + item.Cabin.slice(1)}</div>
-                  <div>{item.RemainingSeats + " seats left"}</div>
+                  <div>{item.RemainingSeats + ' seats left'}</div>
                 </div>
               </div>
-              <div className="flex justify-center flex-col items-center">
-                <Octagon size={30} strokeWidth={1} className="mb-[2px]" />
-                <div className="w-[150px] border-slate-400 border text-sm h-[100px] p-2 rounded-md flex justify-center items-center flex-col">
+              <div className='flex flex-col items-center justify-center'>
+                <Octagon size={30} strokeWidth={1} className='mb-[2px]' />
+                <div className='flex h-[100px] w-[150px] flex-col items-center justify-center rounded-md border border-slate-400 p-2 text-sm'>
                   <div>
                     {item.Stops === 0
-                      ? "Direct Flight"
+                      ? 'Direct Flight'
                       : item.Stops >= 2
-                      ? "" + item.Stops + " stops"
-                      : "" + item.Stops + " stop"}
+                        ? '' + item.Stops + ' stops'
+                        : '' + item.Stops + ' stop'}
                   </div>
                 </div>
               </div>
-              <div className="flex justify-center flex-col items-center">
-                <Coins size={30} strokeWidth={1} className="mb-[2px]" />
-                <div className="w-[150px] border-slate-400 border text-sm h-[100px] p-2 rounded-md flex justify-center items-center flex-col">
-                  <div>{item.MileageCost + " points"} </div>
-                  <div>{"Fees: " + displayDollarAmount(item.TotalTaxes)}</div>
+              <div className='flex flex-col items-center justify-center'>
+                <Coins size={30} strokeWidth={1} className='mb-[2px]' />
+                <div className='flex h-[100px] w-[150px] flex-col items-center justify-center rounded-md border border-slate-400 p-2 text-sm'>
+                  <div>{item.MileageCost + ' points'} </div>
+                  <div>{'Fees: ' + displayDollarAmount(item.TotalTaxes)}</div>
                 </div>
               </div>
               {/* <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
@@ -236,58 +244,61 @@ function FlightCard(props: Props) {
           </div>
           <DialogFooter>
             <a
-              target="_blank"
-              href="https://www.nerdwallet.com/article/travel/how-do-airline-miles-work#:~:text=Airline%20miles%20or%20points%20%E2%80%94%20the,and%20shopping%20with%20specific%20partners."
+              target='_blank'
+              href='https://www.nerdwallet.com/article/travel/how-do-airline-miles-work#:~:text=Airline%20miles%20or%20points%20%E2%80%94%20the,and%20shopping%20with%20specific%20partners.'
+              rel='noreferrer'
             >
-              <div className="text-xs no-underline flex space-x-2 justify-between hover:text-slate-400 transition">
-                Airline miles <ExternalLinkIcon className="ml-[3px]" />{" "}
+              <div className='flex justify-between space-x-2 text-xs no-underline transition hover:text-slate-400'>
+                Airline miles <ExternalLinkIcon className='ml-[3px]' />{' '}
               </div>
             </a>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    );
-  };
+    )
+  }
 
   const cardInGridClasses =
-    "z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg w-[220px] h-auto p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black";
+    'z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg w-[220px] h-auto p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black'
   const cardInBoardClasses =
-    "z-0 relative bg-[#fafafa] overflow-y-hidden drop-shadow-md  transition-all  rounded-lg w-[250px] h-auto p-4 pt-8 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black";
+    'z-0 relative bg-[#fafafa] overflow-y-hidden drop-shadow-md  transition-all  rounded-lg w-[250px] h-auto p-4 pt-8 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black'
 
   return (
     <div
-      // @ts-ignore
+      // @ts-expect-error
       ref={props.isDraggable ? drag : null}
       style={{
         opacity: isDragging ? 0.5 : 1,
         fontSize: 25,
-        fontWeight: "bold",
-        cursor: props.isDraggable ? "move" : "pointer",
+        fontWeight: 'bold',
+        cursor: props.isDraggable ? 'move' : 'pointer',
       }}
     >
-      {showModal == true ? displayModal(props, setModal, props.item) : <></>}
+      {showModal ? displayModal(props, setModal, props.item) : <></>}
       <div
         ref={ref}
         className={props.isSaved ? cardInBoardClasses : cardInGridClasses}
       >
         {props.isSaved ? (
           <X
-            onClick={() => props.handleRemove(props.item)}
-            className="cursor-pointer absolute top-[0px] right-[0px] bg-[#ffffff] p-2 rounded-full hover:bg-slate-200"
+            onClick={() => {
+              props.handleRemove(props.item)
+            }}
+            className='absolute right-[0px] top-[0px] cursor-pointer rounded-full bg-[#ffffff] p-2 hover:bg-slate-200'
             size={32}
             strokeWidth={2}
           />
         ) : (
           <></>
         )}
-        <div className="flex justify-center -mt-4 p-0 text-sm overflow-y-hidden">
-          {props.isDraggable && props.isSaved == false && (
+        <div className='-mt-4 flex justify-center overflow-y-hidden p-0 text-sm'>
+          {props.isDraggable && !props.isSaved && (
             <Image
-              className="rotate-90"
+              className='rotate-90'
               width={30}
               height={30}
               src={svg}
-              alt="draggable"
+              alt='draggable'
             />
           )}
         </div>
@@ -295,33 +306,33 @@ function FlightCard(props: Props) {
           onClick={() => {
             // if (props.x == false) {
 
-            setModal(true);
-            handleClick();
+            setModal(true)
+            handleClick()
             // }
           }}
-          className="text-sm font-light flex flex-col pt-0"
+          className='flex flex-col pt-0 text-sm font-light'
         >
           {props.isSaved && (
-            <div className="flex justify-start items-center">
-              <Hash strokeWidth={2} size={16} className="mr-[5px]" />
+            <div className='flex items-center justify-start'>
+              <Hash strokeWidth={2} size={16} className='mr-[5px]' />
               {getFlightNumbers(props.item)}
             </div>
           )}
           {/* <p>{getFlightNumbers(props.item)}</p> */}
-          <div className="flex justify-start items-center">
-            <PlaneTakeoff strokeWidth={2} size={16} className="mr-[5px]" />
+          <div className='flex items-center justify-start'>
+            <PlaneTakeoff strokeWidth={2} size={16} className='mr-[5px]' />
             {`${new Date(props.item.DepartsAt).toLocaleString()}`}
           </div>
           {/* <p>{`Arrives: ${new Date(props.item.ArrivesAt).toLocaleString()}`}</p> */}
-          <div className="flex justify-start items-center">
-            <Map strokeWidth={2} size={16} className="mr-[5px]" />
+          <div className='flex items-center justify-start'>
+            <Map strokeWidth={2} size={16} className='mr-[5px]' />
             {`${getOriginAirport(props.item.AvailabilitySegments)} -> 
               ${getDestinationAirport(props.item.AvailabilitySegments)}
               `}
           </div>
-          {props.device == "desktop" && props.isSaved == false ? (
-            <div className="flex justify-start items-center">
-              <Clock strokeWidth={2} size={16} className="mr-[5px]" />
+          {props.device == 'desktop' && !props.isSaved ? (
+            <div className='flex items-center justify-start'>
+              <Clock strokeWidth={2} size={16} className='mr-[5px]' />
               {`${displayDuration(
                 getFlightDuration(props.item.AvailabilitySegments)
               )}`}
@@ -335,31 +346,29 @@ function FlightCard(props: Props) {
           ) : (
             <></>
           )} */}
-          {props.device == "desktop" && props.isSaved == false ? (
-            <div className="flex justify-start items-center">
-              <Coins strokeWidth={2} size={16} className="mr-[5px]" />
+          {props.device == 'desktop' && !props.isSaved ? (
+            <div className='flex items-center justify-start'>
+              <Coins strokeWidth={2} size={16} className='mr-[5px]' />
               {props.item.MileageCost +
-                "pts + " +
+                'pts + ' +
                 displayDollarAmount(props.item.TotalTaxes)}
             </div>
           ) : (
             <></>
           )}
         </div>
-        <div className=" text-xs font-thin text-right">
+        <div className=' text-right text-xs font-thin'>
           Click for more flight details
         </div>
-        <div className="flex justify-center">
-          {!props.isSaved &&
-          props.device === "mobile" &&
-          props.isDraggable === false ? (
+        <div className='flex justify-center'>
+          {!props.isSaved && props.device === 'mobile' && !props.isDraggable ? (
             <Button
               onClick={() => {
                 if (!props.isSaved && props.addToBoard !== undefined) {
-                  props.addToBoard(props.item);
+                  props.addToBoard(props.item)
                 }
               }}
-              className="z-4 text-xs font-thin w-[100px] mt-1"
+              className='z-4 mt-1 w-[100px] text-xs font-thin'
             >
               Save Flight
             </Button>
@@ -369,7 +378,7 @@ function FlightCard(props: Props) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-export default FlightCard;
+export default FlightCard
