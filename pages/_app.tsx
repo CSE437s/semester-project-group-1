@@ -12,12 +12,15 @@ function MyApp({
   Component,
   pageProps,
 }: AppProps<{ initialSession: Session }>) {
-  const [supabaseClient] = useState(() =>
-    createPagesBrowserClient({
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  const [supabaseClient] = useState(() => {
+    const URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    console.log('KEYS:', URL, ANON_KEY)
+    return createPagesBrowserClient({
+      supabaseUrl: URL,
+      supabaseKey: ANON_KEY,
     })
-  )
+  })
   return (
     <SessionContextProvider
       supabaseClient={supabaseClient}
