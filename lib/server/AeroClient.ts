@@ -1,4 +1,5 @@
 import {
+  type DataItem,
   type SearchClientInterface,
   type SeatsCachedSearchParams,
 } from '@/lib/types'
@@ -6,19 +7,20 @@ import { type AvailabilityResponseData } from '@/lib/availability-types'
 
 import { type FlightResponseData } from '@/lib/route-types'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sdk = require('api')('@seatsaero/v1.0#cqdn9uslsnn1wyf')
 
 class SeatsAero implements SearchClientInterface {
-  api_key: string
-  constructor(api_key: string) {
-    this.api_key = api_key
+  apiKey: string
+  constructor(apiKey: string) {
+    this.apiKey = apiKey
   }
 
   async cached_search(
     params: SeatsCachedSearchParams
   ): Promise<FlightResponseData> {
     try {
-      await sdk.auth(this.api_key)
+      await sdk.auth(this.apiKey)
       const { data } = await sdk.cachedSearch({
         origin_airport: params.origin_airport,
         destination_airport: params.destination_airport,
@@ -29,7 +31,7 @@ class SeatsAero implements SearchClientInterface {
       console.log(data)
 
       const parsedResponse: FlightResponseData = {
-        data: data.data.map((item: any) => ({
+        data: data.data.map((item: DataItem) => ({
           ...item,
           Route: {
             ...item.Route,
@@ -38,7 +40,7 @@ class SeatsAero implements SearchClientInterface {
         count: data.count,
         hasMore: data.hasMore,
         cursor: data.cursor,
-      } as FlightResponseData
+      } satisfies FlightResponseData
 
       return parsedResponse
     } catch (error) {
@@ -49,7 +51,7 @@ class SeatsAero implements SearchClientInterface {
 
   async get_trips(id: string): Promise<AvailabilityResponseData> {
     try {
-      await sdk.auth(this.api_key)
+      await sdk.auth(this.apiKey)
       const { data } = await sdk.getTrips({ id })
 
       return data as AvailabilityResponseData

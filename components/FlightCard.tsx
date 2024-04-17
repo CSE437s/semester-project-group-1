@@ -4,37 +4,27 @@ import {
 } from '@/lib/availability-types'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
-import React, { useEffect, useRef, useState } from 'react'
-import { ExternalLinkIcon, PaperPlaneIcon } from '@radix-ui/react-icons'
-import { TbCoins } from 'react-icons/tb'
+import React, { type ReactElement, useEffect, useRef, useState } from 'react'
+import { ExternalLinkIcon } from '@radix-ui/react-icons'
 import { Button } from './ui/button'
 import Image from 'next/image'
 import { ItemTypes } from './Constants'
 import airlines from '@/lib/airlines'
 import svg from '../public/drag-handle.svg'
 import { useDrag } from 'react-dnd'
-import { FaPlaneDeparture, FaRegMap } from 'react-icons/fa'
-import { MdAccessTime } from 'react-icons/md'
 import {
   Clock,
   Coins,
-  CoinsIcon,
   Hash,
   Map,
   Octagon,
-  OctagonIcon,
-  Plane,
   PlaneIcon,
   PlaneTakeoff,
-  RockingChair,
-  RockingChairIcon,
   X,
 } from 'lucide-react'
 
@@ -44,22 +34,28 @@ interface Props {
   description?: string
   title?: string
   isSaved: boolean
-  handleRemove: (flight: FlightOption) => void
+  handleRemove: (flight: FlightOption) => Promise<void>
   isDraggable: boolean
   device: string
-  addToBoard?: (flight: FlightOption) => void
+  addToBoard?: (flight: FlightOption) => Promise<void>
   setCurrentlyDragging?: any // use state function
 }
 
-const getOriginAirport = (segments: AvailabilitySegment[]) => {
+const getOriginAirport = (segments: AvailabilitySegment[]): string => {
+  if (segments[0] == null) {
+    throw new Error('Invalid segment')
+  }
   return segments[0].OriginAirport
 }
 
-const getDestinationAirport = (segments: AvailabilitySegment[]) => {
-  return segments[segments.length - 1].DestinationAirport
+const getDestinationAirport = (segments: AvailabilitySegment[]): string => {
+  if (segments.length === 0) {
+    throw new Error('Invalid segment')
+  }
+  return segments[getStops(segments)]?.DestinationAirport ?? ''
 }
 
-const getFlightNumbers = (item: FlightOption) => {
+const getFlightNumbers = (item: FlightOption): string => {
   const parseFlightNumsFromString = (flightNums: string): string[] => {
     return flightNums.split(',').map((num) => num.trim())
   }
@@ -67,17 +63,20 @@ const getFlightNumbers = (item: FlightOption) => {
   return `${flightNums.join(', ')}`
 }
 
-const getStops = (segments: AvailabilitySegment[]) => {
+const getStops = (segments: AvailabilitySegment[]): number => {
   return segments.length - 1
 }
 
-const getFlightDuration = (segments: AvailabilitySegment[]) => {
-  const firstDeparture = new Date(segments[0].DepartsAt)
-  const lastArrival = new Date(segments[segments.length - 1].ArrivesAt)
+const getFlightDuration = (segments: AvailabilitySegment[]): number => {
+  if (segments.length === 0) {
+    throw new Error('Invalid segment')
+  }
+  const firstDeparture = new Date(segments[0]?.DepartsAt ?? '')
+  const lastArrival = new Date(segments[getStops(segments)]?.ArrivesAt ?? '')
   return (lastArrival.getTime() - firstDeparture.getTime()) / 60000
 }
 
-const displayDuration = (duration: number) => {
+const displayDuration = (duration: number): string => {
   // if under an hour, display in minutes. Otherwise, display in hours and minutes
   if (duration < 60) {
     return `${duration} minutes`
@@ -89,20 +88,16 @@ const displayDuration = (duration: number) => {
   }
 }
 
-const displayDollarAmount = (cents: number) => {
+const displayDollarAmount = (cents: number): string => {
   const dollars = cents / 100
   return `$${dollars.toFixed(2)}`
 }
 
-function FlightCard(props: Props) {
+function FlightCard(props: Props): ReactElement {
   const [showModal, setModal] = useState(false)
   const ref = useRef<any>(null)
-  const handleClick = () => {
+  const handleClick = (): void => {
     window.scrollTo({ top: 0, behavior: 'auto' })
-  }
-
-  const handleClick2 = () => {
-    ref.current?.scrollIntoView({ behavior: 'auto' })
   }
 
   const [{ isDragging }, drag] = !props.isDraggable
@@ -115,10 +110,6 @@ function FlightCard(props: Props) {
         }),
       }))
 
-  // const [dragging, setDragging] = useState(isDragging);
-
-  // setDragging(isDragging)
-
   useEffect(() => {
     if (props.setCurrentlyDragging !== undefined) {
       props.setCurrentlyDragging(isDragging)
@@ -126,22 +117,23 @@ function FlightCard(props: Props) {
   }, [isDragging])
 
   function getCarrier(carrier: string): string {
-    const carriers: string[] = carrier.split(',')
-    for (let i = 0; i < carriers.length; i++) {
-      carriers[i] = carriers[i].trim()
-    }
-    function removeDuplicates(arr: string[]) {
+    const carriers: string[] = carrier.split(',').map((item) => {
+      return item.trim()
+    })
+    function removeDuplicates(arr: string[]): Set<string> {
       return new Set<string>(arr)
     }
     const noDupes = removeDuplicates(carriers)
     let airlineString = ''
     noDupes.forEach((element) => {
       const temp = airlines.find((item) => {
-        return item.code == element
+        return item.code === element
       })
-      airlineString += temp?.airline
+      if (temp === undefined) {
+        return
+      }
+      airlineString += temp.airline
     })
-    // console.log(airlineString);
     return airlineString
   }
 
@@ -149,7 +141,7 @@ function FlightCard(props: Props) {
     props: Props,
     setModal: React.Dispatch<React.SetStateAction<boolean>>,
     item: FlightOption
-  ) => {
+  ): ReactElement => {
     return (
       <Dialog
         open={showModal}
@@ -177,16 +169,10 @@ function FlightCard(props: Props) {
                   <div>{getCarrier(item.Carriers)}</div>
                 </div>
               </div>
-              <div className='mb-2 flex flex-col items-center justify-center'>
-                <RockingChairIcon
-                  size={30}
-                  strokeWidth={1}
-                  className='mb-[2px]'
-                />
-                <div className='flex h-[100px] w-[150px] flex-col items-center justify-center rounded-md border border-slate-400 p-2 text-sm'>
-                  <div>{item.Cabin[0].toUpperCase() + item.Cabin.slice(1)}</div>
-                  <div>{item.RemainingSeats + ' seats left'}</div>
-                </div>
+              <div>
+                {item.Cabin.length > 0
+                  ? item.Cabin[0]?.toUpperCase() + item.Cabin.slice(1)
+                  : ''}
               </div>
               <div className='flex flex-col items-center justify-center'>
                 <Octagon size={30} strokeWidth={1} className='mb-[2px]' />
@@ -207,39 +193,6 @@ function FlightCard(props: Props) {
                   <div>{'Fees: ' + displayDollarAmount(item.TotalTaxes)}</div>
                 </div>
               </div>
-              {/* <div className="w-auto border-slate-400 border text-sm h-auto p-2 rounded-md">
-                <div className="text-md flex justify-start space-x-0 items-center">
-                  <Plane strokeWidth={2} size={16} className="mr-[5px]" />
-                  {getCarrier(item.Carriers)}
-                </div>
-                <div className="text-md flex justify-start space-x-0 items-center mb-[20px]">
-                  <RockingChair
-                    strokeWidth={2}
-                    size={16}
-                    className="mr-[5px]"
-                  />
-                  {item.Cabin[0].toUpperCase() + item.Cabin.slice(1)}
-                </div>
-
-                <div className="text-sm font-normal">
-                  Direct Flight:{" "}
-                  {item.Stops === 0
-                    ? "Yes"
-                    : item.Stops >= 2
-                    ? "" + item.Stops + " stops"
-                    : "" + item.Stops + " stop"}
-                </div>
-                <div className="text-sm font-normal mb-[20px]">
-                  Remaining Seats: {item.RemainingSeats}
-                </div>
-                <div className="text-md font-normal flex justify-start items-center">
-                  <TbCoins className="mr-[5px]" />{" "}
-                  {item.MileageCost + " points"}
-                </div>
-                <div className="text-sm font-normal">
-                  Taxes & Fees: {displayDollarAmount(item.TotalTaxes)}
-                </div>
-              </div> */}
             </div>
           </div>
           <DialogFooter>
@@ -265,7 +218,7 @@ function FlightCard(props: Props) {
 
   return (
     <div
-      // @ts-expect-error
+      // @ts-expect-error drag and drop shit
       ref={props.isDraggable ? drag : null}
       style={{
         opacity: isDragging ? 0.5 : 1,
@@ -282,7 +235,7 @@ function FlightCard(props: Props) {
         {props.isSaved ? (
           <X
             onClick={() => {
-              props.handleRemove(props.item)
+              void props.handleRemove(props.item)
             }}
             className='absolute right-[0px] top-[0px] cursor-pointer rounded-full bg-[#ffffff] p-2 hover:bg-slate-200'
             size={32}
@@ -304,11 +257,8 @@ function FlightCard(props: Props) {
         </div>
         <div
           onClick={() => {
-            // if (props.x == false) {
-
             setModal(true)
             handleClick()
-            // }
           }}
           className='flex flex-col pt-0 text-sm font-light'
         >
@@ -318,19 +268,17 @@ function FlightCard(props: Props) {
               {getFlightNumbers(props.item)}
             </div>
           )}
-          {/* <p>{getFlightNumbers(props.item)}</p> */}
           <div className='flex items-center justify-start'>
             <PlaneTakeoff strokeWidth={2} size={16} className='mr-[5px]' />
             {`${new Date(props.item.DepartsAt).toLocaleString()}`}
           </div>
-          {/* <p>{`Arrives: ${new Date(props.item.ArrivesAt).toLocaleString()}`}</p> */}
           <div className='flex items-center justify-start'>
             <Map strokeWidth={2} size={16} className='mr-[5px]' />
             {`${getOriginAirport(props.item.AvailabilitySegments)} -> 
               ${getDestinationAirport(props.item.AvailabilitySegments)}
               `}
           </div>
-          {props.device == 'desktop' && !props.isSaved ? (
+          {props.device === 'desktop' && !props.isSaved ? (
             <div className='flex items-center justify-start'>
               <Clock strokeWidth={2} size={16} className='mr-[5px]' />
               {`${displayDuration(
@@ -340,13 +288,7 @@ function FlightCard(props: Props) {
           ) : (
             <></>
           )}
-
-          {/* {props.device == "desktop" && props.isSaved == false ? (
-            <p>{"Airline: " + props.item.Carriers}</p>
-          ) : (
-            <></>
-          )} */}
-          {props.device == 'desktop' && !props.isSaved ? (
+          {props.device === 'desktop' && !props.isSaved ? (
             <div className='flex items-center justify-start'>
               <Coins strokeWidth={2} size={16} className='mr-[5px]' />
               {props.item.MileageCost +
@@ -365,7 +307,7 @@ function FlightCard(props: Props) {
             <Button
               onClick={() => {
                 if (!props.isSaved && props.addToBoard !== undefined) {
-                  props.addToBoard(props.item)
+                  void props.addToBoard(props.item)
                 }
               }}
               className='z-4 mt-1 w-[100px] text-xs font-thin'

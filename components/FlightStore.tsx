@@ -4,7 +4,7 @@ import {
   type FlightOption,
   type FlightOptionWIndex,
 } from '@/lib/availability-types'
-import React, { useEffect, useState } from 'react'
+import React, { type ReactElement, useEffect, useState } from 'react'
 import {
   type User,
   useSupabaseClient,
@@ -28,13 +28,7 @@ interface Props {
 export const SORT_METHODS_LIST = ['PRICE', 'DURATION', 'STOPS'] as const
 export type SORT_METHODS = 'PRICE' | 'DURATION' | 'STOPS'
 
-// enum SORT_METHODS {
-//   PRICE = "PRICE",
-//   DURATION = "DURATION",
-//   STOPS = "STOPS",
-// };
-
-function FlightStore(props: Props) {
+function FlightStore(props: Props): ReactElement {
   const [board, setBoard] = useState<FlightOption[] | []>([])
   const sb = useSupabaseClient()
   const user: User | null = useUser()
@@ -45,12 +39,10 @@ function FlightStore(props: Props) {
 
   const [dragging, setDragging] = useState<boolean>(false)
 
-  const [noResults, setNoResults] = useState<boolean>(props.data.length == 0)
-
   const [showStore, setShowStore] = useState<boolean>(false)
 
   useEffect(() => {
-    async function getData() {
+    async function getData(): Promise<void> {
       if (user != null) {
         const { data } = await sb
           .from('saved_flights')
@@ -67,13 +59,13 @@ function FlightStore(props: Props) {
       }
     }
 
-    getData()
+    void getData()
   }, [])
 
-  const [{ isOver }, drop] = useDrop(() => ({
+  const [, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    drop: (item: any) => {
-      saveFlight(item)
+    drop: (item: FlightOption) => {
+      void saveFlight(item)
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -89,7 +81,7 @@ function FlightStore(props: Props) {
     idx,
   }))
 
-  const saveFlight = async (flight: FlightOption) => {
+  const saveFlight = async (flight: FlightOption): Promise<void> => {
     // Check if flight has already departed
     if (new Date(flight.DepartsAt).getTime() < new Date().getTime()) {
       toast.warning(
@@ -106,7 +98,7 @@ function FlightStore(props: Props) {
         user_id: user.id,
         departure: flight.DepartsAt,
       })
-      if (error) {
+      if (error != null) {
         console.error('Error saving flight', error)
       } else {
         toast('Saved flight to profile', {})
@@ -115,7 +107,7 @@ function FlightStore(props: Props) {
     }
   }
 
-  const deleteSavedFlight = async (flight: FlightOption) => {
+  const deleteSavedFlight = async (flight: FlightOption): Promise<void> => {
     setBoard((board) => board.filter((item) => item.ID !== flight.ID))
     if (user !== null) {
       await sb
@@ -147,7 +139,7 @@ function FlightStore(props: Props) {
 
   return (
     <div className='mb-10 flex flex-col overflow-x-hidden overscroll-contain'>
-      {props.device == 'desktop' ? (
+      {props.device === 'desktop' ? (
         <div className='relative'>
           <div
             onClick={() => {
@@ -175,7 +167,7 @@ function FlightStore(props: Props) {
       ) : (
         <></>
       )}
-      {props.device == 'desktop' && showStore ? (
+      {props.device === 'desktop' && showStore ? (
         <div
           id='store'
           className='z-10000 fixed left-0 top-0 h-[100vh] w-[22vw] animate-slide border-r-2 border-solid border-[#ee6c4d] bg-[#2c2c2c] p-4 transition-all'
@@ -205,7 +197,7 @@ function FlightStore(props: Props) {
                   isDraggable={props.device === 'desktop'}
                   addToBoard={saveFlight}
                   handleRemove={deleteSavedFlight}
-                  device={props.device == 'desktop' ? 'desktop' : 'mobile'}
+                  device={props.device === 'desktop' ? 'desktop' : 'mobile'}
                 />
               )
             })}
@@ -217,14 +209,8 @@ function FlightStore(props: Props) {
 
       {dragging ? (
         <FadeIn transitionDuration={100}>
-          {/* <div
-            ref={drop}
-            className="hover:bg-black/100 z-20 rounded-t-[60px] fixed h-[45vh] w-[100vw] top-[55vh] right-0 bg-black/75 flex justify-center items-center text-[#ee6c4d] font-bold text-2xl"
-          >
-            Drop flight here to save it for later!
-          </div> */}
           <Drawer open={dragging}>
-            {/* @ts-expect-error */}
+            {/* @ts-expect-error due to drawer things idk */}
             <DrawerContent ref={drop}>
               <div className='mx-auto flex h-[35vh] w-full max-w-sm items-center justify-center text-2xl font-bold text-[#ee6c4d]'>
                 <div className='flex items-center justify-center text-center'>
@@ -244,11 +230,11 @@ function FlightStore(props: Props) {
       )}
       <div className='mx-[10vw] mt-1 flex min-w-[300px] flex-row justify-between overflow-x-hidden overflow-y-hidden'>
         <p className='my-3 mr-4 overflow-x-hidden overflow-y-hidden text-center text-lg font-bold text-[#ee6c4d]'>
-          {props.data.length == 0
+          {props.data.length === 0
             ? 'No flight results for inputted options'
             : 'Flight results'}
         </p>
-        {props.data.length == 0 ? (
+        {props.data.length === 0 ? (
           <></>
         ) : (
           <FlightFilterPopover
@@ -262,7 +248,7 @@ function FlightStore(props: Props) {
 
       <div
         className={
-          props.device == 'desktop'
+          props.device === 'desktop'
             ? cardGridLaptopClasses
             : cardGridMobileClasses
         }
@@ -277,7 +263,7 @@ function FlightStore(props: Props) {
           }
         })
           .slice(0, numFlightsToReturn)
-          .map((flight) => {
+          .map((flight): ReactElement => {
             // Only show flights that are not already saved
             if (!board.some((savedFlight) => savedFlight.ID === flight.ID)) {
               return (
@@ -291,10 +277,11 @@ function FlightStore(props: Props) {
                   isSaved={false}
                   setCurrentlyDragging={setDragging}
                   isDraggable={props.device === 'desktop'}
-                  device={props.device == 'desktop' ? 'desktop' : 'mobile'}
+                  device={props.device === 'desktop' ? 'desktop' : 'mobile'}
                 />
               )
             }
+            return <></>
           })}
       </div>
       {FlightList.length > numFlightsToReturn && (
@@ -310,18 +297,18 @@ function FlightStore(props: Props) {
         </div>
       )}
       <div className='my-3 overflow-y-hidden text-center text-lg font-bold text-[#ee6c4d]'>
-        {props.data.length >= 0 && props.device == 'mobile'
+        {props.data.length >= 0 && props.device === 'mobile'
           ? 'Currently saved flights for this search'
           : ''}
       </div>
       <div
         className={
-          props.data.length == 0
+          props.data.length === 0
             ? 'hidden'
             : 'relative flex flex-row justify-center overflow-y-hidden'
         }
       >
-        {props.device == 'mobile' ? (
+        {props.device === 'mobile' ? (
           <div className={boardMobileClasses}>
             {board.map((flight) => {
               return (
@@ -334,7 +321,7 @@ function FlightStore(props: Props) {
                   isDraggable={props.device === 'desktop'}
                   addToBoard={saveFlight}
                   handleRemove={deleteSavedFlight}
-                  device={props.device == 'desktop' ? 'desktop' : 'mobile'}
+                  device={props.device === 'desktop' ? 'desktop' : 'mobile'}
                 />
               )
             })}

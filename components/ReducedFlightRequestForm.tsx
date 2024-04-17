@@ -1,16 +1,18 @@
 import { Button } from './ui/button'
 import { type RequestFormData } from './FlightRequestForm'
 
+import React, { type ReactElement } from 'react'
+
 interface Props {
   data: RequestFormData | undefined
   setExpanded: (expanded: boolean) => void
 }
 
-const cropISOString = (date: string) => {
+const cropISOString = (date: string): string => {
   return date.slice(0, 10)
 }
 
-export function ReducedFlightRequestForm(props: Props) {
+export function ReducedFlightRequestForm(props: Props): ReactElement {
   // implements a UI reduced form of the flight request, after the user already clicks through the main one
   // should now be on one line showing the input data, with a button to expand the form
   return (

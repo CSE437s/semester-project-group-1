@@ -4,18 +4,18 @@ import { type DataItem, type SeatsCachedSearchParams } from './types'
 import { type BasicFlightRequestStringified } from './route-types'
 import { useEffect, useState } from 'react'
 
-export function cn(...inputs: ClassValue[]) {
+export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 
-const getMinCost = (data: DataItem) => {
+const getMinCost = (data: DataItem): number => {
   const fields = ['J', 'W', 'Y', 'F']
   let minCost = Infinity
   fields.forEach((field) => {
     const availField = `${field}Available`
     const costField = `${field}MileageCost`
     if (
-      data[availField as keyof DataItem] &&
+      Boolean(data[availField as keyof DataItem]) &&
       data[costField as keyof DataItem] < minCost
     ) {
       minCost = data[costField as keyof DataItem]
@@ -26,7 +26,7 @@ const getMinCost = (data: DataItem) => {
 
 const validEmail = (email: string): boolean => {
   const regex =
-    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
   return regex.test(email)
 }
 
@@ -45,15 +45,15 @@ const basicFlightRequestToSeatsCachedSearchParams = (
   }
 }
 
-export const getIsMobile = () => {
+export const getIsMobile = (): boolean => {
   if (typeof window === 'undefined') return false
   return window.innerWidth < 640
 }
 
-const useIsMobile = (px_width: number) => {
+const useIsMobile = (pxWidth: number): boolean => {
   const [width, setWidth] = useState<number>(0)
   const [isMobile, setIsMobile] = useState(false)
-  function handleWindowSizeChange() {
+  function handleWindowSizeChange(): void {
     setWidth(window.innerWidth)
   }
 
@@ -67,8 +67,8 @@ const useIsMobile = (px_width: number) => {
   }, [width])
 
   useEffect(() => {
-    setIsMobile(width <= px_width)
-  }, [px_width, width])
+    setIsMobile(width <= pxWidth)
+  }, [pxWidth, width])
 
   if (isMobile === null) {
     return false

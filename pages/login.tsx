@@ -6,18 +6,17 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import React, { type ReactElement, useState } from 'react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { validEmail } from '@/lib/utils'
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 
-export default function Login() {
+export default function Login(): ReactElement {
   const supabaseClient = useSupabaseClient()
   const router = useRouter()
 
@@ -26,11 +25,11 @@ export default function Login() {
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setEmail(e.target.value)
   }
 
-  const handleCodeSubmit = async () => {
+  const handleCodeSubmit = async (): Promise<void> => {
     console.log(code)
     if (code === '' || code == null) {
       alert('Please enter a code.')
@@ -46,21 +45,21 @@ export default function Login() {
       type: 'email',
     })
 
-    if (error) {
+    if (error != null) {
       alert('Incorrect OTP. Please try again.') // TODO: make better
       setLoading(false)
       setSent(true)
       return
     }
     setLoading(false)
-    if (session) {
+    if (session != null) {
       setLoading(true)
       await supabaseClient.auth.setSession(session)
       await router.push('/')
     }
   }
 
-  const handleClick = async () => {
+  const handleClick = async (): Promise<void> => {
     try {
       if (email === '') {
         alert('Please enter an email.')
@@ -74,7 +73,7 @@ export default function Login() {
       const { error } = await supabaseClient.auth.signInWithOtp({
         email,
       })
-      if (error) {
+      if (error != null) {
         console.log(error.message)
         switch (error.message) {
           case 'Signups not allowed for otp':
@@ -84,6 +83,7 @@ export default function Login() {
             alert(
               'Email rate limit exceeded due to Supabase free tier limitations. Please try again later.'
             )
+            break
           case 'For security purposes, you can only request this once every 60 seconds':
             alert('60 second rate limit hit, please try again in a minute')
             break
@@ -98,7 +98,6 @@ export default function Login() {
       setLoading(false)
       setSent(true)
     } catch (e) {
-      // alert("There was an error. Please try again.") // TODO: make better
       setLoading(false)
     }
   }
@@ -108,12 +107,12 @@ export default function Login() {
       <div className='absolute -left-[12.5vw] top-0 z-0 min-h-[80vh] w-[125vw]  rounded-b-full bg-gradient-to-r from-[#3d5a80] to-blue-300'></div>
 
       <div className='z-10 mt-4 px-20 text-center text-4xl font-bold text-[#ee6c4d]'>
-        Travel you can't imagine
+        Travel you can&apos;t imagine
       </div>
       <div className='z-10 my-5 mt-4 w-[500px] px-20 text-center  text-xl text-white'>
         Find and save flights at your finger tips. Search with complicated
-        queries if you don't know where to go, or input dates and locations if
-        you know where you want to go. With TYCI, the possibilities are
+        queries if you don&apos;t know where to go, or input dates and locations
+        if you know where you want to go. With TYCI, the possibilities are
         limitless.
       </div>
       <div className='z-10 my-10 flex h-auto w-[350px] flex-col items-center justify-center space-y-6 overflow-x-hidden overflow-y-hidden rounded-lg border border-gray-200 bg-[#e0fbfc] p-4 py-8 shadow-lg dark:border-gray-700'>
@@ -137,21 +136,6 @@ export default function Login() {
                 <div className='flex flex-row'>
                   {sent ? (
                     <>
-                      {/* <Input
-                        id="code"
-                        placeholder={"123456"}
-                        required
-                        type="text"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                        onSubmit={handleCodeSubmit}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleCodeSubmit();
-                          }
-                        }}
-                      /> */}
-
                       <InputOTP
                         maxLength={6}
                         pattern={REGEXP_ONLY_DIGITS}
@@ -160,12 +144,14 @@ export default function Login() {
                         onChange={(e) => {
                           setCode(e)
                         }}
-                        onSubmit={(e) => {
-                          handleCodeSubmit()
+                        onSubmit={() => {
+                          void (async () => {
+                            await handleCodeSubmit()
+                          })
                         }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
-                            handleCodeSubmit()
+                            void handleCodeSubmit()
                           }
                         }}
                       >
@@ -180,12 +166,14 @@ export default function Login() {
                       </InputOTP>
                       <Button
                         className='mx-2'
-                        onClick={(e) => {
-                          handleCodeSubmit()
+                        onClick={() => {
+                          void (async () => {
+                            await handleCodeSubmit()
+                          })
                         }}
                         onKeyDown={(e: { key: string }) => {
                           if (e.key === 'Enter') {
-                            handleCodeSubmit()
+                            void handleCodeSubmit()
                           }
                         }}
                       >
@@ -201,19 +189,27 @@ export default function Login() {
                         type='email'
                         value={email}
                         onChange={handleChange}
-                        onSubmit={handleClick}
+                        onSubmit={() => {
+                          void (async () => {
+                            await handleClick()
+                          })
+                        }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
-                            handleClick()
+                            void handleClick()
                           }
                         }}
                       />
                       <Button
                         className='mx-2'
-                        onClick={handleClick}
+                        onClick={() => {
+                          void (async () => {
+                            await handleClick()
+                          })
+                        }}
                         onKeyDown={(e: { key: string }) => {
                           if (e.key === 'Enter') {
-                            handleClick()
+                            void handleClick()
                           }
                         }}
                       >

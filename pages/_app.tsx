@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import '../../../../../styles/globals.css'
 import {
   type Session,
@@ -6,8 +6,8 @@ import {
 } from '@supabase/auth-helpers-nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { type AppProps } from 'next/app'
-import Navbar from '@/components/Navbar'
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 function MyApp({
   Component,
   pageProps,
