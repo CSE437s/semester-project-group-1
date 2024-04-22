@@ -5,41 +5,43 @@ name: Run tests
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 'main'
   pull_request:
-    branches: [ "main" ]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup node
-      uses: actions/setup-node@v4
+      - uses: actions/checkout@v3
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v3.0.0
-      with:
-        run_install: true
-        version: 8.15.1
+      - name: Setup node
+        uses: actions/setup-node@v4
 
-    - run: pnpm run lint
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3.0.0
+        with:
+          run_install: true
+          version: 8.15.1
 
-  build: 
+      - run: pnpm run lint
+
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Setup node
-      uses: actions/setup-node@v4
+      - name: Setup node
+        uses: actions/setup-node@v4
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v3.0.0
-      with:
-        run_install: true
-        version: 8.15.1
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3.0.0
+        with:
+          run_install: true
+          version: 8.15.1
 
-    - run: pnpm run build
+      - run: pnpm run build
+        with:
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
