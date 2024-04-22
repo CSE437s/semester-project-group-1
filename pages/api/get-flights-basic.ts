@@ -1,5 +1,4 @@
 import {
-  BasicFlightRequest,
   type BasicFlightRequestStringified,
   type FlightResponseData,
 } from '@/lib/route-types'
@@ -12,9 +11,10 @@ import { SEAT_CLASS, type SeatsCachedSearchParams } from '@/lib/types'
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<FlightResponseData>
-) {
+): Promise<void> {
   const body = req.body as BasicFlightRequestStringified
   const data = basicFlightRequestToSeatsCachedSearchParams(body)
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const seatsAero = new SeatsAero(process.env.SEATS_API!)
   const searchParams: SeatsCachedSearchParams = {
     origin_airport: data.origin_airport,

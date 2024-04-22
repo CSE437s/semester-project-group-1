@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { type ReactElement, useState } from 'react'
 import {
   type User,
   useSupabaseClient,
@@ -6,36 +6,32 @@ import {
 } from '@supabase/auth-helpers-react'
 import { Button } from '@/components/ui/button'
 
-import { FlightRequestForm } from '@/components/FlightRequestForm'
-import { FlightResponseData } from '@/lib/route-types'
-import Navbar from '@/components/Navbar'
-import { getMinCost } from '@/lib/utils'
 import { useRouter } from 'next/router'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 
 export const dynamic = 'force-dynamic' // TODO: this was here for a reason, figure out why
 
-export default function Home() {
+export default function Home(): ReactElement {
   const sb = useSupabaseClient()
   const user: User | null = useUser()
   const router = useRouter()
   const [logOut, setLogOut] = useState(false)
 
-  const sendBack = async () => {
+  const sendBack = async (): Promise<void> => {
     await router.push('/login')
   }
 
   if (user == null) {
-    sendBack()
+    void sendBack()
   }
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     setLogOut(true)
     await router.push('/login')
     await sb.auth.signOut()
   }
 
-  const changePage = async (pageToChangeTo: string) => {
+  const changePage = async (pageToChangeTo: string): Promise<void> => {
     await router.push('/' + pageToChangeTo)
   }
 
@@ -45,8 +41,10 @@ export default function Home() {
         <div className='my-5 flex w-[30vw] flex-row items-center justify-between space-x-2.5 text-lg'>
           <Button
             className='rounded-full bg-black transition-all hover:bg-slate-400'
-            onClick={async () => {
-              await changePage('')
+            onClick={() => {
+              void (async () => {
+                await changePage('')
+              })
             }}
           >
             &#8592;
@@ -63,8 +61,10 @@ export default function Home() {
         </div>
         <div className='text-md my-5 flex w-[40vw] flex-row items-center justify-center'>
           <Button
-            onClick={async () => {
-              await handleLogout()
+            onClick={() => {
+              void (async () => {
+                await handleLogout()
+              })
             }}
           >
             Log out

@@ -9,6 +9,7 @@ import { DropdownMenuRadioGroupWithOptions } from './ui/DropdownMenuRadioGroup'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { type SORT_METHODS } from './FlightStore'
+import React, { type ReactElement } from 'react'
 
 interface Props {
   selectedSort: SORT_METHODS
@@ -17,7 +18,7 @@ interface Props {
   setResults: (value: number) => void
 }
 
-export function FlightFilterPopover(props: Props) {
+export function FlightFilterPopover(props: Props): ReactElement {
   return (
     <Popover>
       <PopoverTrigger asChild>

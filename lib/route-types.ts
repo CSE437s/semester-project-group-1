@@ -115,6 +115,7 @@ interface StoredFlightData {
   user_id: string
   availability_id: string
   flight_id: string
+  departure: string
 }
 
 interface StoredDataAvailabilityId {

@@ -1,5 +1,4 @@
 import {
-  FlightResponseData,
   type FlightsByIdsRequest,
   type TripResponseData,
 } from '@/lib/route-types'
@@ -10,8 +9,9 @@ import { SeatsAero } from '@/lib/server/AeroClient'
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<TripResponseData | Error>
-) {
+): Promise<void> {
   const body = req.body as FlightsByIdsRequest
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const seatsAero = new SeatsAero(process.env.SEATS_API!)
   try {
     const apiResponse = await seatsAero.get_trips(body.flightId)

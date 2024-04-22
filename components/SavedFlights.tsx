@@ -3,19 +3,21 @@ import {
   useSupabaseClient,
   useUser,
 } from '@supabase/auth-helpers-react'
-import { useEffect, useState } from 'react'
+import { type ReactElement, useEffect, useState } from 'react'
 
 import FlightCard from './FlightCard'
 import { type FlightOption } from '@/lib/availability-types'
-import { StoredFlightData } from '@/lib/route-types'
 import { grabAvailibilities } from '@/lib/requestHandler'
 import { toast } from 'sonner'
+import { type StoredFlightData } from '@/lib/route-types'
+
+import React from 'react'
 
 interface Props {
   device: string
 }
 
-export default function SavedFlights(props: Props) {
+export default function SavedFlights(props: Props): ReactElement {
   const sb = useSupabaseClient()
   const user: User | null = useUser()
   const [flights, setFlights] = useState<FlightOption[]>([])
@@ -25,9 +27,9 @@ export default function SavedFlights(props: Props) {
     // use grabAvailability to get the flight data for each flight id in flights
     // setFlights with the result
 
-    const fetchFlights = async () => {
+    const fetchFlights = async (): Promise<void> => {
       console.log('ping')
-      if (flights.length != 0) return
+      if (flights.length !== 0) return
 
       setLoading(true)
 
@@ -41,7 +43,7 @@ export default function SavedFlights(props: Props) {
         .select('availability_id, flight_id, departure')
         .eq('user_id', user.id)
 
-      if (error) {
+      if (error != null) {
         console.error('Error fetching saved flights', error)
         setLoading(false)
         return
@@ -52,13 +54,17 @@ export default function SavedFlights(props: Props) {
         return
       }
 
+      const flightData: Array<
+        Omit<StoredFlightData, 'id' | 'created_at' | 'user_id'>
+      > = data
+
       // Filter data to not include flights that have already departed
       const currentTime = new Date().getTime()
-      const filteredData = data.filter(
+      const filteredData = flightData.filter(
         (d) => new Date(d.departure).getTime() > currentTime
       )
 
-      const departedFlights = data.filter(
+      const departedFlights = flightData.filter(
         (d) => new Date(d.departure).getTime() <= currentTime
       )
 
@@ -71,7 +77,7 @@ export default function SavedFlights(props: Props) {
             'flight_id',
             departedFlights.map((d) => d.flight_id)
           )
-        if (error) {
+        if (error != null) {
           console.error('Error deleting departed flights', error)
         }
 
@@ -104,39 +110,39 @@ export default function SavedFlights(props: Props) {
       setLoading(false)
     }
 
-    fetchFlights()
+    void fetchFlights() // TODO: if the whole app breaks its maybe voiding this lol
   }, [])
 
-  const deleteSavedFlight = async (flight: FlightOption) => {
+  const deleteSavedFlight = async (flight: FlightOption): Promise<void> => {
     setFlights(flights.filter((f) => f.ID !== flight.ID))
     if (user !== null) {
       const { error } = await sb
         .from('saved_flights')
         .delete()
         .match({ flight_id: flight.ID, user_id: user.id })
-      if (error) {
+      if (error != null) {
         console.error('Error deleting saved flight', error)
       } else {
         let completed = false
         toast.success('Deleted flight from profile', {
           action: {
             label: 'Undo',
-            onClick: async () => {
-              console.log('click')
-              if (completed) return
-              completed = true
-              setFlights([...flights, flight])
-              const { error } = await sb.from('saved_flights').insert([
-                {
-                  user_id: user.id,
-                  flight_id: flight.ID,
-                  availability_id: flight.AvailabilityID,
-                },
-              ])
-              if (error) {
-                toast.error('Error saving flight: ' + error)
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            onClick: async (): Promise<void> => {
+              if (!completed) {
+                completed = true
+                setFlights([...flights, flight])
+                const { error } = await sb.from('saved_flights').insert([
+                  {
+                    user_id: user.id,
+                    flight_id: flight.ID,
+                    availability_id: flight.AvailabilityID,
+                  },
+                ])
+                if (error != null) {
+                  toast.error('Error saving flight: ' + error.message)
+                }
               }
-              console.log(flights.length)
             },
           },
         })
@@ -148,17 +154,17 @@ export default function SavedFlights(props: Props) {
     <div className='flex h-full w-full flex-col items-center justify-center'>
       <div className='flex max-w-[900px] flex-col flex-nowrap items-center justify-center lg:flex-row lg:flex-wrap'>
         {loading && <p>Loading...</p>}
-        {flights &&
-          flights.map((flight) => (
-            <FlightCard
-              key={flight.ID}
-              item={flight}
-              isSaved={true}
-              handleRemove={deleteSavedFlight}
-              device={props.device}
-              isDraggable={false}
-            />
-          ))}
+        {flights?.map((flight) => (
+          <FlightCard
+            key={flight.ID}
+            item={flight}
+            isSaved={true}
+            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+            handleRemove={deleteSavedFlight}
+            device={props.device}
+            isDraggable={false}
+          />
+        ))}
       </div>
     </div>
   )

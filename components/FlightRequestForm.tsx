@@ -17,8 +17,6 @@ import {
 } from '@/components/ui/form'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 
-import { BasicFlightRequest } from '@/lib/route-types'
-import { Button } from '@/components/ui/button'
 import { Calendar } from './ui/calendar'
 import { CalendarIcon } from 'lucide-react'
 import { type FlightOption } from '@/lib/availability-types'
@@ -28,9 +26,10 @@ import { cn } from '@/lib/utils'
 import { fetchFlights } from '@/lib/requestHandler'
 import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
-import { useState } from 'react'
+import React, { type ReactElement, useState } from 'react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Button } from './ui/button'
 
 const FormSchema = z.object({
   outboundAirportCode: z
@@ -63,11 +62,11 @@ interface Props {
   setExpanded: (expanded: boolean) => void
 }
 
-export function FlightRequestForm(props: Props) {
+export function FlightRequestForm(props: Props): ReactElement {
   // const [expanded, setExpanded] = useState(true);
   const { expanded, setExpanded } = props
   const [data, setData] = useState<RequestFormData>()
-  const handleClick = () => {
+  const handleClick = (): void => {
     props.reference.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
@@ -81,7 +80,7 @@ export function FlightRequestForm(props: Props) {
     },
   })
 
-  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+  const onSubmit = async (data: z.infer<typeof FormSchema>): Promise<void> => {
     props.setLoading(true)
     setData(data)
     const res: FlightOption[] = await fetchFlights(data)
@@ -103,7 +102,11 @@ export function FlightRequestForm(props: Props) {
           ) : (
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={() => {
+                  void (async () => {
+                    form.handleSubmit(onSubmit)
+                  })
+                }}
                 className='h-auto w-2/3 space-y-6'
               >
                 <div className='flex w-[35vw] flex-row items-center justify-between'>
@@ -122,10 +125,11 @@ export function FlightRequestForm(props: Props) {
                                   role='combobox'
                                   className={cn(
                                     'justify-between text-black',
-                                    !field.value && 'text-muted-foreground'
+                                    field.value.length === 0 &&
+                                      'text-muted-foreground'
                                   )}
                                 >
-                                  {field.value
+                                  {field.value.length > 0
                                     ? airports.find(
                                         (airport) =>
                                           `${airport.iata}` === field.value
@@ -190,10 +194,11 @@ export function FlightRequestForm(props: Props) {
                                   role='combobox'
                                   className={cn(
                                     'min-w-[400px] justify-between text-black',
-                                    !field.value && 'text-muted-foreground'
+                                    field.value.length === 0 &&
+                                      'text-muted-foreground'
                                   )}
                                 >
-                                  {field.value
+                                  {field.value.length > 0
                                     ? airports.find(
                                         (airport) =>
                                           `${airport.iata}` === field.value
@@ -260,15 +265,19 @@ export function FlightRequestForm(props: Props) {
                                 variant={'outline'}
                                 className={cn(
                                   'w-[175px] pl-3 text-left font-normal text-black',
-
+                                  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
                                   !field.value && 'text-muted-foreground'
                                 )}
                               >
-                                {field.value ? (
-                                  format(field.value, 'PPP')
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
+                                {
+                                  // @typescript-eslint/strict-boolean-expressions
+                                  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+                                  field.value ? (
+                                    format(field.value, 'PPP')
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )
+                                }
                                 <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                               </Button>
                             </FormControl>
@@ -303,15 +312,19 @@ export function FlightRequestForm(props: Props) {
                                 variant={'outline'}
                                 className={cn(
                                   'w-[175px] pl-3 text-left font-normal text-black',
-
+                                  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
                                   !field.value && 'text-muted-foreground'
                                 )}
                               >
-                                {field.value ? (
-                                  format(field.value, 'PPP')
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
+                                {
+                                  // @typescript-eslint/strict-boolean-expressions
+                                  // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+                                  field.value ? (
+                                    format(field.value, 'PPP')
+                                  ) : (
+                                    <span>Pick a date</span>
+                                  )
+                                }
                                 <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                               </Button>
                             </FormControl>
@@ -341,7 +354,7 @@ export function FlightRequestForm(props: Props) {
                   <Button className='bg-[#ee6c4d]' type='submit'>
                     Submit
                   </Button>
-                  {data && (
+                  {data != null && (
                     <Button
                       className='bg-white text-black hover:bg-white'
                       onClick={() => {

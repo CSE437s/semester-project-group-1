@@ -6,7 +6,7 @@ import OpenAI from 'openai'
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<CreateEmbeddingResponse | Error>
-) {
+): Promise<void> {
   const query = req.body.query as string
   const openai = new OpenAI()
   try {

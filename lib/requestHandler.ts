@@ -41,7 +41,7 @@ async function fetchFlights(data: BasicFlightRequest): Promise<FlightOption[]> {
   }
 }
 
-async function grabAvailability(flightId: string) {
+async function grabAvailability(flightId: string): Promise<FlightOption[]> {
   const response = await fetch('/api/get-availability', {
     method: 'POST',
     headers: {
@@ -63,7 +63,9 @@ async function grabAvailability(flightId: string) {
   return availability.data.filter((flight) => flight.RemainingSeats > 0) // && new Date(flight.DepartsAt) > new Date());
 }
 
-async function grabAvailibilities(flightIds: string[]) {
+async function grabAvailibilities(
+  flightIds: string[]
+): Promise<FlightOption[][]> {
   return await Promise.all(
     flightIds.map(async (id) => {
       return await grabAvailability(id)

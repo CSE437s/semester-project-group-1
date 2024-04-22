@@ -3,7 +3,6 @@ import {
   DropdownMenu,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -20,9 +19,8 @@ import {
   useSupabaseClient,
   useUser,
 } from '@supabase/auth-helpers-react'
-import { useEffect, useRef, useState } from 'react'
+import React, { type ReactElement, useRef, useState } from 'react'
 
-import { Button } from '@/components/ui/button'
 import { type CreateEmbeddingResponse } from 'openai/resources/index.mjs'
 import { DndProvider } from 'react-dnd'
 import { DropdownMenuContent } from '@radix-ui/react-dropdown-menu'
@@ -33,10 +31,8 @@ import { Input } from '@/components/ui/input'
 import { LogOut } from 'lucide-react'
 import { Progress } from '@/components/ui/progress'
 import SavedFlights from '@/components/SavedFlights'
-import { StoredFlightData } from '@/lib/route-types'
 import { Toaster } from 'sonner'
 import { fetchFlights } from '@/lib/requestHandler'
-import { set } from 'date-fns'
 import { useIsMobile } from '@/lib/utils'
 import { useRouter } from 'next/router'
 
@@ -48,7 +44,7 @@ type QueryLoadingStatus =
   | 'calling_supabase'
   | 'loading_flights'
 
-export default function Home() {
+export default function Home(): ReactElement {
   const sb = useSupabaseClient()
   const user: User | null = useUser()
   const router = useRouter()
@@ -67,7 +63,7 @@ export default function Home() {
 
   const [page, setPage] = useState('input')
 
-  const handleSetPage = (page: string) => {
+  const handleSetPage = (page: string): void => {
     setPage(page)
     setExpanded(true)
     setQueryExpanded(true)
@@ -78,7 +74,7 @@ export default function Home() {
 
   const ref = useRef<any>(null)
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     await sb.auth.signOut()
     await router.push('/login')
   }
@@ -89,7 +85,9 @@ export default function Home() {
     similarity: number
   }
 
-  const getQueryEmbedding = async (query: string) => {
+  const getQueryEmbedding = async (
+    query: string
+  ): Promise<CreateEmbeddingResponse> => {
     // fetch to 'get-embedding' endpoint
     const res = await fetch('/api/get-embedding', {
       method: 'POST',
@@ -104,7 +102,7 @@ export default function Home() {
   const statusToProgress = (
     status: QueryLoadingStatus,
     flightCallingStatus: number
-  ) => {
+  ): number => {
     switch (status) {
       case 'done':
         return 100
@@ -120,7 +118,7 @@ export default function Home() {
   const statusToMessage = (
     status: QueryLoadingStatus,
     flightCallingStatus: number
-  ) => {
+  ): string => {
     switch (status) {
       case 'done':
         return 'Done'
@@ -133,20 +131,20 @@ export default function Home() {
     }
   }
 
-  const trimEmbedding = (embedding: number[]) => {
+  const trimEmbedding = (embedding: number[]): number[] => {
     return embedding.slice(0, 512)
   }
 
-  const handleSubmitQuery = async () => {
+  const handleSubmitQuery = async (): Promise<void> => {
     setQueryLoading('calling_openai')
 
     const res: CreateEmbeddingResponse = await getQueryEmbedding(queryValue)
-    if (!res.data || res.data.length === 0) {
+    if (res.data.length === 0) {
       console.error('Error fetching embedding', res)
       setQueryLoading('done')
       return
     }
-    const embedding = trimEmbedding(res.data[0].embedding)
+    const embedding = trimEmbedding(res.data[0]?.embedding ?? [])
 
     setQueryLoading('calling_supabase')
 
@@ -184,7 +182,7 @@ export default function Home() {
       completedFetches: number,
       totalFetches: number,
       setFlightCallingStatus: (status: number) => void
-    ) {
+    ): void {
       const percentageComplete = Math.floor(
         (100 * completedFetches) / totalFetches
       )
@@ -218,7 +216,7 @@ export default function Home() {
     setQueryValue('')
   }
 
-  function renderInput() {
+  function renderInput(): ReactElement {
     return (
       <>
         {expanded && (
@@ -262,7 +260,7 @@ export default function Home() {
     )
   }
 
-  function renderQuery() {
+  function renderQuery(): ReactElement {
     return (
       <>
         {/* TODO make querys work */}
@@ -273,12 +271,12 @@ export default function Home() {
                 Write a query to search up flights
               </div>
               <div className='my-5 w-[400px] px-5 text-center font-normal text-[#fafafa]'>
-                If you don't know where to go, you can write any query to search
-                for flights. Our query uses an AI language model to translate
-                any valid request into a flight searching extravaganza. For the
-                moment, we have this set to assume you are leaving O'Hare in
-                Chicago mode -- it will search for flights from ORD to anywhere
-                in the US, for today.
+                If you don&apos;t know where to go, you can write any query to
+                search for flights. Our query uses an AI language model to
+                translate any valid request into a flight searching
+                extravaganza. For the moment, we have this set to assume you are
+                leaving O&apos;Hare in Chicago mode -- it will search for
+                flights from ORD to anywhere in the US, for today.
               </div>
             </>
           )}
@@ -295,7 +293,7 @@ export default function Home() {
             }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                handleSubmitQuery()
+                void handleSubmitQuery()
                 setQueryExpanded(false)
               }
             }}
@@ -329,7 +327,7 @@ export default function Home() {
     )
   }
 
-  function renderSaved() {
+  function renderSaved(): ReactElement {
     return (
       <>
         {/* TODO make api calls for all flights from db to get information with te flights in savedFlights */}
@@ -349,7 +347,7 @@ export default function Home() {
     )
   }
 
-  function renderDragCards(data: FlightOption[]) {
+  function renderDragCards(data: FlightOption[]): ReactElement {
     return (
       <DndProvider backend={HTML5Backend}>
         <div className='flex h-auto flex-row justify-center'>
@@ -359,7 +357,7 @@ export default function Home() {
     )
   }
 
-  function renderMobileCards(data: FlightOption[]) {
+  function renderMobileCards(data: FlightOption[]): ReactElement {
     return (
       <div>
         <DndProvider backend={HTML5Backend}>
@@ -380,7 +378,7 @@ export default function Home() {
           <NavigationMenuList>
             <NavigationMenuItem
               className={`cursor-pointer rounded-md p-2 transition-all hover:bg-slate-200 hover:text-black
-                ${page == 'input' ? 'text-[#ee6c4d]' : 'text-white'}
+                ${page === 'input' ? 'text-[#ee6c4d]' : 'text-white'}
                 `}
               onClick={() => {
                 handleSetPage('input')
@@ -390,7 +388,7 @@ export default function Home() {
             </NavigationMenuItem>
             <NavigationMenuItem
               className={`cursor-pointer rounded-md p-2 transition-all hover:bg-slate-200 hover:text-black
-              ${page == 'query' ? 'text-[#ee6c4d]' : 'text-white'}
+              ${page === 'query' ? 'text-[#ee6c4d]' : 'text-white'}
               `}
               onClick={() => {
                 handleSetPage('query')
@@ -400,7 +398,7 @@ export default function Home() {
             </NavigationMenuItem>
             <NavigationMenuItem
               className={`cursor-pointer rounded-md p-2 transition-all hover:bg-slate-200 hover:text-black
-              ${page == 'saved' ? 'text-[#ee6c4d]' : 'text-white'}
+              ${page === 'saved' ? 'text-[#ee6c4d]' : 'text-white'}
               `}
               onClick={() => {
                 handleSetPage('saved')
@@ -426,16 +424,22 @@ export default function Home() {
             >
               {user !== null ? user.email : ''}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem
+              onClick={() => {
+                void (async () => {
+                  await handleLogout()
+                })
+              }}
+            >
               <LogOut className='mr-2 h-4 w-4' />
               <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      {page == 'input'
+      {page === 'input'
         ? renderInput()
-        : page == 'query'
+        : page === 'query'
           ? renderQuery()
           : renderSaved()}
     </div>
