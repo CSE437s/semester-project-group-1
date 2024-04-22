@@ -43,5 +43,5 @@ jobs:
 
       - run: pnpm run build
         env:
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5pY3N3c2RuaGl4cWpzeGt4cmVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDYwNTM0NDAsImV4cCI6MjAyMTYyOTQ0MH0.PQNQZ0Vf9tASlVXCq1jR-X0wglZRv5vrXFG-FXf8tqM'
+          NEXT_PUBLIC_SUPABASE_URL: 'https://nicswsdnhixqjsxkxreg.supabase.co'
