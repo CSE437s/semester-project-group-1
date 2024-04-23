@@ -134,9 +134,9 @@ function FlightCard(props: Props): ReactElement {
       if (temp === undefined) {
         return
       }
-      airlineString += temp.airline
+      airlineString += temp.airline + ', '
     })
-    return airlineString
+    return airlineString.split(', ')[0] ?? ''
   }
 
   const displayModal = (
@@ -228,9 +228,6 @@ function FlightCard(props: Props): ReactElement {
     'ml-3 flex flex-row flex-wrap space-x-3 pt-0 text-sm font-light'
   const cardGridClass = 'flex flex-col pt-0 text-sm font-light'
 
-  const cardInBoardListClasses =
-    'z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg w-[700px] h-auto p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-row justify-center text-black font-thin text-xs overflow-x-none overflow-y-none'
-
   return (
     <div
       // @ts-expect-error drag and drop shit
@@ -251,9 +248,7 @@ function FlightCard(props: Props): ReactElement {
         ref={ref}
         className={
           props.isSaved
-            ? props.grid !== null && props.grid === false
-              ? cardInBoardListClasses
-              : cardInBoardClasses
+            ? cardInBoardClasses
             : props.grid !== null && props.grid === false
               ? cardInListClasses
               : cardInGridClasses
@@ -334,11 +329,9 @@ function FlightCard(props: Props): ReactElement {
             <></>
           )}
         </div>
-        {!props.isSaved && (
-          <div className=' text-center text-xs font-thin'>
-            Click for more flight details
-          </div>
-        )}
+        <div className=' text-center text-xs font-thin'>
+          Click for more flight details
+        </div>
         <div className='flex justify-center'>
           {!props.isSaved && props.device === 'mobile' && !props.isDraggable ? (
             <Button
