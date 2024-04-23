@@ -10,6 +10,6 @@
 
 ## Instructions/Link to access:
 
-https://437-group-proj-downstream.vercel.app/
+This site is hosted [here](https://437-group-proj-downstream.vercel.app/)
 
-User testing for the beta available at [USERTESTING2.md](USERTESTING2.md)
+User testing for the final release available at [USERTESTING3.md](USERTESTING3.md)
