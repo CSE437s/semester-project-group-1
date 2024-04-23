@@ -424,13 +424,8 @@ export default function Home(): ReactElement {
             >
               {user !== null ? user.email : ''}
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                void (async () => {
-                  await handleLogout()
-                })
-              }}
-            >
+            {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut className='mr-2 h-4 w-4' />
               <span>Log out</span>
             </DropdownMenuItem>
