@@ -81,13 +81,13 @@ export function FlightRequestForm(props: Props): ReactElement {
   })
 
   const onSubmit = async (data: z.infer<typeof FormSchema>): Promise<void> => {
-    event?.preventDefault()
+    // event?.preventDefault()
     props.setLoading(true)
-    setData(data)
     const res: FlightOption[] = await fetchFlights(data)
     props.setData(res)
     props.setLoading(false)
     setExpanded(false)
+    setData(data)
     handleClick()
     window.scrollTo({ top: 700, behavior: 'smooth' })
   }

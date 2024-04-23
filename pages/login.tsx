@@ -106,13 +106,6 @@ export default function Login(): ReactElement {
   return (
     <div className='relative flex min-h-screen flex-col items-center overflow-x-hidden overflow-y-hidden bg-white'>
       <div className='absolute -left-[12.5vw] top-0 z-0 min-h-[80vh] w-[125vw]  rounded-b-full bg-gradient-to-r from-[#3d5a80] to-blue-300'></div>
-
-      <div className='z-10 mt-4 px-20 text-center text-4xl font-bold text-[#ee6c4d]'>
-        Travel you can&apos;t imagine
-      </div>
-      <div className='z-10 my-5 mt-4 w-[500px] px-20 text-center  text-xl text-white'>
-        Find and save flights at your finger tips
-      </div>
       <div className='z-10 my-10 flex h-auto w-[350px] flex-col items-center justify-center space-y-6 overflow-x-hidden overflow-y-hidden rounded-lg border border-gray-200 bg-[#e0fbfc] p-4 py-8 shadow-lg dark:border-gray-700'>
         <div className='space-y-2 text-center'>
           <h1 className='text-3xl font-bold'>Log In</h1>
