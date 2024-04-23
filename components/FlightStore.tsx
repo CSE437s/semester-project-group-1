@@ -134,11 +134,11 @@ function FlightStore(props: Props): ReactElement {
     }, 1000)
   }, [notification])
 
-  const cardGridLaptopClasses =
-    'flex flex-row justify-center flex-wrap max-w-[850px] overflow-x-hidden'
+  // const cardGridLaptopClasses =
+  //   'flex flex-row justify-center flex-wrap max-w-[850px] overflow-x-hidden min-w-[300px]'
 
-  const cardListLaptopClasses =
-    'flex flex-col items-center flex-nowrap max-w-[850px] overflow-y-hidden'
+  // const cardListLaptopClasses =
+  //   'flex flex-col items-center flex-nowrap max-w-[850px] overflow-y-hidden min-w-[300px]'
   const cardGridMobileClasses = 'flex  items-center justify-center flex-col'
 
   const boardMobileClasses =
@@ -150,7 +150,7 @@ function FlightStore(props: Props): ReactElement {
     'animate-ping absolute top-[-10px] right-[-10px] flex p-2  w-[28px] h-[28px] justify-center items-center rounded-full bg-[#ee6c4d] text-[#2c2c2c]'
 
   return (
-    <div className='mb-10 flex flex-col overflow-x-hidden overscroll-contain'>
+    <div className='mb-10 flex flex-col items-center justify-center overflow-x-hidden overscroll-contain'>
       {props.device === 'desktop' ? (
         <div className='relative'>
           <div
@@ -240,7 +240,7 @@ function FlightStore(props: Props): ReactElement {
       ) : (
         <></>
       )}
-      <div className='mx-[10vw] mt-1 flex min-w-[300px] flex-row items-center justify-between overflow-x-hidden overflow-y-hidden'>
+      <div className='mx-[10vw] mt-1 flex min-w-[50vw] max-w-[50vw] flex-row items-center justify-between overflow-x-hidden overflow-y-hidden'>
         <p className='my-3 mr-4 overflow-x-hidden overflow-y-hidden text-center text-lg font-bold text-[#ee6c4d]'>
           {props.data.length === 0
             ? 'No flight results for inputted options'
@@ -256,7 +256,7 @@ function FlightStore(props: Props): ReactElement {
             setResults={setNumFlightsToReturn}
           />
         )}
-        <ToggleGroup variant='outline' type='single'>
+        <ToggleGroup variant='outline' type='single' defaultValue={'grid'}>
           <ToggleGroupItem
             value='grid'
             defaultChecked
@@ -279,11 +279,9 @@ function FlightStore(props: Props): ReactElement {
 
       <div
         className={
-          props.device === 'desktop' && !grid
-            ? cardListLaptopClasses
-            : props.device === 'desktop'
-              ? cardGridLaptopClasses
-              : cardGridMobileClasses
+          props.device === 'desktop'
+            ? `flex min-w-[50vw] max-w-[50vw] overflow-y-hidden ${grid ? 'flex-row flex-wrap justify-center' : 'flex-col flex-nowrap items-center'}`
+            : cardGridMobileClasses
         }
       >
         {FlightList.sort((a, b) => {

@@ -122,7 +122,7 @@ export function FlightRequestForm(props: Props): ReactElement {
                                   variant='outline'
                                   role='combobox'
                                   className={cn(
-                                    'justify-between text-black',
+                                    'min-w-[35vw] justify-between text-black',
                                     field.value.length === 0 &&
                                       'text-muted-foreground'
                                   )}
@@ -137,7 +137,7 @@ export function FlightRequestForm(props: Props): ReactElement {
                                 </Button>
                               </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className='max-w-400px] max-h-[300px] items-start overflow-y-scroll overscroll-contain p-0'>
+                            <PopoverContent className='max-h-[300px] max-w-[400px] items-start overflow-y-scroll overscroll-contain p-0'>
                               <Command>
                                 <CommandInput
                                   placeholder='Search airports...'
