@@ -1,4 +1,10 @@
-import { ArrowDownToLine, BookMarked, X } from 'lucide-react'
+import {
+  AlignJustify,
+  ArrowDownToLine,
+  BookMarked,
+  Grid2X2,
+  X,
+} from 'lucide-react'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import {
   type FlightOption,
@@ -19,6 +25,7 @@ import { FlightFilterPopover } from './FlightFilterPopover'
 import { ItemTypes } from './Constants'
 import { toast } from 'sonner'
 import { useDrop } from 'react-dnd'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 interface Props {
   data: FlightOption[]
@@ -40,6 +47,8 @@ function FlightStore(props: Props): ReactElement {
   const [dragging, setDragging] = useState<boolean>(false)
 
   const [showStore, setShowStore] = useState<boolean>(false)
+
+  const [grid, setGrid] = useState<boolean>(true)
 
   useEffect(() => {
     async function getData(): Promise<void> {
@@ -71,6 +80,7 @@ function FlightStore(props: Props): ReactElement {
       isOver: !!monitor.isOver(),
     }),
   }))
+  const [notification, setNotification] = useState<boolean>(false)
 
   useEffect(() => {
     setDragging(false)
@@ -118,15 +128,17 @@ function FlightStore(props: Props): ReactElement {
     }
   }
 
-  const [notification, setNotification] = useState<boolean>(false)
   useEffect(() => {
     setTimeout(() => {
       setNotification(false)
-    }, 750)
+    }, 1000)
   }, [notification])
 
   const cardGridLaptopClasses =
     'flex flex-row justify-center flex-wrap max-w-[850px] overflow-x-hidden'
+
+  const cardListLaptopClasses =
+    'flex flex-col items-center flex-nowrap max-w-[850px] overflow-y-hidden'
   const cardGridMobileClasses = 'flex  items-center justify-center flex-col'
 
   const boardMobileClasses =
@@ -228,7 +240,7 @@ function FlightStore(props: Props): ReactElement {
       ) : (
         <></>
       )}
-      <div className='mx-[10vw] mt-1 flex min-w-[300px] flex-row justify-between overflow-x-hidden overflow-y-hidden'>
+      <div className='mx-[10vw] mt-1 flex min-w-[300px] flex-row items-center justify-between overflow-x-hidden overflow-y-hidden'>
         <p className='my-3 mr-4 overflow-x-hidden overflow-y-hidden text-center text-lg font-bold text-[#ee6c4d]'>
           {props.data.length === 0
             ? 'No flight results for inputted options'
@@ -244,13 +256,34 @@ function FlightStore(props: Props): ReactElement {
             setResults={setNumFlightsToReturn}
           />
         )}
+        <ToggleGroup variant='outline' type='single'>
+          <ToggleGroupItem
+            value='grid'
+            defaultChecked
+            onClick={() => {
+              setGrid(true)
+            }}
+          >
+            <Grid2X2 size={20} />
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value='list'
+            onClick={() => {
+              setGrid(false)
+            }}
+          >
+            <AlignJustify size={20} />
+          </ToggleGroupItem>
+        </ToggleGroup>
       </div>
 
       <div
         className={
-          props.device === 'desktop'
-            ? cardGridLaptopClasses
-            : cardGridMobileClasses
+          props.device === 'desktop' && !grid
+            ? cardListLaptopClasses
+            : props.device === 'desktop'
+              ? cardGridLaptopClasses
+              : cardGridMobileClasses
         }
       >
         {FlightList.sort((a, b) => {
@@ -272,6 +305,7 @@ function FlightStore(props: Props): ReactElement {
                   description='description'
                   title='title'
                   item={flight}
+                  grid={grid}
                   handleRemove={deleteSavedFlight}
                   addToBoard={saveFlight}
                   isSaved={false}
