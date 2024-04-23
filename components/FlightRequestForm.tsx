@@ -102,11 +102,8 @@ export function FlightRequestForm(props: Props): ReactElement {
           ) : (
             <Form {...form}>
               <form
-                onSubmit={() => {
-                  void (async () => {
-                    form.handleSubmit(onSubmit)
-                  })
-                }}
+                // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                onSubmit={form.handleSubmit(onSubmit)}
                 className='h-auto w-2/3 space-y-6'
               >
                 <div className='flex w-[35vw] flex-row items-center justify-between'>

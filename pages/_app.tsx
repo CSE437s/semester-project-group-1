@@ -15,7 +15,6 @@ function MyApp({
   const [supabaseClient] = useState(() => {
     const URL = process.env.NEXT_PUBLIC_SUPABASE_URL
     const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    console.log('KEYS:', URL, ANON_KEY)
     return createPagesBrowserClient({
       supabaseUrl: URL,
       supabaseKey: ANON_KEY,
