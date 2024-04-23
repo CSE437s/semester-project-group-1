@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 /**
  * v0 by Vercel.
  * @see https://v0.dev/t/XNlTLb7
@@ -141,11 +142,7 @@ export default function Login(): ReactElement {
                         onChange={(e) => {
                           setCode(e)
                         }}
-                        onSubmit={() => {
-                          void (async () => {
-                            await handleCodeSubmit()
-                          })
-                        }}
+                        onSubmit={handleCodeSubmit}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             void handleCodeSubmit()
@@ -163,11 +160,7 @@ export default function Login(): ReactElement {
                       </InputOTP>
                       <Button
                         className='mx-2'
-                        onClick={() => {
-                          void (async () => {
-                            await handleCodeSubmit()
-                          })
-                        }}
+                        onClick={handleCodeSubmit}
                         onKeyDown={(e: { key: string }) => {
                           if (e.key === 'Enter') {
                             void handleCodeSubmit()
@@ -186,11 +179,7 @@ export default function Login(): ReactElement {
                         type='email'
                         value={email}
                         onChange={handleChange}
-                        onSubmit={() => {
-                          void (async () => {
-                            await handleClick()
-                          })
-                        }}
+                        onSubmit={handleClick}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') {
                             void handleClick()
@@ -199,11 +188,7 @@ export default function Login(): ReactElement {
                       />
                       <Button
                         className='mx-2'
-                        onClick={() => {
-                          void (async () => {
-                            await handleClick()
-                          })
-                        }}
+                        onClick={handleClick}
                         onKeyDown={(e: { key: string }) => {
                           if (e.key === 'Enter') {
                             void handleClick()
