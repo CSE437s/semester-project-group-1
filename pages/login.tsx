@@ -110,10 +110,7 @@ export default function Login(): ReactElement {
         Travel you can&apos;t imagine
       </div>
       <div className='z-10 my-5 mt-4 w-[500px] px-20 text-center  text-xl text-white'>
-        Find and save flights at your finger tips. Search with complicated
-        queries if you don&apos;t know where to go, or input dates and locations
-        if you know where you want to go. With TYCI, the possibilities are
-        limitless.
+        Find and save flights at your finger tips
       </div>
       <div className='z-10 my-10 flex h-auto w-[350px] flex-col items-center justify-center space-y-6 overflow-x-hidden overflow-y-hidden rounded-lg border border-gray-200 bg-[#e0fbfc] p-4 py-8 shadow-lg dark:border-gray-700'>
         <div className='space-y-2 text-center'>

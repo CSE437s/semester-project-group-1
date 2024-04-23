@@ -81,6 +81,7 @@ export function FlightRequestForm(props: Props): ReactElement {
   })
 
   const onSubmit = async (data: z.infer<typeof FormSchema>): Promise<void> => {
+    event?.preventDefault()
     props.setLoading(true)
     setData(data)
     const res: FlightOption[] = await fetchFlights(data)

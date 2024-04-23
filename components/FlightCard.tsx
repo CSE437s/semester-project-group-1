@@ -25,6 +25,7 @@ import {
   Octagon,
   PlaneIcon,
   PlaneTakeoff,
+  RockingChair,
   X,
 } from 'lucide-react'
 
@@ -35,6 +36,7 @@ interface Props {
   title?: string
   isSaved: boolean
   handleRemove: (flight: FlightOption) => Promise<void>
+  grid?: boolean
   isDraggable: boolean
   device: string
   addToBoard?: (flight: FlightOption) => Promise<void>
@@ -169,11 +171,15 @@ function FlightCard(props: Props): ReactElement {
                   <div>{getCarrier(item.Carriers)}</div>
                 </div>
               </div>
-              <div>
-                {item.Cabin.length > 0
-                  ? item.Cabin[0]?.toUpperCase() + item.Cabin.slice(1)
-                  : ''}
+              <div className='mb-2 flex flex-col items-center justify-center'>
+                <RockingChair size={30} strokeWidth={1} className='mb-[2px]' />
+                <div className='flex h-[100px] w-[150px] flex-col items-center justify-center rounded-md border border-slate-400 p-2 text-sm'>
+                  {item.Cabin.length > 0
+                    ? item.Cabin[0]?.toUpperCase() + item.Cabin.slice(1)
+                    : ''}
+                </div>
               </div>
+
               <div className='flex flex-col items-center justify-center'>
                 <Octagon size={30} strokeWidth={1} className='mb-[2px]' />
                 <div className='flex h-[100px] w-[150px] flex-col items-center justify-center rounded-md border border-slate-400 p-2 text-sm'>
@@ -211,10 +217,16 @@ function FlightCard(props: Props): ReactElement {
     )
   }
 
+  const cardInListClasses =
+    'z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg w-[700px] h-auto p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-row justify-center text-black font-thin text-xs overflow-x-none overflow-y-none'
   const cardInGridClasses =
     'z-0 relative bg-[#fafafa] drop-shadow-md hover:bg-slate-200 transition-all hover:rounded-tr-none hover:rounded-bl-none rounded-lg w-[220px] h-auto p-4 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black'
   const cardInBoardClasses =
     'z-0 relative bg-[#fafafa] overflow-y-hidden drop-shadow-md  transition-all  rounded-lg w-[250px] h-auto p-4 pt-8 mx-2 my-2 border border-solid border-[#ee6c4d] flex flex-col justify-start text-black'
+
+  const cardListClass =
+    'ml-3 flex flex-row flex-wrap space-x-3 pt-0 text-sm font-light'
+  const cardGridClass = 'flex flex-col pt-0 text-sm font-light'
 
   return (
     <div
@@ -229,8 +241,18 @@ function FlightCard(props: Props): ReactElement {
     >
       {showModal ? displayModal(props, setModal, props.item) : <></>}
       <div
+        onClick={() => {
+          setModal(true)
+          handleClick()
+        }}
         ref={ref}
-        className={props.isSaved ? cardInBoardClasses : cardInGridClasses}
+        className={
+          props.isSaved
+            ? cardInBoardClasses
+            : props.grid !== null && props.grid == false
+              ? cardInListClasses
+              : cardInGridClasses
+        }
       >
         {props.isSaved ? (
           <X
@@ -244,7 +266,7 @@ function FlightCard(props: Props): ReactElement {
         ) : (
           <></>
         )}
-        <div className='-mt-4 flex justify-center overflow-y-hidden p-0 text-sm'>
+        <div className='-mt-4 flex justify-center overflow-x-hidden overflow-y-hidden p-0 text-sm'>
           {props.isDraggable && !props.isSaved && (
             <Image
               className='rotate-90'
@@ -256,14 +278,14 @@ function FlightCard(props: Props): ReactElement {
           )}
         </div>
         <div
-          onClick={() => {
-            setModal(true)
-            handleClick()
-          }}
-          className='flex flex-col pt-0 text-sm font-light'
+          className={
+            props.grid !== null && props.grid == false
+              ? cardListClass
+              : cardGridClass
+          }
         >
           {props.isSaved && (
-            <div className='flex items-center justify-start'>
+            <div className='flex items-center justify-center'>
               <Hash strokeWidth={2} size={16} className='mr-[5px]' />
               {getFlightNumbers(props.item)}
             </div>
@@ -299,7 +321,7 @@ function FlightCard(props: Props): ReactElement {
             <></>
           )}
         </div>
-        <div className=' text-right text-xs font-thin'>
+        <div className=' text-center text-xs font-thin'>
           Click for more flight details
         </div>
         <div className='flex justify-center'>
