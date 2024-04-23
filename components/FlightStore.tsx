@@ -256,7 +256,7 @@ function FlightStore(props: Props): ReactElement {
             setResults={setNumFlightsToReturn}
           />
         )}
-        {props.device === 'desktop' ? (
+        {props.device === 'desktop' && props.data.length !== 0 ? (
           <ToggleGroup variant='outline' type='single' defaultValue={'grid'}>
             <ToggleGroupItem
               value='grid'
