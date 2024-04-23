@@ -35,6 +35,7 @@ import { Toaster } from 'sonner'
 import { fetchFlights } from '@/lib/requestHandler'
 import { useIsMobile } from '@/lib/utils'
 import { useRouter } from 'next/router'
+import type { QueryAsObject } from './api/get-query-json'
 
 export const dynamic = 'force-dynamic' // TODO: this was here for a reason, figure out why
 
@@ -43,6 +44,7 @@ type QueryLoadingStatus =
   | 'calling_openai'
   | 'calling_supabase'
   | 'loading_flights'
+  | 'processing_json'
 
 export default function Home(): ReactElement {
   const sb = useSupabaseClient()
@@ -99,6 +101,17 @@ export default function Home(): ReactElement {
     return await res.json()
   }
 
+  const getQueryAsJson = async (query: string): Promise<QueryAsObject> => {
+    const res = await fetch('/api/get-query-json', {
+      method: 'POST',
+      body: JSON.stringify({ query }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    return await res.json()
+  }
+
   const statusToProgress = (
     status: QueryLoadingStatus,
     flightCallingStatus: number
@@ -107,6 +120,8 @@ export default function Home(): ReactElement {
       case 'done':
         return 100
       case 'calling_openai':
+        return 30
+      case 'processing_json':
         return 20
       case 'calling_supabase':
         return 40
@@ -123,6 +138,8 @@ export default function Home(): ReactElement {
       case 'done':
         return 'Done'
       case 'calling_openai':
+        return 'Processing your query...'
+      case 'processing_json':
         return 'Preparing your query...'
       case 'calling_supabase':
         return 'In the oven...'
@@ -136,9 +153,25 @@ export default function Home(): ReactElement {
   }
 
   const handleSubmitQuery = async (): Promise<void> => {
+    setQueryLoading('processing_json')
+
+    const queryAsJson: QueryAsObject = await getQueryAsJson(queryValue)
+
     setQueryLoading('calling_openai')
 
-    const res: CreateEmbeddingResponse = await getQueryEmbedding(queryValue)
+    const flavorQuery = queryAsJson.destinationFlavorText
+    const departureAirport =
+      queryAsJson.departureAirport === '' ? 'ORD' : queryAsJson.departureAirport
+    const departureStartDate =
+      queryAsJson.departureStartDate === ''
+        ? new Date()
+        : new Date(queryAsJson.departureStartDate)
+    const departureEndDate: Date =
+      queryAsJson.departureEndDate === ''
+        ? new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7)
+        : new Date(queryAsJson.departureEndDate)
+
+    const res: CreateEmbeddingResponse = await getQueryEmbedding(flavorQuery)
     if (res.data.length === 0) {
       console.error('Error fetching embedding', res)
       setQueryLoading('done')
@@ -154,25 +187,20 @@ export default function Home(): ReactElement {
       match_count: 10, // Choose the number of matches
     })) as { data: EmbeddingSearchResponse[] }
 
-    console.log(documents)
+    // console.log(documents)
 
-    // fetch flights for the top 3 matches
-    const TOP = 7
+    // fetch flights for the top 5 matches
+    const TOP = 5
     const fetchData: RequestFormData[] = documents.slice(0, TOP).map((doc) => {
-      const today1am = new Date()
-      today1am.setDate(today1am.getDate() + 1)
-      const tomorrow11pm = new Date()
-      tomorrow11pm.setDate(tomorrow11pm.getDate() + 2)
-      today1am.setHours(0, 0, 0, 0)
-      tomorrow11pm.setHours(23, 59, 59, 999)
-
       return {
-        outboundAirportCode: 'ORD',
+        outboundAirportCode: departureAirport,
         inboundAirportCode: doc.iata,
-        beginRangeSearch: today1am,
-        endRangeSearch: tomorrow11pm,
+        beginRangeSearch: departureStartDate,
+        endRangeSearch: departureEndDate,
       }
     })
+
+    console.log(fetchData)
 
     setQueryLoading('loading_flights')
 
@@ -200,7 +228,8 @@ export default function Home(): ReactElement {
             numFlightsToFetch,
             setFlightCallingStatus
           )
-          return result
+
+          return result.slice(0, 5)
         })
     )
 
@@ -270,14 +299,14 @@ export default function Home(): ReactElement {
               <div className='my-5 w-[400px] px-5 text-center text-2xl font-bold text-[#fafafa]'>
                 Write a query to search up flights
               </div>
-              <div className='my-5 w-[400px] px-5 text-center font-normal text-[#fafafa]'>
+              {/* <div className='my-5 w-[400px] px-5 text-center font-normal text-[#fafafa]'>
                 If you don&apos;t know where to go, you can write any query to
                 search for flights. Our query uses an AI language model to
                 translate any valid request into a flight searching
                 extravaganza. For the moment, we have this set to assume you are
                 leaving O&apos;Hare in Chicago mode -- it will search for
                 flights from ORD to anywhere in the US, for today.
-              </div>
+              </div> */}
             </>
           )}
           <Input
