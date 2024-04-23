@@ -302,6 +302,14 @@ function FlightCard(props: Props): ReactElement {
           </div>
           {props.device === 'desktop' && !props.isSaved ? (
             <div className='flex items-center justify-start'>
+              <PlaneIcon strokeWidth={2} size={16} className='mr-[5px]' />
+              {getCarrier(props.item.Carriers)}
+            </div>
+          ) : (
+            <></>
+          )}
+          {props.device === 'desktop' && !props.isSaved ? (
+            <div className='flex items-center justify-start'>
               <Clock strokeWidth={2} size={16} className='mr-[5px]' />
               {`${displayDuration(
                 getFlightDuration(props.item.AvailabilitySegments)

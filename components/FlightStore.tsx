@@ -256,25 +256,29 @@ function FlightStore(props: Props): ReactElement {
             setResults={setNumFlightsToReturn}
           />
         )}
-        <ToggleGroup variant='outline' type='single' defaultValue={'grid'}>
-          <ToggleGroupItem
-            value='grid'
-            defaultChecked
-            onClick={() => {
-              setGrid(true)
-            }}
-          >
-            <Grid2X2 size={20} />
-          </ToggleGroupItem>
-          <ToggleGroupItem
-            value='list'
-            onClick={() => {
-              setGrid(false)
-            }}
-          >
-            <AlignJustify size={20} />
-          </ToggleGroupItem>
-        </ToggleGroup>
+        {props.device === 'desktop' ? (
+          <ToggleGroup variant='outline' type='single' defaultValue={'grid'}>
+            <ToggleGroupItem
+              value='grid'
+              defaultChecked
+              onClick={() => {
+                setGrid(true)
+              }}
+            >
+              <Grid2X2 size={20} />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value='list'
+              onClick={() => {
+                setGrid(false)
+              }}
+            >
+              <AlignJustify size={20} />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        ) : (
+          <></>
+        )}
       </div>
 
       <div
