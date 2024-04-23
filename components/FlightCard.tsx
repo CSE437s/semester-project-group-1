@@ -249,7 +249,7 @@ function FlightCard(props: Props): ReactElement {
         className={
           props.isSaved
             ? cardInBoardClasses
-            : props.grid !== null && props.grid == false
+            : props.grid !== null && props.grid === false
               ? cardInListClasses
               : cardInGridClasses
         }
@@ -279,7 +279,7 @@ function FlightCard(props: Props): ReactElement {
         </div>
         <div
           className={
-            props.grid !== null && props.grid == false
+            props.grid !== null && props.grid === false
               ? cardListClass
               : cardGridClass
           }

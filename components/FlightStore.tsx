@@ -260,11 +260,18 @@ function FlightStore(props: Props): ReactElement {
           <ToggleGroupItem
             value='grid'
             defaultChecked
-            onClick={() => setGrid(true)}
+            onClick={() => {
+              setGrid(true)
+            }}
           >
             <Grid2X2 size={20} />
           </ToggleGroupItem>
-          <ToggleGroupItem value='list' onClick={() => setGrid(false)}>
+          <ToggleGroupItem
+            value='list'
+            onClick={() => {
+              setGrid(false)
+            }}
+          >
             <AlignJustify size={20} />
           </ToggleGroupItem>
         </ToggleGroup>
