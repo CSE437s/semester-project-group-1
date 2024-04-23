@@ -4,12 +4,13 @@ import {
   useUser,
 } from '@supabase/auth-helpers-react'
 import { type ReactElement, useEffect, useState } from 'react'
-
+import { AlignJustify, Grid2X2 } from 'lucide-react'
 import FlightCard from './FlightCard'
 import { type FlightOption } from '@/lib/availability-types'
 import { grabAvailibilities } from '@/lib/requestHandler'
 import { toast } from 'sonner'
 import { type StoredFlightData } from '@/lib/route-types'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 
 import React from 'react'
 
@@ -150,15 +151,54 @@ export default function SavedFlights(props: Props): ReactElement {
     }
   }
 
+  const [grid, setGrid] = useState<boolean>(true)
+  const cardGridLaptopClasses =
+    'flex flex-row justify-center flex-wrap max-w-[850px] overflow-x-hidden'
+  const cardListLaptopClasses =
+    'flex flex-col items-center flex-nowrap max-w-[850px] overflow-y-hidden'
+  const cardGridMobileClasses = 'flex  items-center justify-center flex-col'
+
   return (
-    <div className='flex h-full w-full flex-col items-center justify-center'>
-      <div className='flex max-w-[900px] flex-col flex-nowrap items-center justify-center lg:flex-row lg:flex-wrap'>
+    <div className='flex h-full w-[80%] flex-col items-center justify-center'>
+      {props.device === 'desktop' ? (
+        <ToggleGroup variant='outline' type='single' defaultValue={'grid'}>
+          <ToggleGroupItem
+            value='grid'
+            defaultChecked
+            onClick={() => {
+              setGrid(true)
+            }}
+          >
+            <Grid2X2 size={20} />
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value='list'
+            onClick={() => {
+              setGrid(false)
+            }}
+          >
+            <AlignJustify size={20} />
+          </ToggleGroupItem>
+        </ToggleGroup>
+      ) : (
+        <></>
+      )}
+      <div
+        className={
+          props.device === 'desktop' && !grid
+            ? cardListLaptopClasses
+            : props.device === 'desktop'
+              ? cardGridLaptopClasses
+              : cardGridMobileClasses
+        }
+      >
         {loading && <p>Loading...</p>}
         {flights?.map((flight) => (
           <FlightCard
             key={flight.ID}
             item={flight}
             isSaved={true}
+            grid={grid}
             // eslint-disable-next-line @typescript-eslint/no-misused-promises
             handleRemove={deleteSavedFlight}
             device={props.device}
