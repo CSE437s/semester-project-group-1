@@ -164,7 +164,7 @@ export default function Home(): ReactElement {
       queryAsJson.departureAirport === '' ? 'ORD' : queryAsJson.departureAirport
     const departureStartDate =
       queryAsJson.departureStartDate === ''
-        ? new Date()
+        ? new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 1)
         : new Date(queryAsJson.departureStartDate)
     const departureEndDate: Date =
       queryAsJson.departureEndDate === ''
